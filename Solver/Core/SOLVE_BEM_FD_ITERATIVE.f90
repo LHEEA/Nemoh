@@ -160,7 +160,8 @@ DO 2000 ISYM=1,NJJ
 	ZIGS=(0.,0.)
 	DO 2255 I=1,IMX
 	  IF(NSYMY .EQ. 0)THEN
-	    ZIGB(I)=2.0*ZOL(I,1)
+	    ZIGB(I)=ZOL(I,1)    ! Factor 2 is removed in comparison with previous version of Aquaplus because
+	                        ! Normal velocity is halved in Aquaplus (because of symmetry)
 	    ZIGS(I)=0.0
 	  ELSE
 	  ZIGB(I)=(ZOL(I,1)+ZOL(I,2))
