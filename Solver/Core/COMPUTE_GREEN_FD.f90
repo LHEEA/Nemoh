@@ -1300,6 +1300,10 @@ MODULE COMPUTE_GREEN_FD
       REAL:: H,HH,A,A1,AA,B,BB,B1,C1,CA,CB,CC,CD,DQ1,DQ2,EPS,EPS1                                                     
       REAL:: Q1,Q2,QQ1,QQ2,QQQ1,QQQ2  
       
+!--------- Value non initialized in previous versions ?!
+      H=0.
+      HH=0.
+!---------      
       IER=0                                                                     
       J=IC+1                                                                    
     1 J=J-1                                                                     

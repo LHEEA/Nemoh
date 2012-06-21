@@ -39,6 +39,7 @@ CONTAINS
 !       Define period
         T=Period
         W=2.*PI/T
+        kwave=w*w/g
 !       Select calculation in function of water depth
         IF ((Depth.EQ.0.).OR.(kwave*Depth.GE.20)) THEN
 !           Calculate wave number
@@ -85,6 +86,8 @@ CONTAINS
             ETA(j)=II*W/G*PHI(j)
         END DO
         CALL WRITE_FS(ID,MeshFS,ETA)
+!        WRITE(*,*) 'Copy FS'
+!        READ(*,*)
 !       Save output
         IF (Sav_Potential.EQ.1) THEN
             CALL WRITE_POTENTIAL(ID,NVEL)
