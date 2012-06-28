@@ -210,7 +210,7 @@
 !
 !   --- Save FK forces ----------------------------------------------------------------------------------------
 !
-    OPEN(10,FILE=ID%ID(1:ID%lID)//'/results/FKforce.tec')
+    OPEN(10,FILE=ID%ID(1:ID%lID)//'/results/FKForce.tec')
     WRITE(10,'(A)') 'VARIABLES="w (rad/s)"'
     DO k=1,Nintegration
         WRITE(10,'(A,I4,I4,A,I4,I4,A)') '"abs(F',IntCase(k)%Body,IntCase(k)%Icase,')" "angle(F',IntCase(k)%Body,IntCase(k)%Icase,')"'

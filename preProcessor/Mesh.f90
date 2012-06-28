@@ -89,7 +89,7 @@
 !       Initialize the mesh structure
         Npoints=0
         Npanels=0
-        OPEN(10,FILE=ID%ID(1:ID%lID)//'\aquaplus.cal')
+        OPEN(10,FILE=ID%ID(1:ID%lID)//'/aquaplus.cal')
         READ(10,*)
         READ(10,*)
         READ(10,*)
@@ -122,7 +122,7 @@
 !       Read surfacic mesh
         Npanels=0
         Npoints=0
-        OPEN(10,FILE=ID%ID(1:ID%lID)//'\aquaplus.cal')
+        OPEN(10,FILE=ID%ID(1:ID%lID)//'/aquaplus.cal')
         READ(10,*)
         READ(10,*)
         READ(10,*)
@@ -200,8 +200,8 @@
             END DO
         END DO
 !       Export mesh
-        INQUIRE (DIRECTORY=ID%ID(1:ID%lID)//'\mesh', EXIST=ex) 
-        IF (.NOT.ex) M=SYSTEM('mkdir '//ID%ID(1:ID%lID)//'\mesh')
+        INQUIRE (DIRECTORY=ID%ID(1:ID%lID)//'/mesh', EXIST=ex) 
+        IF (.NOT.ex) M=SYSTEM('mkdir '//ID%ID(1:ID%lID)//'/mesh')
         OPEN(10,FILE=ID%ID(1:ID%lID)//'/Mesh/L12.dat')
         WRITE(10,'(I3,X,I3)') 2,Mesh%Isym
         DO i=1,Mesh%Npoints
@@ -231,8 +231,8 @@
 		    WRITE(10,'(7(2X,E14.7))') (Mesh%XM(j,i),j=1,3),(Mesh%N(j,i),j=1,3),Mesh%A(i) 
 	    END DO
 	    CLOSE(10)
-	    INQUIRE (DIRECTORY=ID%ID(1:ID%lID)//'\results', EXIST=ex)
-	    IF (.NOT.ex) M=SYSTEM('mkdir '//ID%ID(1:ID%lID)//'\results')	    
+	    INQUIRE (DIRECTORY=ID%ID(1:ID%lID)//'/results', EXIST=ex)
+	    IF (.NOT.ex) M=SYSTEM('mkdir '//ID%ID(1:ID%lID)//'/results')	    
         END SUBROUTINE ReadTMesh
 !       --- 
         SUBROUTINE DeleteTMesh(Mesh)

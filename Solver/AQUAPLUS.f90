@@ -95,13 +95,13 @@
 !   Initialise Kochin function calculation
     OPEN(10,FILE=ID%ID(1:ID%lID)//'/Kochin.dat')
     READ(10,*) Ntheta 
-    IF (Ntheta.GT.0) THEN
-        ALLOCATE(Theta(Ntheta))
+    ALLOCATE(Theta(Ntheta))
+    IF (Ntheta.GT.0) THEN        
         DO j=1,Ntheta
             READ(10,*) Theta(j)
-        END DO
-        ALLOCATE(HKochin(NTheta))
+        END DO        
     END IF
+    ALLOCATE(HKochin(NTheta))
     CLOSE(10)
 !   Initialise free surface calculation points
     OPEN(10,FILE=ID%ID(1:ID%lID)//'/FS.dat')
@@ -283,7 +283,7 @@
     DEALLOCATE(NVEL,PRESSURE,RadCase,IntCase,Period,FNDS,ExcitationForce,AFKForce,PFKForce)    
     CALL DeleteTResults(RadiationResults)
     CALL DeleteTResults(DiffractionResults)
-    IF (Ntheta.GT.0) DEALLOCATE(Theta,HKochin)
+    DEALLOCATE(Theta,HKochin)
     IF (MeshFS%Npoints.GT.0) CALL DeleteTMeshFS(MeshFS)
     CALL DEALLOCATE_DATA
 !

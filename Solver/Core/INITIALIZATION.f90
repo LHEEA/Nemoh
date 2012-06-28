@@ -32,9 +32,9 @@ CONTAINS
     READ(10,*) MAXIT
     READ(10,*) Sav_potential
     CLOSE(10)
-    MESHFILE=ID%ID(1:ID%lID)//'/mesh/L12.dat'
+    MESHFILE=ID%ID(1:ID%lID)//'/Mesh/L12.dat'
     LFILE=ID%lID+13
-    OPEN(10,FILE=ID%ID(1:ID%lID)//'/mesh/L10.dat')
+    OPEN(10,FILE=ID%ID(1:ID%lID)//'/Mesh/L10.dat')
     READ(10,*)
     READ(10,*) NSYMY,NP,NFA
     CLOSE(10)
