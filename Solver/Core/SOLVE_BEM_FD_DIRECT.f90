@@ -106,34 +106,6 @@ MODULE SOLVE_BEM_FD_DIRECT
 	  ENDIF
       1 CONTINUE
 
-!        IF(.not. RHS) then
-!	AKAD=G*AM0/W
-!	BETA=0.0
-!	CB=COS(BETA)
-!	SB=SIN(BETA)
-!	DO 403 I=1,IMX
-!	  CR=SIH(AM0,ZG(I),Depth)*AKAD
-!	  CP=CIH(AM0,ZG(I),Depth)*AKAD
-!	  COEFB=AM0*((XG(I)-XEFF)*CB+(YG(I)-YEFF)*SB)
-!	  SD1B=CR*ZN(I)*COS(COEFB)-(XN(I)*CB+YN(I)*SB)*CP*SIN(COEFB)
-!	  SD2B=CR*ZN(I)*SIN(COEFB)+(XN(I)*CB+YN(I)*SB)*CP*COS(COEFB)
-!	    IF(NSYMY.EQ.1)THEN
-!	      COEFS=AM0*((XG(I)-XEFF)*CB-(YG(I)-YEFF)*SB)
-!	      SD1S=CR*ZN(I)*COS(COEFS)-(XN(I)*CB-YN(I)*SB)*CP*SIN(COEFS)
-!	      SD2S=CR*ZN(I)*SIN(COEFS)+(XN(I)*CB-YN(I)*SB)*CP*COS(COEFS)
-!	    ELSE
-!	      SD1S=0.
-!	      SD2S=0.
-!	    ENDIF
-!	    IF(ZG(I).LT.ZER)THEN
-!	      ZIJ(I,IMX+1)=CMPLX(SD1B+BX*SD1S,SD2B+BX*SD2S)*0.5
-!	    ELSE
-!	      ZIJ(I,IMX+1)=(0.,0.)
-!	    ENDIF            
-!     403 CONTINUE
-!        ENDIF
-
-!        IF(RHS)THEN  !RHS for prescribed NormalVelocity
 	  DO I=1,IMX
 	    IF (NSYMY.EQ.1) THEN
 	      ZIJ(I,IMX+1)=(NVEL(I)+BX*NVEL(I+NFA))*0.5
@@ -141,8 +113,6 @@ MODULE SOLVE_BEM_FD_DIRECT
 	      ZIJ(I,IMX+1)=NVEL(I)
 	    END IF
 	  ENDDO
-!        ENDIF
-
 
 !------------------------------------------------!
         CALL GAUSSZ(ZIJ,NFA,IMX,IMX+1)

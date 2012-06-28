@@ -26,7 +26,7 @@ MODULE COMPUTE_GREEN_INFD
       DPI=2.*PI                                                                 
       QPI=4.*PI
       NJJ=2*(NSYMY+1)                                                           
-      DH=2*Depth
+      DH=0.
       MK=(-1)**(KKK+1)
       IF(KKK.EQ.1)IMXX=IMX
       IF(KKK.EQ.2)IMXX=IXX
