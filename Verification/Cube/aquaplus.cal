@@ -14,9 +14,19 @@
 Cube\Maillages\L12.dat		! Name of mesh file
 384	294			! Number of points and number of panels 	
 6				! Number of degrees of freedom
-1 2 3 4 5 6			! Degrees of freedom ( 1. Surge / 2. Sway / 3. Heave / 4. Roll / 5. Pitch / 6. Yaw / 7. User defined)
+1 1. 0.	0. 0. 0. 0.		! Surge
+1 0. 1.	0. 0. 0. 0.		! Sway
+1 0. 0. 1. 0. 0. 0.		! Heave
+2 1. 0. 0. 0. 0. -2.5		! Roll about CdG
+2 0. 1. 0. 0. 0. -2.5		! Pitch about CdG
+2 0. 0. 1. 0. 0. -2.5		! Yaw about CdG
 6				! Number of resulting generalised forces
-1 2 3 4 5 6			! Generalised forces ( 1. x-force / 2. y-force / 3. z-force / 4. x-moment force / 5. y-moment force / 6. z-moment force / 7. User defined)
+1 1. 0.	0. 0. 0. 0.		! Force in x direction
+1 0. 1.	0. 0. 0. 0.		! Force in y direction
+1 0. 0. 1. 0. 0. 0.		! Force in z direction
+2 1. 0. 0. 0. 0. -2.5		! Moment force in x direction about CdG
+2 0. 1. 0. 0. 0. -2.5		! Moment force in y direction about CdG
+2 0. 0. 1. 0. 0. -2.5		! Moment force in z direction about CdG
 0				! Number of lines of additional information 
 --- Frequencies of interest -------------------------------------------------------------------------------------------------------
 40	0.05	2.		! Number of frequencies, Min, and Max (rad/s)

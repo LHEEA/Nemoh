@@ -108,10 +108,14 @@
             READ(10,*) M,N
             Npoints=Npoints+M
             Npanels=Npanels+N
-            READ(10,*)
-            READ(10,*)
-            READ(10,*)
-            READ(10,*)
+            READ(10,*) N
+            DO i=1,N
+                READ(10,*)
+            END DO
+            READ(10,*) N
+            DO i=1,N
+                READ(10,*)
+            END DO
             READ(10,*) N
             DO i=1,N
                 READ(10,*)
@@ -169,10 +173,14 @@
             Npoints=Npoints+M
             Npanels=Npanels+N
             mesh%LastPanel(c)=Npanels
-            READ(10,*)
-            READ(10,*)
-            READ(10,*)
-            READ(10,*)
+            READ(10,*) N
+            DO i=1,N
+                READ(10,*)
+            END DO
+            READ(10,*) N
+            DO i=1,N
+                READ(10,*)
+            END DO
             READ(10,*) N
             DO i=1,N
                 READ(10,*)

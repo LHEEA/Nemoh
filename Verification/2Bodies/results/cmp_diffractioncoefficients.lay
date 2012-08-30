@@ -1,7 +1,7 @@
 #!MC 1200
 # Created by Tecplot 360 build 12.2.0.9077
 $!VarSet |LFDSFN1| = '"ExcitationForce.tec" "..\resultat\Fex.tec"'
-$!VarSet |LFDSVL1| = '"w (rad/s)" "A   1   1" "B   1   1" "A   1   2" "B   1   2" "A   1   3" "B   1   3" "A   1   4" "B   1   4" "A   1   5" "B   1   5" "A   1   6" "B   1   6" "w" "CA" "CM" "CMinf" "abs(F   1   1)" "angle(F   1   1)" "abs(F   1   2)" "angle(F   1   2)" "abs(F   1   3)" "angle(F   1   3)" "abs(F   1   4)" "angle(F   1   4)" "abs(F   1   5)" "angle(F   1   5)" "abs(F   1   6)" "angle(F   1   6)" "Periode" "Fx_ 1" "Fy_ 1" "Fz_ 1" "Cx_ 1" "Cy_ 1" "Cz_ 1" "AFx_ 1" "AFy_ 1" "AFz_ 1" "ACx_ 1" "ACy_ 1" "ACz_ 1" "abs(F   2   1)" "angle(F   2   1)" "abs(F   2   2)" "angle(F   2   2)" "abs(F   2   3)" "angle(F   2   3)" "abs(F   2   4)" "angle(F   2   4)" "abs(F   2   5)" "angle(F   2   5)" "abs(F   2   6)" "angle(F   2   6)" "Fx_ 2" "Fy_ 2" "Fz_ 2" "Cx_ 2" "Cy_ 2" "Cz_ 2" "AFx_ 2" "AFy_ 2" "AFz_ 2" "ACx_ 2" "ACy_ 2" "ACz_ 2"'
+$!VarSet |LFDSVL1| = '"w (rad/s)" "A   1   1" "B   1   1" "A   1   2" "B   1   2" "A   1   3" "B   1   3" "A   1   4" "B   1   4" "A   1   5" "B   1   5" "A   1   6" "B   1   6" "w" "CA" "CM" "CMinf" "abs(F   1   1)" "angle(F   1   1)" "abs(F   1   2)" "angle(F   1   2)" "abs(F   1   3)" "angle(F   1   3)" "abs(F   1   4)" "angle(F   1   4)" "abs(F   1   5)" "angle(F   1   5)" "abs(F   1   6)" "angle(F   1   6)" "Periode" "Fx_ 1" "Fy_ 1" "Fz_ 1" "Cx_ 1" "Cy_ 1" "Cz_ 1" "AFx_ 1" "AFy_ 1" "AFz_ 1" "ACx_ 1" "ACy_ 1" "ACz_ 1" "abs(F   2   7)" "angle(F   2   7)" "abs(F   2   8)" "angle(F   2   8)" "abs(F   2   9)" "angle(F   2   9)" "abs(F   2  10)" "angle(F   2  10)" "abs(F   2  11)" "angle(F   2  11)" "abs(F   2  12)" "angle(F   2  12)" "Fx_ 2" "Fy_ 2" "Fz_ 2" "Cx_ 2" "Cy_ 2" "Cz_ 2" "AFx_ 2" "AFy_ 2" "AFz_ 2" "ACx_ 2" "ACy_ 2" "ACz_ 2"'
 $!SETSTYLEBASE FACTORY
 $!GLOBALLINKING 
   LINKCOLORMAPS = YES
@@ -2757,9 +2757,9 @@ $!XYLINEAXIS
 $!XYLINEAXIS 
   YDETAIL 1
     {
-    RANGEMIN = 0
-    RANGEMAX = 1500000
-    GRSPACING = 500000
+    RANGEMIN = 2918.238037109375
+    RANGEMAX = 1073413.0387761963
+    GRSPACING = 200000
     GRIDLINES
       {
       SHOW = YES
@@ -2773,8 +2773,8 @@ $!XYLINEAXIS
 $!XYLINEAXIS 
   YDETAIL 2
     {
-    RANGEMIN = -3.1515900000000001
-    RANGEMAX = 3.1415899999999999
+    RANGEMIN = -3.1394250392913818
+    RANGEMAX = 4.3388906286478042
     GRSPACING = 1
     AXISLINE
       {
@@ -4561,9 +4561,9 @@ $!XYLINEAXIS
 $!XYLINEAXIS 
   YDETAIL 1
     {
-    RANGEMIN = 0
-    RANGEMAX = 1500000
-    GRSPACING = 500000
+    RANGEMIN = 1713.0860595703125
+    RANGEMAX = 668125.82211014407
+    GRSPACING = 100000
     GRIDLINES
       {
       SHOW = YES
@@ -4577,8 +4577,8 @@ $!XYLINEAXIS
 $!XYLINEAXIS 
   YDETAIL 2
     {
-    RANGEMIN = -3.1515900000000001
-    RANGEMAX = 3.1415899999999999
+    RANGEMIN = -3.8957901000976562
+    RANGEMAX = 3.139691495847702
     GRSPACING = 1
     AXISLINE
       {
@@ -6365,9 +6365,9 @@ $!XYLINEAXIS
 $!XYLINEAXIS 
   YDETAIL 1
     {
-    RANGEMIN = 0
-    RANGEMAX = 1500000
-    GRSPACING = 500000
+    RANGEMIN = 1692.8060302734375
+    RANGEMAX = 504385.26421939698
+    GRSPACING = 100000
     GRIDLINES
       {
       SHOW = YES
@@ -6381,8 +6381,8 @@ $!XYLINEAXIS
 $!XYLINEAXIS 
   YDETAIL 2
     {
-    RANGEMIN = -3.1515900000000001
-    RANGEMAX = 3.1415899999999999
+    RANGEMIN = -7.7035717964172363
+    RANGEMAX = 3.1343107897996902
     GRSPACING = 1
     AXISLINE
       {
@@ -8169,9 +8169,9 @@ $!XYLINEAXIS
 $!XYLINEAXIS 
   YDETAIL 1
     {
-    RANGEMIN = 0
-    RANGEMAX = 1500000
-    GRSPACING = 500000
+    RANGEMIN = 5112.716796875
+    RANGEMAX = 755257.13194082025
+    GRSPACING = 200000
     GRIDLINES
       {
       SHOW = YES
@@ -8185,8 +8185,8 @@ $!XYLINEAXIS
 $!XYLINEAXIS 
   YDETAIL 2
     {
-    RANGEMIN = -3.1515900000000001
-    RANGEMAX = 3.1415899999999999
+    RANGEMIN = -7.6946706771850586
+    RANGEMAX = 3.0888043558597564
     GRSPACING = 1
     AXISLINE
       {
@@ -9973,9 +9973,9 @@ $!XYLINEAXIS
 $!XYLINEAXIS 
   YDETAIL 1
     {
-    RANGEMIN = 0
-    RANGEMAX = 1500000
-    GRSPACING = 500000
+    RANGEMIN = 973.6171875
+    RANGEMAX = 445300.92828828125
+    GRSPACING = 50000
     GRIDLINES
       {
       SHOW = YES
@@ -9989,8 +9989,8 @@ $!XYLINEAXIS
 $!XYLINEAXIS 
   YDETAIL 2
     {
-    RANGEMIN = -3.1515900000000001
-    RANGEMAX = 3.1415899999999999
+    RANGEMIN = -3.284576416015625
+    RANGEMAX = 3.1420245748281479
     GRSPACING = 1
     AXISLINE
       {
@@ -11777,9 +11777,9 @@ $!XYLINEAXIS
 $!XYLINEAXIS 
   YDETAIL 1
     {
-    RANGEMIN = 0
-    RANGEMAX = 1500000
-    GRSPACING = 500000
+    RANGEMIN = 30169.6796875
+    RANGEMAX = 978738.53490078123
+    GRSPACING = 200000
     GRIDLINES
       {
       SHOW = YES
@@ -11793,8 +11793,8 @@ $!XYLINEAXIS
 $!XYLINEAXIS 
   YDETAIL 2
     {
-    RANGEMIN = -3.1515900000000001
-    RANGEMAX = 3.1415899999999999
+    RANGEMIN = -7.9955654144287109
+    RANGEMAX = 3.134323775076866
     GRSPACING = 1
     AXISLINE
       {
@@ -13581,8 +13581,8 @@ $!XYLINEAXIS
 $!XYLINEAXIS 
   YDETAIL 1
     {
-    RANGEMIN = 0
-    RANGEMAX = 600000
+    RANGEMIN = 1325.636962890625
+    RANGEMAX = 461710.03383630369
     GRSPACING = 50000
     GRIDLINES
       {
@@ -13597,8 +13597,8 @@ $!XYLINEAXIS
 $!XYLINEAXIS 
   YDETAIL 2
     {
-    RANGEMIN = -3.1415899999999999
-    RANGEMAX = 3.1415899999999999
+    RANGEMIN = -6.4261660575866699
+    RANGEMAX = 0.34088194891214368
     GRSPACING = 1
     AXISLINE
       {
@@ -15385,8 +15385,8 @@ $!XYLINEAXIS
 $!XYLINEAXIS 
   YDETAIL 1
     {
-    RANGEMIN = 0
-    RANGEMAX = 1000000
+    RANGEMIN = 2228.5029296875
+    RANGEMAX = 704311.88881845702
     GRSPACING = 200000
     GRIDLINES
       {
@@ -15401,8 +15401,8 @@ $!XYLINEAXIS
 $!XYLINEAXIS 
   YDETAIL 2
     {
-    RANGEMIN = -3.1415899999999999
-    RANGEMAX = 3.1415899999999999
+    RANGEMIN = -3.9399468898773193
+    RANGEMAX = 3.1416771296024324
     GRSPACING = 1
     AXISLINE
       {
@@ -15493,7 +15493,7 @@ $!LINEMAP  [2]
     {
     ZONE = 1
     XAXISVAR = 1
-    YAXISVAR = 53
+    YAXISVAR = 54
     YAXIS = 2
     }
   LINES
@@ -17189,9 +17189,9 @@ $!XYLINEAXIS
 $!XYLINEAXIS 
   YDETAIL 1
     {
-    RANGEMIN = 0
-    RANGEMAX = 1000000
-    GRSPACING = 200000
+    RANGEMIN = 0.30834591388702393
+    RANGEMAX = 385258.52196916542
+    GRSPACING = 50000
     GRIDLINES
       {
       SHOW = YES
@@ -17205,9 +17205,9 @@ $!XYLINEAXIS
 $!XYLINEAXIS 
   YDETAIL 2
     {
-    RANGEMIN = -3.1415899999999999
-    RANGEMAX = 3.1415899999999999
-    GRSPACING = 1
+    RANGEMIN = -7.9854426383972168
+    RANGEMAX = 385258.52279854426
+    GRSPACING = 50000
     AXISLINE
       {
       AXISALIGNMENT = WITHGRIDMAX
@@ -17233,5 +17233,5 @@ $!ATTACHTEXT
   ANCHOR = MIDCENTER
   TEXT = 'Body 2 Force 5'
 $!FRAMECONTROL ACTIVATEBYNUMBER
-  FRAME = 8
+  FRAME = 9
 $!SETSTYLEBASE CONFIG

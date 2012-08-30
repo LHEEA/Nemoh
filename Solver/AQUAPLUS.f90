@@ -135,7 +135,7 @@
 !           Read Normal velocities        
             READ(10,*) Period(j),RadCase(i)%Body,RadCase(i)%Icase,(RVEL(c),IVEL(c),c=1,NFA*2**NSYMY)
             RadiationResults%Period(j)=Period(j)  
-            RadiationResults%Rcase(i)=10.*RadCase(i)%Body+1.*RadCase(i)%Icase
+            RadiationResults%Rcase(i)=1.*RadCase(i)%Icase
             IF (i.EQ.1) THEN
                 WRITE(*,'(A,F8.4,A,$)') ' Calculation for period = ',Period(j),' s '
             ELSE
@@ -148,7 +148,7 @@
             CALL SOLVE_BVP(ID,Period(j),NVEL,PRESSURE,NTheta,Theta,HKochin,MeshFS)
 !           Calculate force coefficient
             DO c=1,Nintegration
-                RadiationResults%Iintegration(c)=10.*IntCase(c)%Body+1.*IntCase(c)%Icase
+                RadiationResults%Iintegration(c)=1.*IntCase(c)%Icase
                 RadiationResults%Force(j,i,c)=0.
                 DO d=1,2**NSYMY*NFA
                     RadiationResults%Force(j,i,c)=RadiationResults%Force(j,i,c)+PRESSURE(d)*FNDS(c,d)
@@ -178,7 +178,7 @@
             CALL SOLVE_BVP(ID,Period(j),NVEL,PRESSURE,NTheta,Theta,HKochin,MeshFS)
 !           Calculate force coefficient
             DO c=1,Nintegration
-                DiffractionResults%Iintegration(c)=10.*IntCase(c)%Body+1.*IntCase(c)%Icase
+                DiffractionResults%Iintegration(c)=1.*IntCase(c)%Icase
                 DiffractionResults%Force(j,i,c)=0.
                 DO d=1,2**NSYMY*NFA
                     DiffractionResults%Force(j,i,c)=DiffractionResults%Force(j,i,c)+PRESSURE(d)*FNDS(c,d)
@@ -205,10 +205,10 @@
     OPEN(10,FILE=ID%ID(1:ID%lID)//'/results/RadiationCoefficients.tec')
     WRITE(10,'(A)') 'VARIABLES="w (rad/s)"'
     DO k=1,Nintegration
-        WRITE(10,'(A,I4,I4,A,I4,I4,A)') '"A',IntCase(k)%Body,IntCase(k)%Icase,'" "B',IntCase(k)%Body,IntCase(k)%Icase,'"'
+        WRITE(10,'(A,I4,I4,A,I4,I4,A)') '"A',IntCase(k)%Body,k,'" "B',IntCase(k)%Body,k,'"'
     END DO
     DO i=1,Nradiation
-        WRITE(10,'(A,I4,A,I4,A,I6,A)') 'Zone t="Motion of body ',RadCase(i)%Body,' in DoF',RadCase(i)%Icase,'",I=',N,',F=POINT'
+        WRITE(10,'(A,I4,A,I4,A,I6,A)') 'Zone t="Motion of body ',RadCase(i)%Body,' in DoF',i,'",I=',N,',F=POINT'
         DO j=1,N
             WRITE(10,'(80(X,E14.7))') 2.*PI/Period(j),(IMAG(RadiationResults%Force(j,i,k))*Period(j)/(2.*PI),-REAL(RadiationResults%Force(j,i,k)),k=1,Nintegration)
         END DO
@@ -228,7 +228,7 @@
     OPEN(10,FILE=ID%ID(1:ID%lID)//'/results/DiffractionForce.tec')
     WRITE(10,'(A)') 'VARIABLES="w (rad/s)"'
     DO k=1,Nintegration
-        WRITE(10,'(A,I4,I4,A,I4,I4,A)') '"abs(F',IntCase(k)%Body,IntCase(k)%Icase,')" "angle(F',IntCase(k)%Body,IntCase(k)%Icase,')"'
+        WRITE(10,'(A,I4,I4,A,I4,I4,A)') '"abs(F',IntCase(k)%Body,k,')" "angle(F',IntCase(k)%Body,k,')"'
     END DO
     DO i=1,Nbeta
         WRITE(10,'(A,F7.3,A,I6,A)') 'Zone t="Diffraction force - beta = ',beta(i)*180./PI,'",I=',N,',F=POINT'
@@ -264,7 +264,7 @@
     OPEN(10,FILE=ID%ID(1:ID%lID)//'/results/ExcitationForce.tec')
     WRITE(10,'(A)') 'VARIABLES="w (rad/s)"'
     DO k=1,Nintegration
-        WRITE(10,'(A,I4,I4,A,I4,I4,A)') '"abs(F',IntCase(k)%Body,IntCase(k)%Icase,')" "angle(F',IntCase(k)%Body,IntCase(k)%Icase,')"'
+        WRITE(10,'(A,I4,I4,A,I4,I4,A)') '"abs(F',IntCase(k)%Body,k,')" "angle(F',IntCase(k)%Body,k,')"'
     END DO
     DO i=1,Nbeta
         WRITE(10,'(A,F7.3,A,I6,A)') 'Zone t="Excitation force - beta = ',beta(i)*180./PI,'",I=',N,',F=POINT'

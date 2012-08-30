@@ -84,6 +84,8 @@ CONTAINS
         DO j=1,MeshFS%Npoints
             CALL COMPUTE_POTENTIAL_DOMAIN(ID,PHI(j),MeshFS%XC(j),MeshFS%YC(j),MeshFS%ZC(j),kwave,AMH,NEXP)
             ETA(j)=II*W/G*PHI(j)
+            WRITE(*,*) MeshFS%XC(j),MeshFS%YC(j),MeshFS%ZC(j),PHI(j)
+            READ(*,*)
         END DO
         CALL WRITE_FS(ID,MeshFS,ETA)
 !        WRITE(*,*) 'Copy FS'

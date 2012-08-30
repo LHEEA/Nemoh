@@ -25,6 +25,7 @@
     TYPE TCase
         INTEGER :: Body
         INTEGER :: ICase
+        REAL,DIMENSION(3) :: Direction,Axis 
     END TYPE
 !   Radiation cases
     INTEGER :: Nradiation
@@ -75,10 +76,14 @@
         END DO
         READ(10,*) M
         Nradiation=Nradiation+M
-        READ(10,*)
+        DO i=1,M
+            READ(10,*)
+        END DO
         READ(10,*) M
         Nintegration=Nintegration+M
-        READ(10,*)
+        DO i=1,M
+            READ(10,*)
+        END DO
         READ(10,*) M
         DO i=1,M
             READ(10,*)
@@ -123,14 +128,14 @@
             READ(10,*)
         END DO
         READ(10,*) M
-        READ(10,*) (RadCase(jrad+i)%ICase,i=1,M)
         DO i=1,M
+            READ(10,*) RadCase(jrad+i)%ICase,(RadCase(jrad+i)%Direction(j),j=1,3),(RadCase(jrad+i)%Axis(j),j=1,3)
             RadCase(jrad+i)%Body=c
         END DO
         jrad=jrad+M
         READ(10,*) M
-        READ(10,*) (IntCase(jint+i)%ICase,i=1,M)
         DO i=1,M
+            READ(10,*) IntCase(jint+i)%ICase,(IntCase(jint+i)%Direction(j),j=1,3),(IntCase(jint+i)%Axis(j),j=1,3)
             IntCase(jint+i)%Body=c
         END DO
         jint=jint+M
@@ -160,7 +165,7 @@
     ALLOCATE(FNDS(Nintegration,Mesh%Npanels*2**Mesh%Isym))
     ALLOCATE(NDS(Mesh%Npanels*2**Mesh%Isym))
     DO j=1,Nintegration
-        CALL ComputeNDS(Mesh,IntCase(j)%Body,IntCase(j)%Icase,NDS)
+        CALL ComputeNDS(Mesh,IntCase(j)%Body,IntCase(j)%Icase,IntCase(j)%Direction,IntCase(j)%Axis,NDS)
         DO c=1,Mesh%Npanels*2**Mesh%Isym
             FNDS(j,c)=NDS(c)
         END DO
@@ -180,7 +185,7 @@
     WRITE(11,*) Nw,Nradiation
     DO i=1,Nw
         DO j=1,Nradiation
-            CALL ComputeRadiationCondition(Mesh,RadCase(j)%Body,RadCase(j)%Icase,NVEL)
+            CALL ComputeRadiationCondition(Mesh,RadCase(j)%Body,RadCase(j)%Icase,RadCase(j)%Direction,RadCase(j)%Axis,NVEL)
             WRITE(11,*) 2.*PI/w(i),RadCase(j)%Body,RadCase(j)%Icase,(REAL(NVEL(c)),IMAG(NVEL(c)),c=1,Mesh%Npanels*2**Mesh%Isym)
         END DO
     END DO
@@ -213,7 +218,7 @@
     OPEN(10,FILE=ID%ID(1:ID%lID)//'/results/FKForce.tec')
     WRITE(10,'(A)') 'VARIABLES="w (rad/s)"'
     DO k=1,Nintegration
-        WRITE(10,'(A,I4,I4,A,I4,I4,A)') '"abs(F',IntCase(k)%Body,IntCase(k)%Icase,')" "angle(F',IntCase(k)%Body,IntCase(k)%Icase,')"'
+        WRITE(10,'(A,I4,I4,A,I4,I4,A)') '"abs(F',IntCase(k)%Body,k,')" "angle(F',IntCase(k)%Body,k,')"'
     END DO
     DO c=1,Nbeta
         WRITE(10,'(A,F7.3,A,I6,A)') 'Zone t="FKforce - beta = ',beta(c)*180./PI,'",I=',Nw,',F=POINT'

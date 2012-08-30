@@ -32,7 +32,15 @@
     END DO
     READ(10,*) M
     DO i=1,M
-        DO j=1,12
+        DO j=1,8
+            READ(10,*)
+        END DO
+        READ(10,*) N
+        DO j=1,N
+            READ(10,*)
+        END DO
+        READ(10,*) N
+        DO j=1,N
             READ(10,*)
         END DO
         READ(10,*) N

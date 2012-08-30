@@ -4,82 +4,62 @@ IMPLICIT NONE
 !
 CONTAINS
 !-- SUBROUTINE ComputeRadiationCondition
-    SUBROUTINE ComputeRadiationCondition(Mesh,c,iCase,NVEL)  
+    SUBROUTINE ComputeRadiationCondition(Mesh,c,iCase,Direction,Axis,NVEL)  
     USE MMesh
     IMPLICIT NONE
     TYPE(TMesh) :: Mesh
     INTEGER :: c,iCase
+    REAL,DIMENSION(3) :: Direction,Axis
     COMPLEX,DIMENSION(:) :: NVEL
+    REAL,DIMENSION(3) :: VEL
     INTEGER :: i
-    SELECT CASE (iCase)
+    SELECT CASE (iCase)    
     CASE (1)
+!       Degree of freedom is a translation      
         DO i=1,Mesh%Npanels
             IF (Mesh%cPanel(i).EQ.c) THEN
-                NVEL(i)=CMPLX(Mesh%N(1,i),0.)
+                VEL(1)=Direction(1)
+                VEL(2)=Direction(2)
+                VEL(3)=Direction(3)
+                NVEL(i)=CMPLX(Mesh%N(1,i)*VEL(1)+Mesh%N(2,i)*VEL(2)+Mesh%N(3,i)*VEL(3),0.)
             ELSE
                 NVEL(i)=CMPLX(0.,0.)
             END IF
             IF (Mesh%iSym.EQ.1) THEN
-                NVEL(i+Mesh%Npanels)=NVEL(i)
+                IF (Mesh%cPanel(i).EQ.c) THEN
+                    VEL(1)=Direction(1)
+                    VEL(2)=Direction(2)
+                    VEL(3)=Direction(3)
+                    NVEL(i+Mesh%Npanels)=CMPLX(Mesh%N(1,i)*VEL(1)-Mesh%N(2,i)*VEL(2)+Mesh%N(3,i)*VEL(3),0.)
+                ELSE
+                    NVEL(i+Mesh%Npanels)=CMPLX(0.,0.)
+                END IF
             END IF
         END DO
     CASE (2)
+!       Degree of freedom is a rotation
         DO i=1,Mesh%Npanels
             IF (Mesh%cPanel(i).EQ.c) THEN
-                NVEL(i)=CMPLX(Mesh%N(2,i),0.)
+                VEL(1)=Direction(2)*(Mesh%XM(3,i)-Axis(3))-Direction(3)*(Mesh%XM(2,i)-Axis(2))
+                VEL(2)=Direction(3)*(Mesh%XM(1,i)-Axis(1))-Direction(1)*(Mesh%XM(3,i)-Axis(3))
+                VEL(3)=Direction(1)*(Mesh%XM(2,i)-Axis(2))-Direction(2)*(Mesh%XM(1,i)-Axis(1))                
+                NVEL(i)=CMPLX(Mesh%N(1,i)*VEL(1)+Mesh%N(2,i)*VEL(2)+Mesh%N(3,i)*VEL(3),0.)
             ELSE
                 NVEL(i)=CMPLX(0.,0.)
             END IF
             IF (Mesh%iSym.EQ.1) THEN
-                NVEL(i+Mesh%Npanels)=-NVEL(i)
+                IF (Mesh%cPanel(i).EQ.c) THEN
+                    VEL(1)=Direction(2)*(Mesh%XM(3,i)-Axis(3))-Direction(3)*(-Mesh%XM(2,i)-Axis(2))
+                    VEL(2)=Direction(3)*(Mesh%XM(1,i)-Axis(1))-Direction(1)*(Mesh%XM(3,i)-Axis(3))
+                    VEL(3)=Direction(1)*(-Mesh%XM(2,i)-Axis(2))-Direction(2)*(Mesh%XM(1,i)-Axis(1))                
+                    NVEL(i+Mesh%Npanels)=CMPLX(Mesh%N(1,i)*VEL(1)-Mesh%N(2,i)*VEL(2)+Mesh%N(3,i)*VEL(3),0.)
+                ELSE
+                    NVEL(i+Mesh%Npanels)=CMPLX(0.,0.)
+                END IF
             END IF
         END DO
     CASE (3)
-        DO i=1,Mesh%Npanels
-            IF (Mesh%cPanel(i).EQ.c) THEN
-                NVEL(i)=CMPLX(Mesh%N(3,i),0.)
-            ELSE
-                NVEL(i)=CMPLX(0.,0.)
-            END IF
-            IF (Mesh%iSym.EQ.1) THEN
-                NVEL(i+Mesh%Npanels)=NVEL(i)
-            END IF
-        END DO
-    CASE (4)
-        DO i=1,Mesh%Npanels
-            IF (Mesh%cPanel(i).EQ.c) THEN
-                NVEL(i)=CMPLX(-(Mesh%XM(3,i)-Mesh%CG(3,c))*Mesh%N(2,i)+(Mesh%XM(2,i)-Mesh%CG(2,c))*Mesh%N(3,i),0.)
-            ELSE
-                NVEL(i)=CMPLX(0.,0.)
-            END IF
-            IF (Mesh%iSym.EQ.1) THEN
-                NVEL(i+Mesh%Npanels)=-NVEL(i)
-            END IF
-        END DO
-    CASE (5)
-        DO i=1,Mesh%Npanels
-            IF (Mesh%cPanel(i).EQ.c) THEN
-                NVEL(i)=CMPLX(-(Mesh%XM(1,i)-Mesh%CG(1,c))*Mesh%N(3,i)+(Mesh%XM(3,i)-Mesh%CG(3,c))*Mesh%N(1,i),0.)
-            ELSE
-                NVEL(i)=CMPLX(0.,0.)
-            END IF
-            IF (Mesh%iSym.EQ.1) THEN
-                NVEL(i+Mesh%Npanels)=NVEL(i)
-            END IF
-        END DO
-    CASE (6)
-        DO i=1,Mesh%Npanels
-            IF (Mesh%cPanel(i).EQ.c) THEN
-                NVEL(i)=CMPLX(-(Mesh%XM(2,i)-Mesh%CG(2,c))*Mesh%N(1,i)+(Mesh%XM(1,i)-Mesh%CG(1,c))*Mesh%N(2,i),0.)
-            ELSE
-                NVEL(i)=CMPLX(0.,0.)
-            END IF
-            IF (Mesh%iSym.EQ.1) THEN
-                NVEL(i+Mesh%Npanels)=-NVEL(i)
-            END IF
-        END DO
-    CASE (7)
-        WRITE(*,*) 'Error: radiation case 7 not implemented yet'
+        WRITE(*,*) 'Error: radiation case 3 not implemented yet'
         STOP
     CASE DEFAULT
         WRITE(*,*) 'Error: unknown radiation case'
