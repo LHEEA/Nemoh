@@ -9,6 +9,7 @@
     USE MIdentification
     USE MEnvironment
     USE MResults
+    USE MIRF
     USE iflport
 !    
     IMPLICIT NONE
@@ -19,6 +20,8 @@
 !   Hydrodynamic coefficients cases
     TYPE(TResults) :: RadiationResults
     TYPE(TResults) :: DiffractionResults
+!   IRFs
+    TYPE(TIRF) :: IRF
 !   RAOs
     COMPLEX,DIMENSION(:,:,:),ALLOCATABLE :: RAOs
 !   Locals
@@ -42,6 +45,14 @@
     CALL ReadTResults(RadiationResults,ID%ID(1:ID%lID)//'/results/Radiation.dat')
 !   Read radiation results
     CALL ReadTResults(DiffractionResults,ID%ID(1:ID%lID)//'/results/Diffraction.dat')
+!
+!   --- Compute IRFs -------------------------------------------------------------------------------------------------------------------------------------------------------------------
+!
+    CALL Initialize_IRF(IRF,RadiationResults,ID%ID(1:ID%lID)//'/aquaplus.cal')  
+    IF (IRF%Switch.EQ.1) THEN
+        CALL Compute_IRF(IRF,RadiationResults)
+        CALL Save_IRF(IRF,ID%ID(1:ID%lID)//'/results/IRF.tec')
+    END IF
 !
 !   --- Compute RAOs -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 !    

@@ -13,6 +13,7 @@
     COMPLEX,DIMENSION(RadiationResults%Nintegration,DiffractionResults%Nperiod,*) :: RAOs
     TYPE(TEnvironment) :: Environment
 !   Locals
+    CHARACTER*20 :: lookfor
     INTEGER :: Nx,Ny
     REAL :: Lx,Ly
     REAL,DIMENSION(:),ALLOCATABLE :: X,Y
@@ -27,28 +28,11 @@
     PI=4.*ATAN(1.)
 !   Read data
     OPEN(10,FILE=ID%ID(1:ID%lID)//'/aquaplus.cal')
-    DO i=1,6
-        READ(10,*)
+    READ(10,'(A20)') lookfor
+    DO WHILE (lookfor.NE.'--- Post processing ')
+        READ(10,'(A20)') lookfor
     END DO
-    READ(10,*) M
-    DO i=1,M
-        DO j=1,8
-            READ(10,*)
-        END DO
-        READ(10,*) N
-        DO j=1,N
-            READ(10,*)
-        END DO
-        READ(10,*) N
-        DO j=1,N
-            READ(10,*)
-        END DO
-        READ(10,*) N
-        DO j=1,N
-            READ(10,*)
-        END DO
-    END DO
-    DO i=1,7
+    DO i=1,2
         READ(10,*)
     END DO
     READ(10,*) Nx,Ny,Lx,Ly

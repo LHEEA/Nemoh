@@ -99,7 +99,6 @@
     ELSE
         w(1)=wmin
     END IF
-    READ(10,*)
     READ(10,*) Nbeta,betamin,betamax
     ALLOCATE(beta(Nbeta))
     IF (Nbeta.GT.1) THEN
@@ -110,8 +109,8 @@
         beta(1)=betamin*PI/180.
     END IF
     READ(10,*)
-    READ(10,*) Ntheta,thetamin,thetamax
     READ(10,*)
+    READ(10,*) Ntheta,thetamin,thetamax
     READ(10,*) Nx,Ny,Lx,Ly
     CLOSE(10)
 !   re-read input file and store radiation and integration cases
