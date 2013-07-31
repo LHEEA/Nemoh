@@ -86,7 +86,7 @@ CONTAINS
         REZ=REAL(ZPBT(i))
         IMZ=AIMAG(ZPBT(i))
         phase=ATAN2(IMZ,REZ)
-        WRITE(11,'(8(2X,E14.7))') X(i),Y(i),Z(i),amp,phase,REZ,IMZ,REAL(NVELTEMPB(I)),IMAG(NVELTEMPB(I))
+        WRITE(11,'(9(2X,E14.7))') X(i),Y(i),Z(i),amp,phase,REZ,IMZ,REAL(NVELTEMPB(I)),IMAG(NVELTEMPB(I))
     END DO
     IF (NSYMY .eq. 1) THEN
         DO i=1,NP        
@@ -94,7 +94,7 @@ CONTAINS
 	        IMZ=AIMAG(ZPST(i))
             phase=ATAN2(IMZ,REZ)
             amp=ABS(ZPST(i))
-	        WRITE(11,'(8(2X,E14.7))') X(i),-Y(i),Z(i),amp,phase,REZ,IMZ,REAL(NVELTEMPS(I)),IMAG(NVELTEMPS(I))
+	        WRITE(11,'(9(2X,E14.7))') X(i),-Y(i),Z(i),amp,phase,REZ,IMZ,REAL(NVELTEMPS(I)),IMAG(NVELTEMPS(I))
         END DO
     END IF
     DO i=1,NFA

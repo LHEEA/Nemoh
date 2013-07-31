@@ -84,15 +84,17 @@ CONTAINS
         DO j=1,MeshFS%Npoints
             CALL COMPUTE_POTENTIAL_DOMAIN(ID,PHI(j),MeshFS%XC(j),MeshFS%YC(j),MeshFS%ZC(j),kwave,AMH,NEXP)
             ETA(j)=II*W/G*PHI(j)
-            WRITE(*,*) MeshFS%XC(j),MeshFS%YC(j),MeshFS%ZC(j),PHI(j)
-            READ(*,*)
         END DO
         CALL WRITE_FS(ID,MeshFS,ETA)
-!        WRITE(*,*) 'Copy FS'
-!        READ(*,*)
+        IF (MeshFS%Npoints.GT.0) THEN 
+            WRITE(*,*) 'Copy FS'
+            READ(*,*)
+        END IF
 !       Save output
         IF (Sav_Potential.EQ.1) THEN
             CALL WRITE_POTENTIAL(ID,NVEL)
+            WRITE(*,*) 'Change name of file for potential'
+            READ(*,*)
         END IF    
 !    
     END SUBROUTINE SOLVE_BVP
