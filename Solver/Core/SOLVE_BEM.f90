@@ -4,10 +4,11 @@ IMPLICIT NONE
 !
 CONTAINS
 !
-    SUBROUTINE SOLVE_BVP(ID,Period,NVEL,PRESSURE,NTheta,Theta,HKochin,MeshFS)
+    SUBROUTINE SOLVE_BVP(ProblemNumber,ID,Period,NVEL,PRESSURE,Switch_Kochin,NTheta,Theta,HKochin,Switch_FS,MeshFS,Switch_potential)
 !
         USE MIDENTIFICATION
         USE COM_VAR
+        USE MMesh
         USE OUTPUT
         USE SOLVE_BEM_INFD_DIRECT
         USE SOLVE_BEM_INFD_ITERATIVE
@@ -16,13 +17,17 @@ CONTAINS
 !
         IMPLICIT NONE
 !       Inputs/outputs
+        INTEGER :: ProblemNumber
         TYPE(TID) :: ID
         REAL :: Period
-        COMPLEX,DIMENSION(*) :: NVEL,PRESSURE
+        COMPLEX,DIMENSION(*) :: NVEL,PRESSURE        
+        INTEGER :: Switch_Kochin
         INTEGER :: NTheta
         REAL,DIMENSION(*) :: THeta
         COMPLEX,DIMENSION(*) :: HKochin
-        TYPE(TMeshFS) :: MeshFS
+        INTEGER :: Switch_FS
+        TYPE(TMesh) :: MeshFS
+        INTEGER :: Switch_potential
 !       For solver (DIRECT or GMRES)
         INTEGER :: NEXP
         INTEGER :: lwork
@@ -77,24 +82,23 @@ CONTAINS
             END IF
         END DO
 !       Compute Kochin Functions
-        DO j=1,NTheta
-            CALL COMPUTE_KOCHIN(kwave,Theta(j),HKochin(j))
-        END DO
+        IF (Switch_Kochin.EQ.1) THEN
+            DO j=1,NTheta
+                CALL COMPUTE_KOCHIN(kwave,Theta(j),HKochin(j))
+            END DO
+            CALL WRITE_KOCHIN(ID,ProblemNumber,HKochin,NTheta)
+        END IF
 !       Save free surface elevation
-        DO j=1,MeshFS%Npoints
-            CALL COMPUTE_POTENTIAL_DOMAIN(ID,PHI(j),MeshFS%XC(j),MeshFS%YC(j),MeshFS%ZC(j),kwave,AMH,NEXP)
-            ETA(j)=II*W/G*PHI(j)
-        END DO
-        CALL WRITE_FS(ID,MeshFS,ETA)
-        IF (MeshFS%Npoints.GT.0) THEN 
-            WRITE(*,*) 'Copy FS'
-            READ(*,*)
+        IF (Switch_FS.EQ.1) THEN
+            DO j=1,MeshFS%Npoints
+                CALL COMPUTE_POTENTIAL_DOMAIN(ID,PHI(j),MeshFS%X(1,j),MeshFS%X(2,j),0.,kwave,AMH,NEXP)
+                ETA(j)=II*W/G*PHI(j)
+            END DO
+            CALL WRITE_FS(ID,ProblemNumber,ETA,MeshFS)
         END IF
 !       Save output
-        IF (Sav_Potential.EQ.1) THEN
-            CALL WRITE_POTENTIAL(ID,NVEL)
-            WRITE(*,*) 'Change name of file for potential'
-            READ(*,*)
+        IF (Switch_Potential.EQ.1) THEN
+            CALL WRITE_POTENTIAL(ID,ProblemNumber)
         END IF    
 !    
     END SUBROUTINE SOLVE_BVP

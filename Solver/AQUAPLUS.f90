@@ -7,7 +7,8 @@
     PROGRAM Main
 !   
     USE MIdentification
-    USE MResults
+    USE MMesh
+    USE MBodyConditions
     USE iflport
     USE SOLVE_BEM
     USE OUTPUT
@@ -18,43 +19,29 @@
     TYPE(TID)               :: ID
 !   Array sizes
     INTEGER                 :: NFA,NSYMY    ! Number of panels and symmetry about xOz plane
-!   Wave periods
-    INTEGER :: N
-    REAL,DIMENSION(:),ALLOCATABLE :: Period
-!   TYPE TCase
-    TYPE TCase
-        INTEGER :: Body
-        INTEGER :: ICase
-    END TYPE
+!   Body conditions
+    TYPE(TBodyConditions)   :: BodyConditions
 !   Kochin function
     INTEGER                 :: Ntheta    
     REAL,DIMENSION(:),ALLOCATABLE :: Theta
-!   Free surface visualisation
-    TYPE(TMeshFS) :: MeshFS
-!   Radiation cases
-    INTEGER :: Nradiation
-    TYPE(TCase),DIMENSION(:),ALLOCATABLE :: RadCase
-    TYPE(TResults) :: RadiationResults
-!   Diffraction cases
-    INTEGER :: Nbeta
-    REAL,DIMENSION(:),ALLOCATABLE :: beta
-    TYPE(TResults) :: DiffractionResults
-    REAL,DIMENSION(:,:,:),ALLOCATABLE :: AFKForce,PFKForce
-    COMPLEX,DIMENSION(:,:,:),ALLOCATABLE :: ExcitationForce
-!   Force integration cases
-    INTEGER :: Nintegration
-    TYPE(TCase),DIMENSION(:),ALLOCATABLE :: IntCase
-     REAL,DIMENSION(:,:),ALLOCATABLE :: FNDS 
+!   Meshes
+    TYPE(TMesh) :: Mesh 
+    TYPE(TMesh) :: MeshFS
 !   Aquaplus
     REAL                    :: T
     REAL,DIMENSION(:),ALLOCATABLE    :: RVEL,IVEL
     COMPLEX,DIMENSION(:),ALLOCATABLE :: NVEL,PRESSURE
     COMPLEX,DIMENSION(:),ALLOCATABLE :: HKochin
+!   Results
+    REAL :: XEFF,YEFF
+    COMPLEX,DIMENSION(:,:),ALLOCATABLE :: Force
+    REAL,DIMENSION(:),ALLOCATABLE :: line
 !   Locals
     REAL                    :: PI
     INTEGER			        :: c,d,M,l,i,j,k
     REAL                    :: Discard
     COMPLEX,PARAMETER       :: II=CMPLX(0.,1.)
+
       
 !
 !   --- Initialisation -------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -63,35 +50,15 @@
     WRITE(*,*) ' '
     WRITE(*,'(A,$)') '  -> Initialisation ' 
 !   Read case ID
-    CALL ReadTID(ID,'ID.dat')    
+    CALL ReadTID(ID,'ID.dat') 
+!   Read Mesh
+    CALL ReadTMesh(Mesh,ID)  
+!   Read Body Conditions
+    CALL ReadTBodyConditions(BodyConditions,Mesh%Npanels*2**Mesh%Isym,ID%ID(1:ID%lID)//'/Normalvelocities.dat') 
 !   Initialise Aquaplus
-    CALL INITIALIZE(ID,NFA,NSYMY)
+    CALL INITIALIZE(ID,NFA,NSYMY,XEFF,YEFF,Mesh)
+    ALLOCATE(NVEL(NFA*2**NSYMY))
     WRITE(*,'(A,$)') '.'
-!   Initialise radiation case studies
-    OPEN(10,FILE=ID%ID(1:ID%lID)//'/RadiationCases.dat')
-    READ(10,*) N,Nradiation
-    ALLOCATE(Period(N),RadCase(NRadiation))
-    CLOSE(10)
-    ALLOCATE(RVEL(2**NSYMY*NFA),IVEL(2**NSYMY*NFA))
-    ALLOCATE(NVEL(2**NSYMY*NFA),PRESSURE(2**NSYMY*NFA))
-    WRITE(*,'(A,$)') '.'
-!   Initialise diffraction case studies
-    OPEN(10,FILE=ID%ID(1:ID%lID)//'/DiffractionCases.dat')
-    READ(10,*) M,Nbeta
-    IF (M.NE.N) THEN
-        WRITE(*,*) 'Error: number of periods for diffraction is different from for radiation'
-    END IF
-    ALLOCATE(beta(Nbeta))
-    CLOSE(10)
-    WRITE(*,'(A,$)') '.'
-!   Initialise integration
-    OPEN(10,FILE=ID%ID(1:ID%lID)//'/Integration.dat')
-    READ(10,*) M,Nintegration
-    ALLOCATE(IntCase(Nintegration),FNDS(Nintegration,NFA*2**NSYMY))
-    DO j=1,Nintegration
-        READ(10,*) Discard,IntCase(j)%Body,IntCase(j)%Icase,(FNDS(j,c),c=1,NFA*2**NSYMY)
-    END DO
-    CLOSE(10)
 !   Initialise Kochin function calculation
     OPEN(10,FILE=ID%ID(1:ID%lID)//'/Kochin.dat')
     READ(10,*) Ntheta 
@@ -105,19 +72,17 @@
     CLOSE(10)
 !   Initialise free surface calculation points
     OPEN(10,FILE=ID%ID(1:ID%lID)//'/FS.dat')
-    READ(10,*) MeshFS%Npoints,MeshFS%Npanels
+    READ(10,*) MeshFS%Npoints    
     IF (MeshFS%Npoints.GT.0) THEN
-        CALL CreateTMeshFS(MeshFS,MeshFS%Npoints,MeshFS%Npanels)
+        CALL CreateTMesh(MeshFS,MeshFS%Npoints,1,1)
         DO j=1,MeshFS%Npoints
-            READ(10,*) MeshFS%XC(j),MeshFS%YC(j),MeshFS%ZC(j)
-        END DO
-        DO j=1,MeshFS%Npanels
-            READ(10,*) (MeshFS%P(k,j),k=1,4)
+            READ(10,*) MeshFS%X(1,j),MeshFS%X(2,j)
         END DO
     END IF
     CLOSE(10)
-    CALL CreateTResults(RadiationResults,N,Nradiation,Nintegration,Ntheta)
-    CALL CreateTResults(DiffractionResults,N,Nbeta,Nintegration,Ntheta)   
+!   Initialise results table
+    ALLOCATE(Force(6*Mesh%Nbodies,Bodyconditions%Nproblems))
+    Force(:,:)=0.
     WRITE(*,*) '. Done !'
     WRITE(*,*) ' '
 !
@@ -125,71 +90,32 @@
 !
     WRITE(*,*) ' -> Solve BVPs and calculate forces ' 
     WRITE(*,*) ' '
-    OPEN(10,FILE=ID%ID(1:ID%lID)//'/RadiationCases.dat')
-    READ(10,*) M,M
-    OPEN(12,FILE=ID%ID(1:ID%lID)//'/DiffractionCases.dat')
-    READ(12,*) M,M
-    DO j=1,N 
-!       --> Radiation cases
-        DO i=1,Nradiation            
-!           Read Normal velocities        
-            READ(10,*) Period(j),RadCase(i)%Body,RadCase(i)%Icase,(RVEL(c),IVEL(c),c=1,NFA*2**NSYMY)
-            RadiationResults%Period(j)=Period(j)  
-            RadiationResults%Rcase(i)=1.*RadCase(i)%Icase
-            IF (i.EQ.1) THEN
-                WRITE(*,'(A,F8.4,A,$)') ' Calculation for period = ',Period(j),' s '
-            ELSE
-                WRITE(*,'(A,$)') '.'
-            END IF
-            DO c=1,NFA*2**NSYMY
-                NVEL(c)=CMPLX(RVEL(c),IVEL(c))
-            END DO
-!           Solve BVP
-            CALL SOLVE_BVP(ID,Period(j),NVEL,PRESSURE,NTheta,Theta,HKochin,MeshFS)
-!           Calculate force coefficient
-            DO c=1,Nintegration
-                RadiationResults%Iintegration(c)=1.*IntCase(c)%Icase
-                RadiationResults%Force(j,i,c)=0.
-                DO d=1,2**NSYMY*NFA
-                    RadiationResults%Force(j,i,c)=RadiationResults%Force(j,i,c)+PRESSURE(d)*FNDS(c,d)
-                END DO
-            END DO
-!           Retain Kochin coefficients
-            DO c=1,Ntheta
-                RadiationResults%Theta(c)=Theta(c)
-                RadiationResults%HKochin(j,i,c)=HKochin(c)
-            END DO            
+    DO j=1,BodyConditions%Nproblems 
+        WRITE(*,'(A,I5,A,I5,A,$)') ' Problem ',j,' / ',BodyConditions%Nproblems,' .'
+        DO c=1,Mesh%Npanels*2**Mesh%Isym
+            NVEL(c)=CMPLX(RVEL(c),IVEL(c))
         END DO
- !       --> Diffraction cases
-        DO i=1,Nbeta
-!           Read Normal velocities        
-            READ(12,*) Period(j),Beta(i),Discard,(RVEL(c),IVEL(c),c=1,NFA*2**NSYMY)
-            DiffractionResults%Period(j)=Period(j)
-            DiffractionResults%Rcase(i)=Beta(i)
-            IF ((i.EQ.1).AND.(Nradiation.EQ.0)) THEN
-                WRITE(*,'(A,F8.4,A,$)') ' Calculation for period = ',Period(j),' s '
-            ELSE
-                WRITE(*,'(A,$)') '.'
-            END IF
-            DO c=1,NFA*2**NSYMY
-                NVEL(c)=CMPLX(RVEL(c),IVEL(c))
-            END DO
-!           Solve BVP
-            CALL SOLVE_BVP(ID,Period(j),NVEL,PRESSURE,NTheta,Theta,HKochin,MeshFS)
-!           Calculate force coefficient
-            DO c=1,Nintegration
-                DiffractionResults%Iintegration(c)=1.*IntCase(c)%Icase
-                DiffractionResults%Force(j,i,c)=0.
-                DO d=1,2**NSYMY*NFA
-                    DiffractionResults%Force(j,i,c)=DiffractionResults%Force(j,i,c)+PRESSURE(d)*FNDS(c,d)
-                END DO
-            END DO
-!           Retain Kochin coefficients
-            DO c=1,Ntheta
-                DiffractionResults%Theta(c)=Theta(c)
-                DiffractionResults%HKochin(j,i,c)=HKochin(c)
-            END DO  
-        END DO 
+!       Solve BVP
+        CALL SOLVE_BVP(j,ID,2.*PI/BodyConditions%Omega(j),NVEL,PRESSURE,BodyConditions%Switch_Kochin(j),NTheta,Theta,HKochin,BodyConditions%Switch_Freesurface(j),MeshFS,BodyConditions%Switch_Potential(j))
+!       Calculate force coefficients
+        DO c=1,Mesh%Npanels
+            Force(1+6*(Mesh%cPanel(c)-1),j)=Force(1+6*(Mesh%cPanel(c)-1),j)-PRESSURE(c)*Mesh%N(1,c)*Mesh%A(c)
+            Force(2+6*(Mesh%cPanel(c)-1),j)=Force(2+6*(Mesh%cPanel(c)-1),j)-PRESSURE(c)*Mesh%N(2,c)*Mesh%A(c)
+            Force(3+6*(Mesh%cPanel(c)-1),j)=Force(3+6*(Mesh%cPanel(c)-1),j)-PRESSURE(c)*Mesh%N(3,c)*Mesh%A(c)
+            Force(4+6*(Mesh%cPanel(c)-1),j)=Force(4+6*(Mesh%cPanel(c)-1),j)-PRESSURE(c)*(-(Mesh%XM(3,c)-0.)*Mesh%N(2,c)+(Mesh%XM(2,c)-YEFF)*Mesh%N(3,c))*Mesh%A(c)
+            Force(5+6*(Mesh%cPanel(c)-1),j)=Force(5+6*(Mesh%cPanel(c)-1),j)-PRESSURE(c)*(-(Mesh%XM(1,c)-XEFF)*Mesh%N(3,c)+(Mesh%XM(3,c)-YEFF)*Mesh%N(1,c))*Mesh%A(c)
+            Force(6+6*(Mesh%cPanel(c)-1),j)=Force(6+6*(Mesh%cPanel(c)-1),j)-PRESSURE(c)*(-(Mesh%XM(2,c)-YEFF)*Mesh%N(1,c)+(Mesh%XM(1,c)-YEFF)*Mesh%N(2,c))*Mesh%A(c)
+        END DO
+        IF (Mesh%Isym.EQ.1) THEN
+            DO c=1,Mesh%Npanels
+                Force(1+6*(Mesh%cPanel(c)-1),j)=Force(1+6*(Mesh%cPanel(c)-1),j)-PRESSURE(c+Mesh%Npanels)*Mesh%N(1,c)*Mesh%A(c)
+                Force(2+6*(Mesh%cPanel(c)-1),j)=Force(2+6*(Mesh%cPanel(c)-1),j)+PRESSURE(c+Mesh%Npanels)*Mesh%N(2,c)*Mesh%A(c)
+                Force(3+6*(Mesh%cPanel(c)-1),j)=Force(3+6*(Mesh%cPanel(c)-1),j)-PRESSURE(c+Mesh%Npanels)*Mesh%N(3,c)*Mesh%A(c)
+                Force(4+6*(Mesh%cPanel(c)-1),j)=Force(4+6*(Mesh%cPanel(c)-1),j)-PRESSURE(c+Mesh%Npanels)*((Mesh%XM(3,c)-0.)*Mesh%N(2,c)-(Mesh%XM(2,c)-YEFF)*Mesh%N(3,c))*Mesh%A(c)
+                Force(5+6*(Mesh%cPanel(c)-1),j)=Force(5+6*(Mesh%cPanel(c)-1),j)-PRESSURE(c+Mesh%Npanels)*(-(Mesh%XM(1,c)-XEFF)*Mesh%N(3,c)+(Mesh%XM(3,c)-YEFF)*Mesh%N(1,c))*Mesh%A(c)
+                Force(6+6*(Mesh%cPanel(c)-1),j)=Force(6+6*(Mesh%cPanel(c)-1),j)-PRESSURE(c+Mesh%Npanels)*((Mesh%XM(2,c)-YEFF)*Mesh%N(1,c)-(Mesh%XM(1,c)-YEFF)*Mesh%N(2,c))*Mesh%A(c)
+            END DO    
+        END IF    
         WRITE(*,*) '. Done !'      
     END DO    
     WRITE(*,*) ' ' 
@@ -200,91 +126,28 @@
 !
     WRITE(*,*) ' -> Save results ' 
     WRITE(*,*) ' '
-    CALL SaveTResults(RadiationResults,ID%ID(1:ID%lID)//'/results/Radiation.dat')
-    CALL SaveTResults(DiffractionResults,ID%ID(1:ID%lID)//'/results/Diffraction.dat')
-    OPEN(10,FILE=ID%ID(1:ID%lID)//'/results/RadiationCoefficients.tec')
-    WRITE(10,'(A)') 'VARIABLES="w (rad/s)"'
-    DO k=1,Nintegration
-        WRITE(10,'(A,I4,I4,A,I4,I4,A)') '"A',IntCase(k)%Body,k,'" "B',IntCase(k)%Body,k,'"'
-    END DO
-    DO i=1,Nradiation
-        WRITE(10,'(A,I4,A,I4,A,I6,A)') 'Zone t="Motion of body ',RadCase(i)%Body,' in DoF',i,'",I=',N,',F=POINT'
-        DO j=1,N
-            WRITE(10,'(80(X,E14.7))') 2.*PI/Period(j),(IMAG(RadiationResults%Force(j,i,k))*Period(j)/(2.*PI),-REAL(RadiationResults%Force(j,i,k)),k=1,Nintegration)
+    OPEN(10,FILE=ID%ID(1:ID%lID)//'/results/Forces.dat')
+    ALLOCATE(line(BodyConditions%Nproblems*2))
+    DO c=1,6*Mesh%Nbodies
+        DO j=1,BodyConditions%Nproblems
+            IF (Bodyconditions%Switch_type(j).EQ.0) THEN
+                line(2*j-1)=ABS(Force(c,j))
+                line(2*j)=ATAN2(IMAG(Force(c,j)),REAL(Force(c,j)))
+            ELSE
+                line(2*j-1)=IMAG(Force(c,j))/BodyConditions%Omega(j)
+                line(2*j)=-REAL(Force(c,j))
+            END IF
         END DO
+        WRITE(10,*) (line(j),j=1,2*BodyConditions%Nproblems)      
     END DO
-    CLOSE(10)
-    OPEN(10,FILE=ID%ID(1:ID%lID)//'/results/RadiationKochin.tec')
-    WRITE(10,'(A)') 'VARIABLES="Theta (rad)" "ABS(HKochin)" "ANGLE(HKochin)"'
-    DO i=1,Nradiation
-        DO j=1,N
-            WRITE(10,'(A,I4,A,F7.4,A,I6,A)') 'Zone t="Motion of body ',RadCase(i)%Body,' at frequency ',2.*PI/Period(j),' rad/s",I=',Ntheta,',F=POINT'
-            DO k=1,Ntheta
-                WRITE(10,'(80(X,E14.7))') Theta(k),ABS(RadiationResults%HKochin(j,i,k)),ATAN2(IMAG(RadiationResults%HKochin(j,i,k)),REAL(RadiationResults%HKochin(j,i,k)))
-            END DO
-        END DO
-    END DO
-    CLOSE(10)
-    OPEN(10,FILE=ID%ID(1:ID%lID)//'/results/DiffractionForce.tec')
-    WRITE(10,'(A)') 'VARIABLES="w (rad/s)"'
-    DO k=1,Nintegration
-        WRITE(10,'(A,I4,I4,A,I4,I4,A)') '"abs(F',IntCase(k)%Body,k,')" "angle(F',IntCase(k)%Body,k,')"'
-    END DO
-    DO i=1,Nbeta
-        WRITE(10,'(A,F7.3,A,I6,A)') 'Zone t="Diffraction force - beta = ',beta(i)*180./PI,'",I=',N,',F=POINT'
-        DO j=1,N
-            WRITE(10,'(80(X,E14.7))') 2.*PI/Period(j),(ABS(DiffractionResults%Force(j,i,k)),ATAN2(IMAG(DiffractionResults%Force(j,i,k)),REAL(DiffractionResults%Force(j,i,k))),k=1,Nintegration)
-        END DO
-    END DO
-    CLOSE(10)
-    OPEN(10,FILE=ID%ID(1:ID%lID)//'/results/DiffractionKochin.tec')
-    WRITE(10,'(A)') 'VARIABLES="Theta (rad)" "ABS(HKochin)" "ANGLE(HKochin)"'
-    DO i=1,Nbeta
-        DO j=1,N
-            WRITE(10,'(A,F7.3,A,F7.4,A,I6,A)') 'Zone t="Diffraction - beta = ',beta(i)*180./PI,' at frequency ',2.*PI/Period(j),' rad/s",I=',Ntheta,',F=POINT'
-            DO k=1,Ntheta
-                WRITE(10,'(80(X,E14.7))') Theta(k),ABS(DiffractionResults%HKochin(j,i,k)),ATAN2(IMAG(DiffractionResults%HKochin(j,i,k)),REAL(DiffractionResults%HKochin(j,i,k)))
-            END DO
-        END DO
-    END DO
-    CLOSE(10)
-    ALLOCATE(ExcitationForce(N,Nbeta,Nintegration),AFKForce(N,Nbeta,Nintegration),PFKForce(N,Nbeta,Nintegration))
-    OPEN(10,FILE=ID%ID(1:ID%lID)//'/results/FKForce.tec')
-    READ(10,*)
-    DO k=1,Nintegration
-        READ(10,*)
-    END DO
-    DO i=1,Nbeta
-        READ(10,*) 
-        DO j=1,N
-            READ(10,*) Discard,(AFKForce(j,i,k),PFKForce(j,i,k),k=1,Nintegration)
-        END DO
-    END DO
-    CLOSE(10)
-    OPEN(10,FILE=ID%ID(1:ID%lID)//'/results/ExcitationForce.tec')
-    WRITE(10,'(A)') 'VARIABLES="w (rad/s)"'
-    DO k=1,Nintegration
-        WRITE(10,'(A,I4,I4,A,I4,I4,A)') '"abs(F',IntCase(k)%Body,k,')" "angle(F',IntCase(k)%Body,k,')"'
-    END DO
-    DO i=1,Nbeta
-        WRITE(10,'(A,F7.3,A,I6,A)') 'Zone t="Excitation force - beta = ',beta(i)*180./PI,'",I=',N,',F=POINT'
-        DO j=1,N
-            DO k=1,Nintegration
-                ExcitationForce(j,i,k)=DiffractionResults%Force(j,i,k)+AFKForce(j,i,k)*(COS(PFKForce(j,i,k))+II*SIN(PFKForce(j,i,k)))
-            END DO
-            WRITE(10,'(80(X,E14.7))') 2.*PI/Period(j),(ABS(ExcitationForce(j,i,k)),ATAN2(IMAG(ExcitationForce(j,i,k)),REAL(ExcitationForce(j,i,k))),k=1,Nintegration)
-        END DO
-    END DO
-    CLOSE(10)
-    
+    CLOSE(10)    
 !
 !   --- Finalize -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 !
-    DEALLOCATE(NVEL,PRESSURE,RadCase,IntCase,Period,FNDS,ExcitationForce,AFKForce,PFKForce)    
-    CALL DeleteTResults(RadiationResults)
-    CALL DeleteTResults(DiffractionResults)
+    DEALLOCATE(NVEL,PRESSURE)    
+    DEALLOCATE(Force)
     DEALLOCATE(Theta,HKochin)
-    IF (MeshFS%Npoints.GT.0) CALL DeleteTMeshFS(MeshFS)
+    IF (MeshFS%Npoints.GT.0) CALL DeleteTMesh(MeshFS)
     CALL DEALLOCATE_DATA
 !
     END PROGRAM Main
