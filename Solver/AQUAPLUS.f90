@@ -29,7 +29,6 @@
     TYPE(TMesh) :: MeshFS
 !   Aquaplus
     REAL                    :: T
-    REAL,DIMENSION(:),ALLOCATABLE    :: RVEL,IVEL
     COMPLEX,DIMENSION(:),ALLOCATABLE :: NVEL,PRESSURE
     COMPLEX,DIMENSION(:),ALLOCATABLE :: HKochin
 !   Results
@@ -57,10 +56,10 @@
     CALL ReadTBodyConditions(BodyConditions,Mesh%Npanels*2**Mesh%Isym,ID%ID(1:ID%lID)//'/Normalvelocities.dat') 
 !   Initialise Aquaplus
     CALL INITIALIZE(ID,NFA,NSYMY,XEFF,YEFF,Mesh)
-    ALLOCATE(NVEL(NFA*2**NSYMY))
+    ALLOCATE(NVEL(NFA*2**NSYMY),PRESSURE(NFA*2**NSYMY))
     WRITE(*,'(A,$)') '.'
 !   Initialise Kochin function calculation
-    OPEN(10,FILE=ID%ID(1:ID%lID)//'/Kochin.dat')
+    OPEN(10,FILE=ID%ID(1:ID%lID)//'/Mesh/Kochin.dat')
     READ(10,*) Ntheta 
     ALLOCATE(Theta(Ntheta))
     IF (Ntheta.GT.0) THEN        
@@ -71,7 +70,7 @@
     ALLOCATE(HKochin(NTheta))
     CLOSE(10)
 !   Initialise free surface calculation points
-    OPEN(10,FILE=ID%ID(1:ID%lID)//'/FS.dat')
+    OPEN(10,FILE=ID%ID(1:ID%lID)//'/Mesh/FS.dat')
     READ(10,*) MeshFS%Npoints    
     IF (MeshFS%Npoints.GT.0) THEN
         CALL CreateTMesh(MeshFS,MeshFS%Npoints,1,1)
@@ -93,7 +92,7 @@
     DO j=1,BodyConditions%Nproblems 
         WRITE(*,'(A,I5,A,I5,A,$)') ' Problem ',j,' / ',BodyConditions%Nproblems,' .'
         DO c=1,Mesh%Npanels*2**Mesh%Isym
-            NVEL(c)=CMPLX(RVEL(c),IVEL(c))
+            NVEL(c)=BodyConditions%NormalVelocity(c,j)
         END DO
 !       Solve BVP
         CALL SOLVE_BVP(j,ID,2.*PI/BodyConditions%Omega(j),NVEL,PRESSURE,BodyConditions%Switch_Kochin(j),NTheta,Theta,HKochin,BodyConditions%Switch_Freesurface(j),MeshFS,BodyConditions%Switch_Potential(j))
