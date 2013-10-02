@@ -1,2 +1,0 @@
-VARIABLES="X" "Y" "Z" "Module" "Phase" "Real" "Imag" "Re(NVEL)" "Im(NVEL)"
-ZONE t="Free surface",N=      0, E=    -49 , F=FEPOINT,ET=QUADRILATERAL

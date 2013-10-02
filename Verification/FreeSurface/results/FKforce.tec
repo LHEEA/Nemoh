@@ -1,3 +1,0 @@
-VARIABLES="w (rad/s)"
-Zone t="FKforce - beta =  30.000",I=     1,F=POINT
-  0.1000000E+01
