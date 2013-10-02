@@ -125,7 +125,7 @@
 !
     WRITE(*,*) ' -> Save results ' 
     WRITE(*,*) ' '
-    OPEN(10,FILE=ID%ID(1:ID%lID)//'/results/Forces.dat')
+    OPEN(10,FILE=ID%ID(1:ID%lID)//'/Results/Forces.dat')
     ALLOCATE(line(BodyConditions%Nproblems*2))
     DO c=1,6*Mesh%Nbodies
         DO j=1,BodyConditions%Nproblems
