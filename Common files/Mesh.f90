@@ -74,7 +74,7 @@
         OPEN(10,FILE=ID%ID(1:ID%lID)//'/Mesh/L10.dat')
         READ(10,*)
         READ(10,*) i,Npoints,Npanels,Nbodies
-        CLOSE(10) 
+         CLOSE(10) 
         CALL CreateTMesh(Mesh,Npoints,Npanels,Nbodies)
 !       Read mesh
         OPEN(10,FILE=ID%ID(1:ID%lID)//'/Mesh/L12.dat')

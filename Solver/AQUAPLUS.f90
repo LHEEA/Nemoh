@@ -33,6 +33,8 @@
     COMPLEX,DIMENSION(:),ALLOCATABLE :: HKochin
 !   Results
     REAL :: XEFF,YEFF
+    INTEGER :: Nintegration
+    REAL,DIMENSION(:,:),ALLOCATABLE :: NDS
     COMPLEX,DIMENSION(:,:),ALLOCATABLE :: Force
     REAL,DIMENSION(:),ALLOCATABLE :: line
 !   Locals
@@ -41,7 +43,7 @@
     REAL                    :: Discard
     COMPLEX,PARAMETER       :: II=CMPLX(0.,1.)
 
-      
+     CALL Licence 
 !
 !   --- Initialisation -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 !     
@@ -58,6 +60,14 @@
     CALL INITIALIZE(ID,NFA,NSYMY,XEFF,YEFF,Mesh)
     ALLOCATE(NVEL(NFA*2**NSYMY),PRESSURE(NFA*2**NSYMY))
     WRITE(*,'(A,$)') '.'
+!   Initialise Force matrix
+    OPEN(10,FILE=ID%ID(1:ID%lID)//'/Mesh/Integration.dat')
+    READ(10,*) Nintegration
+    ALLOCATE(NDS(Nintegration,NFA*2**NSYMY))
+    DO i=1,Nintegration
+        READ(10,*) (NDS(i,j),j=1,NFA*2**NSYMY)
+    END DO
+    CLOSE(10)
 !   Initialise Kochin function calculation
     OPEN(10,FILE=ID%ID(1:ID%lID)//'/Mesh/Kochin.dat')
     READ(10,*) Ntheta 
@@ -70,7 +80,7 @@
     ALLOCATE(HKochin(NTheta))
     CLOSE(10)
 !   Initialise free surface calculation points
-    OPEN(10,FILE=ID%ID(1:ID%lID)//'/Mesh/FS.dat')
+    OPEN(10,FILE=ID%ID(1:ID%lID)//'/Mesh/Freesurface.dat')
     READ(10,*) MeshFS%Npoints    
     IF (MeshFS%Npoints.GT.0) THEN
         CALL CreateTMesh(MeshFS,MeshFS%Npoints,1,1)
@@ -80,7 +90,7 @@
     END IF
     CLOSE(10)
 !   Initialise results table
-    ALLOCATE(Force(6*Mesh%Nbodies,Bodyconditions%Nproblems))
+    ALLOCATE(Force(Nintegration,Bodyconditions%Nproblems))
     Force(:,:)=0.
     WRITE(*,*) '. Done !'
     WRITE(*,*) ' '
@@ -97,24 +107,11 @@
 !       Solve BVP
         CALL SOLVE_BVP(j,ID,2.*PI/BodyConditions%Omega(j),NVEL,PRESSURE,BodyConditions%Switch_Kochin(j),NTheta,Theta,HKochin,BodyConditions%Switch_Freesurface(j),MeshFS,BodyConditions%Switch_Potential(j))
 !       Calculate force coefficients
-        DO c=1,Mesh%Npanels
-            Force(1+6*(Mesh%cPanel(c)-1),j)=Force(1+6*(Mesh%cPanel(c)-1),j)-PRESSURE(c)*Mesh%N(1,c)*Mesh%A(c)
-            Force(2+6*(Mesh%cPanel(c)-1),j)=Force(2+6*(Mesh%cPanel(c)-1),j)-PRESSURE(c)*Mesh%N(2,c)*Mesh%A(c)
-            Force(3+6*(Mesh%cPanel(c)-1),j)=Force(3+6*(Mesh%cPanel(c)-1),j)-PRESSURE(c)*Mesh%N(3,c)*Mesh%A(c)
-            Force(4+6*(Mesh%cPanel(c)-1),j)=Force(4+6*(Mesh%cPanel(c)-1),j)-PRESSURE(c)*(-(Mesh%XM(3,c)-0.)*Mesh%N(2,c)+(Mesh%XM(2,c)-YEFF)*Mesh%N(3,c))*Mesh%A(c)
-            Force(5+6*(Mesh%cPanel(c)-1),j)=Force(5+6*(Mesh%cPanel(c)-1),j)-PRESSURE(c)*(-(Mesh%XM(1,c)-XEFF)*Mesh%N(3,c)+(Mesh%XM(3,c)-YEFF)*Mesh%N(1,c))*Mesh%A(c)
-            Force(6+6*(Mesh%cPanel(c)-1),j)=Force(6+6*(Mesh%cPanel(c)-1),j)-PRESSURE(c)*(-(Mesh%XM(2,c)-YEFF)*Mesh%N(1,c)+(Mesh%XM(1,c)-YEFF)*Mesh%N(2,c))*Mesh%A(c)
+        DO i=1,Nintegration
+            DO c=1,Mesh%Npanels*2**Mesh%Isym
+                Force(i,j)=Force(i,j)-PRESSURE(c)*NDS(i,c)
+            END DO
         END DO
-        IF (Mesh%Isym.EQ.1) THEN
-            DO c=1,Mesh%Npanels
-                Force(1+6*(Mesh%cPanel(c)-1),j)=Force(1+6*(Mesh%cPanel(c)-1),j)-PRESSURE(c+Mesh%Npanels)*Mesh%N(1,c)*Mesh%A(c)
-                Force(2+6*(Mesh%cPanel(c)-1),j)=Force(2+6*(Mesh%cPanel(c)-1),j)+PRESSURE(c+Mesh%Npanels)*Mesh%N(2,c)*Mesh%A(c)
-                Force(3+6*(Mesh%cPanel(c)-1),j)=Force(3+6*(Mesh%cPanel(c)-1),j)-PRESSURE(c+Mesh%Npanels)*Mesh%N(3,c)*Mesh%A(c)
-                Force(4+6*(Mesh%cPanel(c)-1),j)=Force(4+6*(Mesh%cPanel(c)-1),j)-PRESSURE(c+Mesh%Npanels)*((Mesh%XM(3,c)-0.)*Mesh%N(2,c)-(Mesh%XM(2,c)-YEFF)*Mesh%N(3,c))*Mesh%A(c)
-                Force(5+6*(Mesh%cPanel(c)-1),j)=Force(5+6*(Mesh%cPanel(c)-1),j)-PRESSURE(c+Mesh%Npanels)*(-(Mesh%XM(1,c)-XEFF)*Mesh%N(3,c)+(Mesh%XM(3,c)-YEFF)*Mesh%N(1,c))*Mesh%A(c)
-                Force(6+6*(Mesh%cPanel(c)-1),j)=Force(6+6*(Mesh%cPanel(c)-1),j)-PRESSURE(c+Mesh%Npanels)*((Mesh%XM(2,c)-YEFF)*Mesh%N(1,c)-(Mesh%XM(1,c)-YEFF)*Mesh%N(2,c))*Mesh%A(c)
-            END DO    
-        END IF    
         WRITE(*,*) '. Done !'      
     END DO    
     WRITE(*,*) ' ' 
@@ -127,14 +124,14 @@
     WRITE(*,*) ' '
     OPEN(10,FILE=ID%ID(1:ID%lID)//'/Results/Forces.dat')
     ALLOCATE(line(BodyConditions%Nproblems*2))
-    DO c=1,6*Mesh%Nbodies
+    DO c=1,Nintegration
         DO j=1,BodyConditions%Nproblems
-            IF (Bodyconditions%Switch_type(j).EQ.0) THEN
+            IF (Bodyconditions%Switch_type(j).NE.-1.) THEN
                 line(2*j-1)=ABS(Force(c,j))
                 line(2*j)=ATAN2(IMAG(Force(c,j)),REAL(Force(c,j)))
             ELSE
-                line(2*j-1)=IMAG(Force(c,j))/BodyConditions%Omega(j)
-                line(2*j)=-REAL(Force(c,j))
+                line(2*j-1)=-IMAG(Force(c,j))/BodyConditions%Omega(j)
+                line(2*j)=REAL(Force(c,j))
             END IF
         END DO
         WRITE(10,*) (line(j),j=1,2*BodyConditions%Nproblems)      
