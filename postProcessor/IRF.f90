@@ -1,7 +1,7 @@
     MODULE MIRF
 !
     TYPE TIRF
-        INTEGER :: Switch,Ntime,Ncase,Nintegration
+        INTEGER :: Switch,Ntime,Nradiation,Nintegration
         REAL,DIMENSION(:),ALLOCATABLE :: Time
         REAL,DIMENSION(:,:,:),ALLOCATABLE :: K
         REAL,DIMENSION(:,:),ALLOCATABLE :: AddedMass 
@@ -11,30 +11,30 @@
 !
 !       Operators for creation, copy, initialisation and destruction
 !
-        SUBROUTINE CreateTIRF(IRF,Ntime,Ncase,Nintegration)
+        SUBROUTINE CreateTIRF(IRF,Ntime,Nradiation,Nintegration)
         IMPLICIT NONE
         TYPE(TIRF) :: IRF
-        INTEGER :: Ntime,Ncase,Nintegration
+        INTEGER :: Ntime,Nradiation,Nintegration
         IRF%Ntime=Ntime
-        IRF%Ncase=Ncase
-        ALLOCATE(IRF%Time(0:Ntime-1),IRF%AddedMass(Ncase,Nintegration),IRF%K(0:Ntime-1,Ncase,Nintegration))
+        IRF%Nradiation=Nradiation
+        ALLOCATE(IRF%Time(0:Ntime-1),IRF%AddedMass(Nradiation,Nintegration),IRF%K(0:Ntime-1,Nradiation,Nintegration))
         END SUBROUTINE CreateTIRF
 !       --- 
         SUBROUTINE CopyTIRF(IRFTarget,IRFSource)
         IMPLICIT NONE
         INTEGER :: i,j,k
         TYPE(TIRF) :: IRFTarget,IRFSource      
-        CALL CreateTIRF(IRFTarget,IRFSource%Ntime,IRFSource%Ncase,IRFSource%Nintegration)
+        CALL CreateTIRF(IRFTarget,IRFSource%Ntime,IRFSource%Nradiation,IRFSource%Nintegration)
         DO i=0,IRFTarget%Ntime-1
             IRFTarget%Time(i)=IRFSource%Time(i)
         END DO
-        DO j=1,IRFTarget%Ncase
+        DO j=1,IRFTarget%Nradiation
             DO k=1,IRFTarget%Nintegration
                 IRFTarget%Addedmass(j,k)=IRFSource%Addedmass(j,k)
             END DO
         END DO
         DO i=0,IRFTarget%Ntime-1
-            DO j=1,IRFTarget%Ncase
+            DO j=1,IRFTarget%Nradiation
                 DO k=1,IRFTarget%Nintegration
                     IRFTarget%K(i,j,k)=IRFSource%K(i,j,k)
                 END DO
@@ -61,9 +61,9 @@
         CLOSE(10)
         IF (IRF%Switch.EQ.1) THEN
             IRF%Ntime=INT(tf/dt)
-            IRF%Ncase=Results%NCase
+            IRF%Nradiation=Results%Nradiation
             IRF%Nintegration=Results%Nintegration            
-            CALL CreateTIRF(IRF,IRF%Ntime,IRF%Ncase,IRF%Nintegration)
+            CALL CreateTIRF(IRF,IRF%Ntime,IRF%Nradiation,IRF%Nintegration)
             DO i=0,IRF%Ntime-1
                 IRF%Time(i)=i*dt
             END DO
@@ -75,35 +75,35 @@
         IMPLICIT NONE	    
         TYPE(TIRF) :: IRF
         TYPE(TResults) :: Results
-        REAL,DIMENSION(Results%Nperiod) :: CM
+        REAL,DIMENSION(Results%Nw) :: CM
         INTEGER :: i,j,k,l
         REAL :: PI
         PI=4.*ATAN(1.0)
         DO i=0,IRF%Ntime-1
-            DO j=1,Results%Ncase
+            DO j=1,Results%Nradiation
                 DO k=1,Results%Nintegration
                     IRF%K(i,j,k)=0.
-                    DO l=1,Results%Nperiod-1
+                    DO l=1,Results%Nw-1
 !                        IRF%K(i,j,k)=IRF%K(i,j,k)-REAL(Results%Force(l,j,k))*COS(2.*PI/Results%Period(l)*IRF%Time(i))*2.*PI*ABS(1./Results%Period(l)-1./Results%Period(l+1))
-                        IRF%K(i,j,k)=IRF%K(i,j,k)-0.5*(REAL(Results%Force(l,j,k))*COS(2.*PI/Results%Period(l)*IRF%Time(i))+REAL(Results%Force(l+1,j,k))*COS(2.*PI/Results%Period(l+1)*IRF%Time(i)))*2.*PI*ABS(1./Results%Period(l)-1./Results%Period(l+1))                    
+                        IRF%K(i,j,k)=IRF%K(i,j,k)-0.5*(Results%RadiationDamping(l,j,k)*COS(Results%w(l)*IRF%Time(i))+Results%RadiationDamping(l+1,j,k)*COS(Results%w(l+1)*IRF%Time(i)))*(Results%w(l+1)-Results%w(l))                    
                     END DO 
                     IRF%K(i,j,k)=IRF%K(i,j,k)*2./PI         
                 END DO
             END DO
         END DO
-        DO j=1,Results%Ncase
+        DO j=1,Results%Nradiation
             DO k=1,Results%Nintegration
                 IRF%AddedMass(j,k)=0.
-                DO l=1,Results%Nperiod
+                DO l=1,Results%Nw
                     CM(l)=0.
                     DO i=0,IRF%Ntime-2
  !                       CM(l)=CM(l)+IRF%K(i,j,k)*SIN(2.*PI/Results%Period(l)*IRF%Time(i))*(IRF%Time(i+1)-IRF%Time(i))
-                       CM(l)=CM(l)+0.5*(IRF%K(i,j,k)*SIN(2.*PI/Results%Period(l)*IRF%Time(i))+IRF%K(i+1,j,k)*SIN(2.*PI/Results%Period(l)*IRF%Time(i+1)))*(IRF%Time(i+1)-IRF%Time(i))
+                       CM(l)=CM(l)+0.5*(IRF%K(i,j,k)*SIN(Results%w(l)*IRF%Time(i))+IRF%K(i+1,j,k)*SIN(Results%w(l)*IRF%Time(i+1)))*(IRF%Time(i+1)-IRF%Time(i))
                     END DO  
-                    CM(l)=(IMAG(Results%Force(l,j,k))+CM(l))*Results%Period(l)/(2.*PI)
+                    CM(l)=(Results%AddedMass(l,j,k)+CM(l))/Results%w(l)
                     IRF%AddedMass(j,k)=IRF%AddedMass(j,k)+CM(l)   
                 END DO         
-                IRF%AddedMass(j,k)=IRF%AddedMass(j,k)/Results%Nperiod
+                IRF%AddedMass(j,k)=IRF%AddedMass(j,k)/Results%Nw
             END DO
         END DO
         END SUBROUTINE Compute_IRF
@@ -118,7 +118,7 @@
         DO k=1,IRF%Nintegration
             WRITE(10,'(A,I4,A,I4,A)') '"AddedMass ',k,'" "IRF ',k,'"'
         END DO
-        DO j=1,IRF%Ncase
+        DO j=1,IRF%Nradiation
             WRITE(10,'(A,I4,A,I6,A)') 'Zone t="DoF ',j,'",I=',IRF%Ntime,',F=POINT'
             DO i=0,IRF%Ntime-1                
                 WRITE(10,'(80(X,E14.7))') IRF%Time(i),(IRF%AddedMass(j,k),IRF%K(i,j,k),k=1,IRF%Nintegration)

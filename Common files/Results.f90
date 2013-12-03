@@ -1,32 +1,38 @@
     MODULE MResults
 !
     TYPE TResults
-        INTEGER :: Nperiod,Ncase,Nintegration
-        REAL,DIMENSION(:),ALLOCATABLE :: Period
-        REAL,DIMENSION(:),ALLOCATABLE :: Rcase
-        INTEGER,DIMENSION(:),ALLOCATABLE :: Iintegration
-        COMPLEX,DIMENSION(:,:,:),ALLOCATABLE :: Force
+        INTEGER :: Nw,Nbeta,Nradiation,Nintegration
+        REAL,DIMENSION(:),ALLOCATABLE :: w
+        INTEGER,DIMENSION(:,:),ALLOCATABLE :: IndxForce
+        INTEGER,DIMENSION(:,:),ALLOCATABLE :: IndxRadiation
+        REAL,DIMENSION(:),ALLOCATABLE :: beta
+        COMPLEX,DIMENSION(:,:,:),ALLOCATABLE :: DiffractionForce
+        COMPLEX,DIMENSION(:,:,:),ALLOCATABLE :: FroudeKrylovForce
+        REAL,DIMENSION(:,:,:),ALLOCATABLE :: AddedMass
+        REAL,DIMENSION(:,:,:),ALLOCATABLE :: RadiationDamping
         INTEGER :: Ntheta
         REAL,DIMENSION(:),ALLOCATABLE :: Theta
-        COMPLEX,DIMENSION(:,:,:),ALLOCATABLE :: HKochin        
+        COMPLEX,DIMENSION(:,:,:),ALLOCATABLE :: HKochinDiffraction
+        COMPLEX,DIMENSION(:,:,:),ALLOCATABLE :: HKochinRadiation   
     END TYPE TResults
 !
     CONTAINS
 !
 !       Operators for creation, copy, initialisation and destruction
 !
-        SUBROUTINE CreateTResults(Results,Nperiod,Ncase,Nintegration,Ntheta)
+        SUBROUTINE CreateTResults(Results,Nw,Nbeta,Nradiation,Nintegration,Ntheta)
         IMPLICIT NONE
         TYPE(TResults) :: Results
-        INTEGER :: Nperiod,Ncase,Nintegration,Ntheta
-        Results%Nperiod=Nperiod
-        Results%Ncase=Ncase
+        INTEGER :: Nw,Nbeta,Nradiation,Nintegration,Ntheta
+        Results%Nw=Nw
+        Results%Nbeta=Nbeta
+        Results%Nradiation=Nradiation
         Results%Nintegration=Nintegration
-        ALLOCATE(Results%Period(Nperiod),Results%Rcase(Ncase),Results%Iintegration(Nintegration))
-        ALLOCATE(Results%Force(Nperiod,Ncase,Nintegration))
+        ALLOCATE(Results%w(Nw),Results%IndxForce(Nintegration,3),Results%beta(Nbeta),Results%IndxRadiation(Nintegration,3))
+        ALLOCATE(Results%DiffractionForce(Nw,Nbeta,Nintegration),Results%FroudeKrylovForce(Nw,Nbeta,Nintegration),Results%AddedMass(Nw,Nradiation,Nintegration),Results%RadiationDamping(Nw,Nradiation,Nintegration))
         Results%Ntheta=Ntheta
         IF (Results%Ntheta.GT.0) THEN            
-            ALLOCATE(Results%Theta(Ntheta),Results%HKochin(Nperiod,Ncase,Ntheta))
+            ALLOCATE(Results%Theta(Ntheta),Results%HKochinDiffraction(Nw,Nbeta,Ntheta),Results%HKochinRadiation(Nw,Nradiation,Ntheta))
         END IF
         END SUBROUTINE CreateTResults
 !       --- 
@@ -34,72 +40,147 @@
         IMPLICIT NONE
         INTEGER :: i,j,k
         TYPE(TResults) :: ResultsTarget,ResultsSource      
-        CALL CreateTResults(ResultsTarget,ResultsSource%Nperiod,ResultsSource%Ncase,ResultsSource%Nintegration,ResultsSource%Ntheta)
-        DO i=1,ResultsTarget%Nperiod
-            ResultsTarget%Period(i)=ResultsSource%Period(i)
+        CALL CreateTResults(ResultsTarget,ResultsSource%Nw,ResultsSource%Nbeta,ResultsSource%Nradiation,ResultsSource%Nintegration,ResultsSource%Ntheta)
+        DO i=1,ResultsTarget%Nw
+            ResultsTarget%w(i)=ResultsSource%w(i)
         END DO
-        DO i=1,ResultsTarget%Ncase
-            ResultsTarget%Rcase(i)=ResultsSource%Rcase(i)
+        DO i=1,ResultsTarget%Nbeta
+            ResultsTarget%beta(i)=ResultsSource%beta(i)
         END DO
         DO i=1,ResultsTarget%Nintegration
-            ResultsTarget%Iintegration(i)=ResultsSource%Iintegration(i)
+            DO j=1,3
+                ResultsTarget%IndxForce(i,j)=ResultsSource%IndxForce(i,j)
+                ResultsTarget%IndxRadiation(i,j)=ResultsSource%IndxRadiation(i,j)
+            END DO
         END DO
-        DO j=1,ResultsTarget%Nperiod
-            DO i=1,ResultsTarget%Ncase
+        DO j=1,ResultsTarget%Nw
+            DO i=1,ResultsTarget%Nbeta
                 DO k=1,ResultsTarget%Nintegration
-                    ResultsTarget%Force(j,i,k)=ResultsSource%Force(j,i,k)
+                    ResultsTarget%DiffractionForce(j,i,k)=ResultsSource%DiffractionForce(j,i,k)
+                    ResultsTarget%FroudeKrylovForce(j,i,k)=ResultsSource%FroudeKrylovForce(j,i,k)
+                END DO
+            END DO
+            DO i=1,ResultsTarget%Nbeta
+                DO k=1,ResultsTarget%Nintegration
+                    ResultsTarget%AddedMass(j,i,k)=ResultsSource%AddedMass(j,i,k)
+                    ResultsTarget%RadiationDamping(j,i,k)=ResultsSource%RadiationDamping(j,i,k)
                 END DO
             END DO
         END DO
         DO k=1,ResultsTarget%Ntheta
             ResultsTarget%Theta(k)=ResultsSource%Theta(k)
-            DO j=1,ResultsTarget%Nperiod
-                DO i=1,ResultsTarget%Ncase                
-                    ResultsTarget%HKochin(j,i,k)=ResultsSource%HKochin(j,i,k)
+            DO j=1,ResultsTarget%Nw
+                DO i=1,ResultsTarget%Nbeta               
+                    ResultsTarget%HKochinDiffraction(j,i,k)=ResultsSource%HKochinDiffraction(j,i,k)
+                END DO
+                DO i=1,ResultsTarget%Nradiation              
+                    ResultsTarget%HKochinRadiation(j,i,k)=ResultsSource%HKochinRadiation(j,i,k)
                 END DO
             END DO
         END DO
         END SUBROUTINE CopyTResults
 !       ---
-        SUBROUTINE ReadTResults(Results,namefile)
+        SUBROUTINE ReadTResults(Results,namefile,nameindex,namefileFK)
         IMPLICIT NONE	    
         TYPE(TResults) :: Results
-        CHARACTER*(*) :: namefile
-        INTEGER :: Nperiod,Ncase,Nintegration,Ntheta
-        INTEGER :: i,j,k
-        OPEN(10,FILE=namefile)
-        READ(10,*) Nperiod,Ncase,Nintegration,Ntheta
-        CALL CreateTResults(Results,Nperiod,Ncase,Nintegration,Ntheta)
-        READ(10,*) (Results%Period(i),i=1,Nperiod)
+        CHARACTER*(*) :: namefile,nameindex,namefileFK
+        INTEGER :: Nw,Nbeta,Nradiation,Nintegration,Ntheta
+        INTEGER :: i,j,k,c
+        REAL :: discard,amplitude,phase
+        REAL,DIMENSION(:),ALLOCATABLE :: line
+        OPEN(10,FILE=nameindex)
+        READ(10,*) Nw,Nbeta,Nradiation,Nintegration,Ntheta
+        CALL CreateTResults(Results,Nw,Nbeta,Nradiation,Nintegration,Ntheta)
+        READ(10,*)
         DO k=1,Nintegration
-            DO j=1,Ncase
-                READ(10,*) Results%Iintegration(k),Results%Rcase(j),(Results%Force(i,j,k),i=1,Nperiod)
-            END DO
+            READ(10,*) Results%IndxForce(k,1),Results%IndxForce(k,2),Results%IndxForce(k,3)
         END DO
-        DO k=1,Ntheta
-            DO j=1,Ncase
-                READ(10,*) Results%Theta(k),(Results%HKochin(i,j,k),i=1,Nperiod)
+        READ(10,*)
+        DO k=1,Nradiation
+            READ(10,*) Results%IndxRadiation(k,1),Results%IndxRadiation(k,2),Results%IndxRadiation(k,3)
+        END DO
+        READ(10,*) (Results%beta(k),k=1,Nbeta)
+        READ(10,*) (Results%w(k),k=1,Nw)
+        READ(10,*) (Results%theta(k),k=1,Ntheta)
+        CLOSE(10)
+        ALLOCATE(line(2*Nw*(Nbeta+Nradiation)))
+        OPEN(10,FILE=namefile)        
+        DO k=1,Nintegration
+            READ(10,*) (line(j),j=1,2*Nw*(Nbeta+Nradiation))
+            c=1
+            DO i=1,Nw
+                DO j=1,Nbeta
+                    Results%DiffractionForce(i,j,k)=line(c)*CEXP(CMPLX(0.,1.)*line(c+1))
+                    c=c+2
+                END DO
+                DO j=1,Nradiation
+                    Results%AddedMass(i,j,k)=line(c)
+                    Results%RadiationDamping(i,j,k)=line(c+1)
+                    c=c+2
+                 END DO
             END DO
         END DO
         CLOSE(10)
-        END SUBROUTINE ReadTResults
-!       ---
-        SUBROUTINE SaveTResults(Results,namefile)
-        IMPLICIT NONE	    
-        TYPE(TResults) :: Results
-        CHARACTER*(*) :: namefile
-        INTEGER :: i,j,k
-        OPEN(10,FILE=namefile)
-        WRITE(10,*) Results%Nperiod,Results%Ncase,Results%Nintegration,Results%Ntheta
-        WRITE(10,*) (Results%Period(i),i=1,Results%Nperiod)
-        DO k=1,Results%Nintegration
-            DO j=1,Results%Ncase
-                WRITE(10,*) Results%Iintegration(k),Results%Rcase(j),(Results%Force(i,j,k),i=1,Results%Nperiod)
+        DEALLOCATE(line)
+        ALLOCATE(line(2*Nintegration+1))
+        OPEN(10,FILE=namefileFK)
+        READ(10,*)
+        DO k=1,Nintegration
+            READ(10,*)
+        END DO
+        DO j=1,Nbeta
+            READ(10,*)
+            DO i=1,Nw
+                READ(10,*) (line(k),k=1,1+2*Nintegration)
+                c=2
+                DO k=1,Nintegration
+                    Results%FroudeKrylovForce(i,j,k)=line(c)*CEXP(CMPLX(0.,1.)*line(c+1))
+                    c=c+2
+                END DO
             END DO
         END DO
-        DO k=1,Results%Ntheta
-            DO j=1,Results%Ncase
-                WRITE(10,*) Results%Theta(k),(Results%HKochin(i,j,k),i=1,Results%Nperiod)
+        CLOSE(10)
+        DEALLOCATE(line)
+        END SUBROUTINE ReadTResults
+!       ---
+        SUBROUTINE SaveTResults(Results,namedir)
+        IMPLICIT NONE	    
+        TYPE(TResults) :: Results
+        CHARACTER*(*) :: namedir
+        INTEGER :: i,j,k
+        OPEN(10,FILE=namedir//'/RadiationCoefficients.tec')
+        WRITE(10,'(A)') 'VARIABLES="w (rad/s)"'
+        DO k=1,Results%Nintegration
+            WRITE(10,'(A,I4,I4,A,I4,I4,A)') '"A',Results%IndxForce(k,2),Results%IndxForce(k,3),'" "B',Results%IndxForce(k,2),Results%IndxForce(k,3),'"'
+        END DO
+        DO j=1,Results%Nradiation
+            WRITE(10,'(A,I4,A,I4,A,I6,A)') 'Zone t="Motion of body ',Results%IndxRadiation(j,2),' in DoF',Results%IndxRadiation(j,3),'",I=',Results%Nw,',F=POINT'
+            DO i=1,Results%Nw
+                WRITE(10,'(80(X,E14.7))') Results%w(i),(Results%AddedMass(i,j,k),Results%RadiationDamping(i,j,k),k=1,Results%Nintegration)
+            END DO
+        END DO
+        CLOSE(10)
+        OPEN(10,FILE=namedir//'/DiffractionForce.tec')
+        WRITE(10,'(A)') 'VARIABLES="w (rad/s)"'
+        DO k=1,Results%Nintegration
+            WRITE(10,'(A,I4,I4,A,I4,I4,A)') '"abs(F',Results%IndxForce(k,2),Results%IndxForce(k,3),')" "angle(F',Results%IndxForce(k,2),Results%IndxForce(k,3),')"'
+        END DO
+        DO j=1,Results%Nbeta
+            WRITE(10,'(A,F7.3,A,I6,A)') 'Zone t="Diffraction force - beta = ',Results%beta(j)*180./(4.*ATAN(1.0)),' deg",I=',Results%Nw,',F=POINT'
+            DO i=1,Results%Nw
+                WRITE(10,'(80(X,E14.7))') Results%w(i),(ABS(Results%DiffractionForce(i,j,k)),ATAN2(IMAG(Results%DiffractionForce(i,j,k)),REAL(Results%DiffractionForce(i,j,k))),k=1,Results%Nintegration)
+            END DO
+        END DO
+        CLOSE(10)
+        OPEN(10,FILE=namedir//'/ExcitationForce.tec')
+        WRITE(10,'(A)') 'VARIABLES="w (rad/s)"'
+        DO k=1,Results%Nintegration
+            WRITE(10,'(A,I4,I4,A,I4,I4,A)') '"abs(F',Results%IndxForce(k,2),Results%IndxForce(k,3),')" "angle(F',Results%IndxForce(k,2),Results%IndxForce(k,3),')"'
+        END DO
+        DO j=1,Results%Nbeta
+            WRITE(10,'(A,F7.3,A,I6,A)') 'Zone t="Diffraction force - beta = ',Results%beta(j)*180./(4.*ATAN(1.0)),' deg",I=',Results%Nw,',F=POINT'
+            DO i=1,Results%Nw
+                WRITE(10,'(80(X,E14.7))') Results%w(i),(ABS(Results%DiffractionForce(i,j,k)+Results%FroudeKrylovForce(i,j,k)),ATAN2(IMAG(Results%DiffractionForce(i,j,k)+Results%FroudeKrylovForce(i,j,k)),REAL(Results%DiffractionForce(i,j,k)+Results%FroudeKrylovForce(i,j,k))),k=1,Results%Nintegration)
             END DO
         END DO
         CLOSE(10)
@@ -108,8 +189,9 @@
         SUBROUTINE DeleteTResults(Results)
         IMPLICIT NONE
         TYPE(TResults) :: Results
-        DEALLOCATE(Results%Force,Results%Period,Results%Rcase,Results%Iintegration)
-        IF (Results%Ntheta.GT.0) DEALLOCATE(Results%Theta,Results%HKochin)
+        DEALLOCATE(Results%w,Results%beta,Results%IndxForce,Results%IndxRadiation)
+        DEALLOCATE(Results%DiffractionForce,Results%FroudeKrylovForce,Results%AddedMass,Results%RadiationDamping)
+        IF (Results%Ntheta.GT.0) DEALLOCATE(Results%Theta,Results%HKochinRadiation,Results%HKochinDiffraction)
         END SUBROUTINE DeleteTResults  
 !       ---
 END MODULE

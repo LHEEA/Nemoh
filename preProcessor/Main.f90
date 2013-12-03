@@ -25,18 +25,21 @@
     TYPE TCase
         INTEGER :: Body
         INTEGER :: ICase
+        INTEGER :: Mode
         REAL,DIMENSION(3) :: Direction,Axis 
     END TYPE
 !   Radiation cases
     INTEGER :: Nradiation
     TYPE(TCase),DIMENSION(:),ALLOCATABLE :: RadCase
     COMPLEX,DIMENSION(:),ALLOCATABLE :: NVEL
+    COMPLEX,DIMENSION(:,:),ALLOCATABLE :: NormalVelocity
 !   Diffraction cases
     INTEGER :: Nbeta
     REAL :: betamin,betamax
     REAL,DIMENSION(:),ALLOCATABLE :: beta
     COMPLEX,DIMENSION(:),ALLOCATABLE :: Pressure
 !   Force integration cases
+    INTEGER :: Switch_Potential
     INTEGER :: Nintegration
     TYPE(TCase),DIMENSION(:),ALLOCATABLE :: IntCase
     REAL,DIMENSION(:),ALLOCATABLE :: NDS
@@ -44,9 +47,11 @@
 !   Froude Krylov forces
     COMPLEX,DIMENSION(:,:,:),ALLOCATABLE :: FKforce 
 !   Free surface visualisation
+    INTEGER :: Switch_FreeSurface
     INTEGER :: Nx,Ny
     REAL :: Lx,Ly
 !   Kochin function
+    INTEGER :: Switch_Kochin
     INTEGER :: NTheta
     REAL :: Thetamin,Thetamax
 !   Other local variables
@@ -110,8 +115,19 @@
     END IF
     READ(10,*)
     READ(10,*)
+    READ(10,*) Switch_Potential
     READ(10,*) Ntheta,thetamin,thetamax
+    IF (NTheta.GT.0) THEN
+        Switch_Kochin=1
+    ELSE
+        Switch_Kochin=0
+    END IF
     READ(10,*) Nx,Ny,Lx,Ly
+    IF (Nx.GT.0) THEN
+        Switch_FreeSurface=1
+    ELSE
+        Switch_FreeSurface=0
+    END IF
     CLOSE(10)
 !   re-read input file and store radiation and integration cases
     ALLOCATE(RadCase(Nradiation))
@@ -130,12 +146,14 @@
         DO i=1,M
             READ(10,*) RadCase(jrad+i)%ICase,(RadCase(jrad+i)%Direction(j),j=1,3),(RadCase(jrad+i)%Axis(j),j=1,3)
             RadCase(jrad+i)%Body=c
+            RadCase(jrad+i)%Mode=i
         END DO
         jrad=jrad+M
         READ(10,*) M
         DO i=1,M
             READ(10,*) IntCase(jint+i)%ICase,(IntCase(jint+i)%Direction(j),j=1,3),(IntCase(jint+i)%Axis(j),j=1,3)
             IntCase(jint+i)%Body=c
+            IntCase(jint+i)%Mode=i
         END DO
         jint=jint+M
         READ(10,*) M
@@ -156,7 +174,7 @@
     WRITE(*,'(A,I5,A,F7.4,A,F7.4)') '  ->',Nw,' wave frequencies from ',w(1),' to ',w(Nw)
     WRITE(*,'(A,I5,A,F7.4,A,F7.4)') '  ->',Nbeta,' wave directions from  ',beta(1),' to ',beta(Nbeta)
     WRITE(*,'(A,I5,A)') '  ->',Nradiation,' radiation problems'
-    WRITE(*,'(A,I5,A)') '  ->',Nintegration,' integration cases'
+    WRITE(*,'(A,I5,A)') '  ->',Nintegration,' forces'
     WRITE(*,*) ' '
 !
 !   --- Generate force integration file ----------------------------------------------------------------------------------------
@@ -170,47 +188,57 @@
         END DO
     END DO 
     DEALLOCATE(NDS)
-    OPEN(11,FILE=ID%ID(1:ID%lID)//'/Integration.dat')
-    WRITE(11,*) 0,Nintegration
+    OPEN(11,FILE=ID%ID(1:ID%lID)//'/Mesh/Integration.dat')
+    WRITE(11,*) Nintegration
     DO j=1,Nintegration
-        WRITE(11,*) 0.,IntCase(j)%Body,IntCase(j)%Icase,(FNDS(j,c),c=1,Mesh%Npanels*2**Mesh%Isym)
+        WRITE(11,*) (FNDS(j,c),c=1,Mesh%Npanels*2**Mesh%Isym)
     END DO
     CLOSE(11)
 !
-!   --- Generate radiations cases file ----------------------------------------------------------------------------------------
+!   --- Generate body conditions and calculate FK forces ----------------------------------------------------------------------------------------
 !
     ALLOCATE(NVEL(Mesh%Npanels*2**Mesh%Isym))
-    OPEN(11,FILE=ID%ID(1:ID%lID)//'/RadiationCases.dat')
-    WRITE(11,*) Nw,Nradiation
-    DO i=1,Nw
-        DO j=1,Nradiation
-            CALL ComputeRadiationCondition(Mesh,RadCase(j)%Body,RadCase(j)%Icase,RadCase(j)%Direction,RadCase(j)%Axis,NVEL)
-            WRITE(11,*) 2.*PI/w(i),RadCase(j)%Body,RadCase(j)%Icase,(REAL(NVEL(c)),IMAG(NVEL(c)),c=1,Mesh%Npanels*2**Mesh%Isym)
-        END DO
-    END DO
-    CLOSE(11)
-!
-!   --- Generate diffraction cases file ----------------------------------------------------------------------------------------
-!
     ALLOCATE(PRESSURE(Mesh%Npanels*2**Mesh%Isym))
     ALLOCATE(FKForce(Nw,Nbeta,Nintegration))
-    OPEN(11,FILE=ID%ID(1:ID%lID)//'/DiffractionCases.dat')
-    WRITE(11,*) Nw,Nbeta
-    DO j=1,Nw
-        DO i=1,Nbeta
-            CALL ComputeWave(Mesh,w(j),Beta(i),Environment,PRESSURE,NVEL)
-            WRITE(11,*) 2.*PI/w(j),Beta(i),0,(-REAL(NVEL(c)),-IMAG(NVEL(c)),c=1,Mesh%Npanels*2**Mesh%Isym)
+    ALLOCATE(NormalVelocity(Mesh%Npanels*2**Mesh%Isym,(Nbeta+Nradiation)*Nw))
+    DO i=1,Nw
+        DO j=1,Nbeta
+            CALL ComputeWave(Mesh,w(i),Beta(j),Environment,PRESSURE,NVEL)
+            DO c=1,Mesh%Npanels*2**Mesh%Isym
+                NormalVelocity(c,j+(i-1)*(Nbeta+Nradiation))=NVEL(c)
+            END DO 
 !           Calculate the corresponding FK forces
             DO k=1,Nintegration
-                FKForce(j,i,k)=0.
+                FKForce(i,j,k)=0.
                 DO c=1,Mesh%nPanels*2**Mesh%Isym
-                    FKForce(j,i,k)=FKForce(j,i,k)+PRESSURE(c)*FNDS(k,c)    
+                    FKForce(i,j,k)=FKForce(i,j,k)+PRESSURE(c)*FNDS(k,c)    
                 END DO
             END DO
-        END DO    
+        END DO
+        DO j=1,Nradiation
+            CALL ComputeRadiationCondition(Mesh,RadCase(j)%Body,RadCase(j)%Icase,RadCase(j)%Direction,RadCase(j)%Axis,NVEL)
+            DO c=1,Mesh%Npanels*2**Mesh%Isym
+                NormalVelocity(c,j+Nbeta+(i-1)*(Nbeta+Nradiation))=NVEL(c)
+            END DO 
+        END DO
     END DO
-    CLOSE(11)
+    CLOSE(11)        
     DEALLOCATE(PRESSURE,NVEL,FNDS)
+!
+!   --- Save body conditions ----------------------------------------------------------------------------------------
+!
+    OPEN(11,FILE=ID%ID(1:ID%lID)//'/Normalvelocities.dat')
+    WRITE(11,*) (Nbeta+Nradiation)*Nw
+    WRITE(11,*) ((w(i),j=1,Nbeta+Nradiation),i=1,Nw)
+    WRITE(11,*) (((beta(j),j=1,Nbeta),(-1.,j=1,Nradiation)),i=1,Nw)
+    WRITE(11,*) ((Switch_Potential,j=1,Nbeta+Nradiation),i=1,Nw)
+    WRITE(11,*) ((Switch_Freesurface,j=1,Nbeta+Nradiation),i=1,Nw)
+    WRITE(11,*) ((Switch_Kochin,j=1,Nbeta+Nradiation),i=1,Nw)
+    DO c=1,Mesh%Npanels*2**Mesh%Isym
+        WRITE(11,*) (REAL(NormalVelocity(c,j)),IMAG(NormalVelocity(c,j)),j=1,(Nbeta+Nradiation)*Nw)
+    END DO
+    CLOSE(11)        
+    DEALLOCATE(NormalVelocity)
 !
 !   --- Save FK forces ----------------------------------------------------------------------------------------
 !
@@ -226,10 +254,16 @@
         END DO
     END DO
     CLOSE(10)
+    OPEN(10,FILE=ID%ID(1:ID%lID)//'/results/FKForce.dat')
+    DO k=1,Nintegration
+        WRITE(10,*) ((ABS(FKForce(i,c,k)),ATAN2(IMAG(FKForce(i,c,k)),REAL(FKForce(i,c,k))),c=1,Nbeta),(0.*c,0.*c,c=1,Nradiation),i=1,Nw) 
+    END DO
+    CLOSE(10)
+    DEALLOCATE(FKForce)
 !
 !   --- Generate Free Surface visualisation file ----------------------------------------------------------------------
 !
-    OPEN(11,FILE=ID%ID(1:ID%lID)//'/FS.dat')
+    OPEN(11,FILE=ID%ID(1:ID%lID)//'/Mesh/Freesurface.dat')
     WRITE(11,*) Nx*Ny,(Nx-1)*(Ny-1)
     DO i=1,Nx
         DO j=1,Ny
@@ -245,7 +279,7 @@
 !
 !   --- Generate Kochin file ----------------------------------------------------------------------------------------
 !
-    OPEN(11,FILE=ID%ID(1:ID%lID)//'/Kochin.dat')
+    OPEN(11,FILE=ID%ID(1:ID%lID)//'/Mesh/Kochin.dat')
     WRITE(11,*) NTheta    
     IF (Ntheta.GT.0) THEN
         IF (NTheta.GT.1) THEN
@@ -257,9 +291,26 @@
         END IF
     END IF
     CLOSE(11)
+!   
+!   --- Save index of cases ----------------------------------------------------------------------------------------------
 !
-!   --- Finalize ----------------------------------------------------------------------------------------
+    OPEN(10,FILE=ID%ID(1:ID%lID)//'/results/index.dat')
+    WRITE(10,*) Nw,Nbeta,Nradiation,Nintegration,Ntheta
+    WRITE(10,*) '--- Force ---'
+    DO k=1,Nintegration
+        WRITE(10,*) k,IntCase(k)%Body,IntCase(k)%Mode
+    END DO
+    WRITE(10,*) '--- Motion ---'
+    DO k=1,Nradiation
+        WRITE(10,*) k,RadCase(k)%Body,RadCase(k)%Mode
+    END DO 
+    WRITE(10,*) (Beta(k),k=1,Nbeta)
+    WRITE(10,*) (w(k),k=1,Nw)
+    WRITE(10,*) ((Thetamin+(Thetamax-Thetamin)*(k-1)/(NTheta-1))*PI/180.,k=1,Ntheta)
+    CLOSE(10)
+!
+!   --- Finalize ----------------------------------------------------------------------------------------------------
 ! 
-    DEALLOCATE(FKForce)
+    DEALLOCATE(RadCase,IntCase,Beta)    
 !
     END PROGRAM Main

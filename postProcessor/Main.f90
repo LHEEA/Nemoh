@@ -18,8 +18,7 @@
 !   Environment
     TYPE(TEnvironment) :: Environment
 !   Hydrodynamic coefficients cases
-    TYPE(TResults) :: RadiationResults
-    TYPE(TResults) :: DiffractionResults
+    TYPE(TResults) :: Results
 !   IRFs
     TYPE(TIRF) :: IRF
 !   RAOs
@@ -39,37 +38,35 @@
 !   Read case ID
     CALL ReadTID(ID,'ID.dat')    
     WRITE(*,'(A,$)') '.'
-!   Read Environement
+!   Read environement
     CALL ReadTEnvironment(Environment,ID%ID(1:ID%lID)//'/aquaplus.cal') 
-!   Read radiation results
-    CALL ReadTResults(RadiationResults,ID%ID(1:ID%lID)//'/results/Radiation.dat')
-!   Read radiation results
-    CALL ReadTResults(DiffractionResults,ID%ID(1:ID%lID)//'/results/Diffraction.dat')
+!   Read results
+    CALL ReadTResults(Results,ID%ID(1:ID%lID)//'/results/forces.dat',ID%ID(1:ID%lID)//'/results/index.dat',ID%ID(1:ID%lID)//'/results/FKForce.tec')
+    CALL SaveTResults(Results,ID%ID(1:ID%lID)//'/results')
 !
 !   --- Compute IRFs -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 !
-    CALL Initialize_IRF(IRF,RadiationResults,ID%ID(1:ID%lID)//'/aquaplus.cal')  
+    CALL Initialize_IRF(IRF,Results,ID%ID(1:ID%lID)//'/aquaplus.cal')  
     IF (IRF%Switch.EQ.1) THEN
-        CALL Compute_IRF(IRF,RadiationResults)
+        CALL Compute_IRF(IRF,Results)
         CALL Save_IRF(IRF,ID%ID(1:ID%lID)//'/results/IRF.tec')
     END IF
 !
 !   --- Compute RAOs -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 !    
-    ALLOCATE(RAOs(RadiationResults%Ncase,DiffractionResults%Nperiod,DiffractionResults%Ncase))
-    CALL Compute_RAOs(RAOs,RadiationResults,DiffractionResults)
+    ALLOCATE(RAOs(Results%Nintegration,Results%Nw,Results%Nbeta))
+    CALL Compute_RAOs(RAOs,Results)
 !
 !   --- Save results -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 !
     WRITE(*,*) ' -> Save results ' 
     WRITE(*,*) ' '
-    CALL Plot_WaveElevation(ID,Environment,1,1,RAOs,RadiationResults,DiffractionResults)
+    CALL Plot_WaveElevation(ID,Environment,1,1,RAOs,Results)
      
 !
 !   --- Finalize -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 !
-    CALL DeleteTResults(RadiationResults)
-    CALL DeleteTResults(DiffractionResults)
+    CALL DeleteTResults(Results)
     DEALLOCATE(RAOs)
 !
     END PROGRAM Main

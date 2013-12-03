@@ -82,7 +82,8 @@
         CHARACTER*80 :: meshfile,line
         INTEGER :: lfile
         INTEGER :: M,N
-        REAL,DIMENSION(3) :: U,V,W
+        REAL,DIMENSION(3) :: U,V,W1,W2
+        REAL :: A1,A2
         REAL :: calNorme
         REAL :: tX,tY
         LOGICAL :: ex
@@ -189,22 +190,30 @@
         CLOSE(10)
 !       Perform additional calculations (normal vectors, areas, ...)
         DO i=1,Mesh%Npanels
-!           Centre of panels
+!           Surface of panel, centre and normal vector
             DO j=1,3
-                Mesh%XM(j,i)=0.25*(Mesh%X(j,Mesh%P(1,i))+Mesh%X(j,Mesh%P(2,i))+Mesh%X(j,Mesh%P(3,i))+Mesh%X(j,Mesh%P(4,i)))
-            END DO
-!           Surface of panel and normal vector
-            DO j=1,3
-                U(j)=Mesh%X(j,Mesh%P(3,i))-Mesh%X(j,Mesh%P(1,i))
+                U(j)=Mesh%X(j,Mesh%P(2,i))-Mesh%X(j,Mesh%P(1,i))
                 V(j)=Mesh%X(j,Mesh%P(4,i))-Mesh%X(j,Mesh%P(2,i))
             END DO
-            CALL CrossProduct(U,V,W)
-            Mesh%A(i)=0.5*calNorme(W)
+            CALL CrossProduct(U,V,W1)
+            A1=0.5*calNorme(W1)
+            DO j=1,3
+                U(j)=Mesh%X(j,Mesh%P(4,i))-Mesh%X(j,Mesh%P(3,i))
+                V(j)=Mesh%X(j,Mesh%P(2,i))-Mesh%X(j,Mesh%P(3,i))
+            END DO
+            CALL CrossProduct(U,V,W2)
+            A2=0.5*calNorme(W2)
+            Mesh%A(i)=A1+A2
             IF (Mesh%A(i).LT.1.0E-07) THEN
                 WRITE(*,'(A,I6,A,E14.7)') 'Error: surface of panel ',i,' is too small (',Mesh%A(i),')'
+                STOP
             END IF 
             DO j=1,3
-                Mesh%N(j,i)=W(j)/(2.*Mesh%A(i))
+                Mesh%XM(j,i)=1./3*(Mesh%X(j,Mesh%P(1,i))+Mesh%X(j,Mesh%P(2,i))+Mesh%X(j,Mesh%P(4,i)))*A1/Mesh%A(i)+1./3*(Mesh%X(j,Mesh%P(2,i))+Mesh%X(j,Mesh%P(3,i))+Mesh%X(j,Mesh%P(4,i)))*A2/Mesh%A(i)
+            END DO
+            U=W1+W2
+            DO j=1,3
+                Mesh%N(j,i)=U(j)/calNorme(U)
             END DO
         END DO
 !       Export mesh
@@ -222,8 +231,12 @@
         WRITE(10,'(4(X,I6))') 0,0,0,0
         CLOSE(10)
         OPEN(10,FILE=ID%ID(1:ID%lID)//'/Mesh/L10.dat')
-        WRITE(10,*)
-        WRITE(10,'(3(X,I6))') Mesh%Isym,Mesh%Npoints,Mesh%Npanels
+        WRITE(10,*) 
+        WRITE(10,'(4(X,I6))') Mesh%Isym,Mesh%Npoints,Mesh%Npanels,Mesh%Nbodies
+        DO i=1,Mesh%Npanels
+            WRITE(10,'(I5,7(X,E14.7))') Mesh%cPanel(i),(Mesh%XM(j,i),j=1,3),(Mesh%N(j,i),j=1,3),Mesh%A(i)
+        END DO
+        WRITE(10,*) 0
         CLOSE(10)
         OPEN(10,file=ID%ID(1:ID%lID)//'/Mesh/Mesh.tec')
         WRITE(10,'(A)') 'VARIABLES="X" "Y" "Z" "NX" "NY" "NZ" "A"'
