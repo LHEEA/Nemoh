@@ -6,48 +6,34 @@ IMPLICIT NONE
 
 CONTAINS
 !-------------------------------------------------------------------------------------!
-    SUBROUTINE PRE_PROC_MESH
+    SUBROUTINE PRE_PROC_MESH(Mesh)
+    
+    USE MMesh
      
     IMPLICIT NONE
 
-    INTEGER :: ITYPE
     INTEGER:: I,J,K,L,NC1 
     REAL :: GL,BL 
     REAL,DIMENSION(3) :: N13,N24  
     REAL :: DPOINT 
-    REAL :: XL,YL,ZL                      
+    REAL :: XL,YL,ZL  
+    TYPE(TMesh) :: Mesh                    
 
 !-------------------------------------------------------------------------------------!
-    OPEN(UNIT=1,FILE=MESHFILE(1:LFILE),STATUS='OLD')
-    READ(1,*)ITYPE,NSYMY
-    IF(NSYMY.NE.0)NSYMY=1    
-    IF (ITYPE.EQ.2) THEN 
-        READ(1,*)I,XL,YL,ZL  !DES POINTS
-        DO WHILE (I.NE.0)
-            X(I)=XL
-	        Y(I)=YL
-	        Z(I)=ZL  
-	        READ(1,*)I,XL,YL,ZL
-	    END DO
-	    NC1=0
-        READ(1,*)I,J,K,L    !DES SOMMETS DES FACETTES
-        DO WHILE (I.NE.0)
-            NC1=NC1+1
-            M1(NC1)=I
-	        M2(NC1)=J
-	        M3(NC1)=K
-	        M4(NC1)=L
-	        READ(1,*)I,J,K,L
-	    END DO
-	ELSE
-	    WRITE(*,*)
-	    WRITE(*,*) 'Hess and Smith numerotation not implemented yet'
-	    WRITE(*,*) 'Use natural numerotation instead'
-	    STOP
-	END IF
-	CLOSE(1)
-	IMX=NFA
+!   Copy mesh in Aquaplus format
+    DO i=1,Mesh%Npoints
+        X(i)=Mesh%X(1,i)
+        Y(i)=Mesh%X(2,i)
+        Z(i)=Mesh%X(3,i)
+    END DO
+    DO i=1,Mesh%Npanels
+        M1(i)=Mesh%P(1,i)
+        M2(i)=Mesh%P(2,i)
+        M3(i)=Mesh%P(3,i)
+        M4(i)=Mesh%P(4,i)
+    END DO	
 !-------------------------------------------------------------------------------------!
+    IMX=NFA
     GL=0.
     BL=0.
     DO I=1,NP
