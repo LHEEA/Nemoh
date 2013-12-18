@@ -90,7 +90,7 @@
 !       Initialize the mesh structure
         Npoints=0
         Npanels=0
-        OPEN(10,FILE=ID%ID(1:ID%lID)//'/aquaplus.cal')
+        OPEN(10,FILE=ID%ID(1:ID%lID)//'/Nemoh.cal')
         READ(10,*)
         READ(10,*)
         READ(10,*)
@@ -99,11 +99,6 @@
         READ(10,*)
         READ(10,*) Nbodies
         DO c=1,Nbodies
-            READ(10,*)
-            READ(10,*)
-            READ(10,*) 
-            READ(10,*)
-            READ(10,*)
             READ(10,*)
             READ(10,*)
             READ(10,*) M,N
@@ -127,7 +122,7 @@
 !       Read surfacic mesh
         Npanels=0
         Npoints=0
-        OPEN(10,FILE=ID%ID(1:ID%lID)//'/aquaplus.cal')
+        OPEN(10,FILE=ID%ID(1:ID%lID)//'/Nemoh.cal')
         READ(10,*)
         READ(10,*)
         READ(10,*)
@@ -137,15 +132,8 @@
         READ(10,*) 
         DO c=1,Nbodies
             READ(10,*)
-            READ(10,*) 
             tX=0.
             tY=0.
-            READ(10,*) (Mesh%CG(j,c),j=1,3)
-            Mesh%CG(1,c)=Mesh%CG(1,c)+tX
-            Mesh%CG(2,c)=Mesh%CG(2,c)+tY
-            READ(10,*)
-            READ(10,*)
-            READ(10,*)
             READ(10,*) meshfile
             lfile=LNBLNK(meshfile)
             OPEN(11,FILE=meshfile(1:lfile))

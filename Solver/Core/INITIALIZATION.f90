@@ -20,7 +20,7 @@ CONTAINS
     TYPE(TMesh) :: Mesh    
 !
 !   Read input file and geometry
-    OPEN(10,file=ID%ID(1:ID%lID)//'/aquaplus.cal',form='formatted',status='old')
+    OPEN(10,file=ID%ID(1:ID%lID)//'/nemoh.cal',form='formatted',status='old')
     READ(10,*)
     READ(10,*) RHO
     READ(10,*) G
@@ -43,7 +43,7 @@ CONTAINS
     IF (NSYMY.EQ.1) YEFF=0
     NF=NFA
     NSYM=NSYMY
-!   Initialise Aquaplus
+!   Initialise Nemoh
     CALL ALLOCATE_DATA
     CALL PRE_PROC_MESH(Mesh)
     CALL CREK(251)

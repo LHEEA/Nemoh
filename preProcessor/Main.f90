@@ -66,17 +66,17 @@
 !
     CALL ReadTID(ID,'ID.dat')
     CALL ReadTMesh(Mesh,ID)   
-    CALL ReadTEnvironment(Environment,ID%ID(1:ID%lID)//'/aquaplus.cal')
+    CALL ReadTEnvironment(Environment,ID%ID(1:ID%lID)//'/Nemoh.cal')
 !   Read number of radiation cases, number of force integration cases, range of considered periods and diffraction cases
 !   an directions for Kochin function
     Nradiation=0
     Nintegration=0
-    OPEN(10,FILE=ID%ID(1:ID%lID)//'/aquaplus.cal')
+    OPEN(10,FILE=ID%ID(1:ID%lID)//'/Nemoh.cal')
     DO c=1,7
         READ(10,*)
     END DO
     DO c=1,Mesh%Nbodies
-        DO i=1,8
+        DO i=1,3
             READ(10,*)
         END DO
         READ(10,*) M
@@ -132,14 +132,14 @@
 !   re-read input file and store radiation and integration cases
     ALLOCATE(RadCase(Nradiation))
     ALLOCATE(IntCase(Nintegration))
-    OPEN(10,FILE=ID%ID(1:ID%lID)//'/aquaplus.cal')
+    OPEN(10,FILE=ID%ID(1:ID%lID)//'/Nemoh.cal')
     DO c=1,7
         READ(10,*)
     END DO
     jrad=0
     jint=0
     DO c=1,Mesh%Nbodies
-        DO i=1,8
+        DO i=1,3
             READ(10,*)
         END DO
         READ(10,*) M

@@ -106,8 +106,8 @@ MODULE SOLVE_BEM_INFD_DIRECT
 
 	DO 2255 I=1,IMX
 	  IF(NSYMY .EQ. 0)THEN
-	    ZIGB(I)=ZOL(I,1)    ! Factor 2 is removed in comparison with previous version of Aquaplus because
-	                        ! Normal velocity is halved in Aquaplus (because of symmetry)
+	    ZIGB(I)=ZOL(I,1)    ! Factor 2 is removed in comparison with previous version of Nemoh because
+	                        ! Normal velocity is halved in Nemoh (because of symmetry)
 	    ZIGS(I)=0.0
 	  ELSE
 	    ZIGB(I)=(ZOL(I,1)+ZOL(I,2))

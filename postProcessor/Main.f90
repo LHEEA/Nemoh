@@ -39,14 +39,14 @@
     CALL ReadTID(ID,'ID.dat')    
     WRITE(*,'(A,$)') '.'
 !   Read environement
-    CALL ReadTEnvironment(Environment,ID%ID(1:ID%lID)//'/aquaplus.cal') 
+    CALL ReadTEnvironment(Environment,ID%ID(1:ID%lID)//'/nemoh.cal') 
 !   Read results
     CALL ReadTResults(Results,ID%ID(1:ID%lID)//'/results/forces.dat',ID%ID(1:ID%lID)//'/results/index.dat',ID%ID(1:ID%lID)//'/results/FKForce.tec')
     CALL SaveTResults(Results,ID%ID(1:ID%lID)//'/results')
 !
 !   --- Compute IRFs -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 !
-    CALL Initialize_IRF(IRF,Results,ID%ID(1:ID%lID)//'/aquaplus.cal')  
+    CALL Initialize_IRF(IRF,Results,ID%ID(1:ID%lID)//'/nemoh.cal')  
     IF (IRF%Switch.EQ.1) THEN
         CALL Compute_IRF(IRF,Results)
         CALL Save_IRF(IRF,ID%ID(1:ID%lID)//'/results/IRF.tec')

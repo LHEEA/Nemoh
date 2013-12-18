@@ -27,7 +27,7 @@
 !
     PI=4.*ATAN(1.)
 !   Read data
-    OPEN(10,FILE=ID%ID(1:ID%lID)//'/aquaplus.cal')
+    OPEN(10,FILE=ID%ID(1:ID%lID)//'/Nemoh.cal')
     READ(10,'(A20)') lookfor
     DO WHILE (lookfor.NE.'--- Post processing ')
         READ(10,'(A20)') lookfor

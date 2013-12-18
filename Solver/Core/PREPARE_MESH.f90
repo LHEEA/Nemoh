@@ -20,7 +20,7 @@ CONTAINS
     TYPE(TMesh) :: Mesh                    
 
 !-------------------------------------------------------------------------------------!
-!   Copy mesh in Aquaplus format
+!   Copy mesh in Nemoh format
     DO i=1,Mesh%Npoints
         X(i)=Mesh%X(1,i)
         Y(i)=Mesh%X(2,i)

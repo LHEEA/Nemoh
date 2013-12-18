@@ -27,7 +27,7 @@
 !   Meshes
     TYPE(TMesh) :: Mesh 
     TYPE(TMesh) :: MeshFS
-!   Aquaplus
+!   Nemoh
     REAL                    :: T
     COMPLEX,DIMENSION(:),ALLOCATABLE :: NVEL,PRESSURE
     COMPLEX,DIMENSION(:),ALLOCATABLE :: HKochin
@@ -56,7 +56,7 @@
     CALL ReadTMesh(Mesh,ID)  
 !   Read Body Conditions
     CALL ReadTBodyConditions(BodyConditions,Mesh%Npanels*2**Mesh%Isym,ID%ID(1:ID%lID)//'/Normalvelocities.dat') 
-!   Initialise Aquaplus
+!   Initialise Nemoh
     CALL INITIALIZE(ID,NFA,NSYMY,XEFF,YEFF,Mesh)
     ALLOCATE(NVEL(NFA*2**NSYMY),PRESSURE(NFA*2**NSYMY))
     WRITE(*,'(A,$)') '.'
