@@ -6,13 +6,8 @@
 --- Description of floating bodies -----------------------------------------------------------------------------------------------
 1				! Number of bodies
 --- Body 1 -----------------------------------------------------------------------------------------------------------------------
-100.E+03			! Physical mass
-0.	0.	-7.5		! Coordinates of gravity centre
-1.	 0.	0.		! Inertia matrix in cartesian frame
-0.	 1.	0.		!
-0.	 0.	1.		!
-Cylinder\mesh\L12.dat		! Name of mesh file
-500	280			! Number of points and number of panels 	
+mesh\cylinder.dat		! Name of mesh file
+540	300			! Number of points and number of panels 	
 6				! Number of degrees of freedom
 1 1. 0.	0. 0. 0. 0.		! Surge
 1 0. 1.	0. 0. 0. 0.		! Sway
