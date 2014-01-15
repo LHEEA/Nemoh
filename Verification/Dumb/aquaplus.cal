@@ -1,5 +1,0 @@
---- Environment ------------------------------------------------------------------------------------------------------------------
-1000.0				! RHO 			! KG/M**3 	! Fluid specific volume 
-9.81				! G			! M/S**2	! Gravity
-0.				! DEPTH			! M		! Water depth
-0.	0.			! XEFF YEFF		! M		! Wave measurement point

@@ -1,3 +1,27 @@
+!--------------------------------------------------------------------------------------
+!
+!   Copyright 2014 Ecole Centrale de Nantes, 1 rue de la Noë, 44300 Nantes, France
+!
+!   Licensed under the Apache License, Version 2.0 (the "License");
+!   you may not use this file except in compliance with the License.
+!   You may obtain a copy of the License at
+!
+!       http://www.apache.org/licenses/LICENSE-2.0
+!
+!   Unless required by applicable law or agreed to in writing, software
+!   distributed under the License is distributed on an "AS IS" BASIS,
+!   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+!   See the License for the specific language governing permissions and
+!   limitations under the License. 
+!
+!   Contributors list:
+!   - G. Delhommeau
+!   - P. Guével
+!   - J.C. Daubisse
+!   - J. Singh 
+!   - A. Babarit 
+!
+!--------------------------------------------------------------------------------------
     SUBROUTINE COMPUTE_KOCHIN(kwave,Theta,HKochin)
 !
     USE COM_VAR
@@ -14,6 +38,7 @@
     REAL :: PI
     INTEGER :: i,k,l
     REAL :: wbar
+    REAL :: CTE,CTM
     COMPLEX,DIMENSION(NFA*2**NSYMY) :: ZS
     COMPLEX,DIMENSION(NP) :: CEP,CEM,ZJ
     INTEGER,DIMENSION(5) :: KK
@@ -22,14 +47,14 @@
     PI=4.*ATAN(1.)
 !   Compute Kochin coefficients (integration using Gauss - 1 point)
     HKochin1=0.
-    DO i=1,NFA
-        wbar=(XG(i)-XEFF)*COS(Theta)+(YG(i)-YEFF)*SIN(Theta)
-        HKochin1=HKochin1+ZIGB(i)*CIH(kwave,ZG(i),Depth)*CEXP(-II*kwave*wbar)*AIRE(i)
-        IF (NSYMY.EQ.1) THEN
-            wbar=(XG(i)-XEFF)*COS(Theta)+(-YG(i)-YEFF)*SIN(Theta)
-            HKochin1=HKochin1+ZIGS(i)*CIH(kwave,ZG(i),Depth)*CEXP(-II*kwave*wbar)*AIRE(i)
-        END IF
-    END DO  
+!    DO i=1,NFA
+!        wbar=(XG(i)-XEFF)*COS(Theta)+(YG(i)-YEFF)*SIN(Theta)
+!        HKochin1=HKochin1+ZIGB(i)*CIH(kwave,ZG(i),Depth)*CEXP(-II*kwave*wbar)*AIRE(i)
+!        IF (NSYMY.EQ.1) THEN
+!            wbar=(XG(i)-XEFF)*COS(Theta)+(-YG(i)-YEFF)*SIN(Theta)
+!            HKochin1=HKochin1+ZIGS(i)*CIH(kwave,ZG(i),Depth)*CEXP(-II*kwave*wbar)*AIRE(i)
+!        END IF
+!    END DO  
 !   Compute Kochin coefficients (analytical integration)   
     DO k=1,NP
         wbar=(X(k)-XEFF)*COS(Theta)+(Y(k)-YEFF)*SIN(Theta)
@@ -69,7 +94,7 @@
 	    IF ((kwave*Depth.GT.18.).OR.(kwave*Depth.LE.0.)) THEN
 	        ZS(i)=ZS(i)/kwave    
 	    ELSE
-	        ZS(i)=0.5*ZS(i)*EXP(kwave*Depth)/SINH(kwave*Depth)
+	        ZS(i)=0.5*ZS(i)*EXP(kwave*Depth)/SINH(kwave*Depth)/kwave
 	    END IF
 	 END DO
      IF (NSYMY.EQ.1) THEN
@@ -112,7 +137,7 @@
 	        IF ((kwave*Depth.GT.18.).OR.(kwave*Depth.LE.0.)) THEN
 	            ZS(i+NFA)=-ZS(i+NFA)/kwave    
 	        ELSE
-	            ZS(i+NFA)=-0.5*ZS(i+NFA)*EXP(kwave*Depth)/SINH(kwave*Depth)
+	            ZS(i+NFA)=-0.5*ZS(i+NFA)*EXP(kwave*Depth)/SINH(kwave*Depth)/kwave
 	        END IF
 	     END DO
      END IF
@@ -123,5 +148,6 @@
             HKochin=HKochin+ZIGS(i)*ZS(i+NFA)
         END IF 
      END DO
+     HKochin=0.25/PI*HKochin
 !  
     END SUBROUTINE COMPUTE_KOCHIN

@@ -1,8 +1,31 @@
-! ----------------------------------------------
+!--------------------------------------------------------------------------------------
 !
-!   Solve the BVPs
+!   NEMOH V1.0 - BVP solver - January 2014
 !
-! ----------------------------------------------
+!--------------------------------------------------------------------------------------
+!
+!   Copyright 2014 Ecole Centrale de Nantes, 1 rue de la Noë, 44300 Nantes, France
+!
+!   Licensed under the Apache License, Version 2.0 (the "License");
+!   you may not use this file except in compliance with the License.
+!   You may obtain a copy of the License at
+!
+!       http://www.apache.org/licenses/LICENSE-2.0
+!
+!   Unless required by applicable law or agreed to in writing, software
+!   distributed under the License is distributed on an "AS IS" BASIS,
+!   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+!   See the License for the specific language governing permissions and
+!   limitations under the License. 
+!
+!   Contributors list:
+!   - G. Delhommeau
+!   - P. Guével
+!   - J.C. Daubisse
+!   - J. Singh
+!   - A. Babarit  
+!
+!--------------------------------------------------------------------------------------
 !
     PROGRAM Main
 !   
@@ -80,11 +103,14 @@
     CLOSE(10)
 !   Initialise free surface calculation points
     OPEN(10,FILE=ID%ID(1:ID%lID)//'/Mesh/Freesurface.dat')
-    READ(10,*) MeshFS%Npoints    
+    READ(10,*) MeshFS%Npoints,MeshFS%Npanels 
     IF (MeshFS%Npoints.GT.0) THEN
-        CALL CreateTMesh(MeshFS,MeshFS%Npoints,1,1)
+        CALL CreateTMesh(MeshFS,MeshFS%Npoints,MeshFS%Npanels,1)
         DO j=1,MeshFS%Npoints
             READ(10,*) MeshFS%X(1,j),MeshFS%X(2,j)
+        END DO
+        DO j=1,MeshFS%Npanels
+            READ(10,*) MeshFS%P(1,j),MeshFS%P(2,j),MeshFS%P(3,j),MeshFS%P(4,j)
         END DO
     END IF
     CLOSE(10)

@@ -1,0 +1,6 @@
+   NEMOH
+   Copyright 2014 Ecole Centrale de Nantes
+
+   This product has been developed at 
+   Ecole Centrale de Nantes (http://www.ec-nantes.fr) by
+   G. Delhommeau, A. Babarit, J. Singh, P. Guével, J.C. Daubisse

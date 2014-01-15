@@ -1,3 +1,24 @@
+!--------------------------------------------------------------------------------------
+!
+!   Copyright 2014 Ecole Centrale de Nantes, 1 rue de la Noë, 44300 Nantes, France
+!
+!   Licensed under the Apache License, Version 2.0 (the "License");
+!   you may not use this file except in compliance with the License.
+!   You may obtain a copy of the License at
+!
+!       http://www.apache.org/licenses/LICENSE-2.0
+!
+!   Unless required by applicable law or agreed to in writing, software
+!   distributed under the License is distributed on an "AS IS" BASIS,
+!   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+!   See the License for the specific language governing permissions and
+!   limitations under the License. 
+!
+!   Contributors list:
+!   - J. Singh
+!   - A. Babarit 
+!
+!--------------------------------------------------------------------------------------
 MODULE SOLVE_BEM
 !
 IMPLICIT NONE
@@ -11,9 +32,7 @@ CONTAINS
         USE MMesh
         USE OUTPUT
         USE SOLVE_BEM_INFD_DIRECT
-        USE SOLVE_BEM_INFD_ITERATIVE
         USE SOLVE_BEM_FD_DIRECT
-        USE SOLVE_BEM_FD_ITERATIVE        
 !
         IMPLICIT NONE
 !       Inputs/outputs
@@ -30,8 +49,6 @@ CONTAINS
         INTEGER :: Switch_potential
 !       For solver (DIRECT or GMRES)
         INTEGER :: NEXP
-        INTEGER :: lwork
-        COMPLEX, DIMENSION(:), ALLOCATABLE :: WORK 
 !       Locals
         INTEGER :: i,j
         REAL :: PI,W
@@ -54,11 +71,9 @@ CONTAINS
             IF (Indiq_solver .eq. 0) CALL SOLVE_POTENTIAL_INFD_DIRECT(NVEL)        
 !           Solve using GMRES ?
             IF (Indiq_solver .eq. 1) THEN
-                LWORK=IRES*IRES + IRES*(IMX+5) + 6*IMX+IRES+1
-                ALLOCATE(WORK(LWORK))
-                CALL SOLVE_POTENTIAL_INFD_ITERATIVE(LWORK,WORK,NVEL)
-                DEALLOCATE(WORK)
-            END IF
+                WRITE(*,*) ' Iterative solver is not available'
+                STOP
+             END IF
         ELSE
 !           Calculate wave number
             AKH=w*w*Depth/G                                                 
@@ -68,10 +83,8 @@ CONTAINS
             IF (Indiq_solver .eq. 0) CALL SOLVE_POTENTIAL_FD_DIRECT(NVEL,AMH,NEXP)        
 !           Solve using GMRES ?
             IF (Indiq_solver .eq. 1) THEN
-                LWORK=IRES*IRES + IRES*(IMX+5) + 6*IMX+IRES+1
-                ALLOCATE(WORK(LWORK))
-                CALL SOLVE_POTENTIAL_FD_ITERATIVE(LWORK,WORK,NVEL,AMH,NEXP)
-                DEALLOCATE(WORK)
+                WRITE(*,*) ' Iterative solver is not available'
+                STOP
             END IF        
         END IF
 !       Assemble pressure
@@ -86,7 +99,7 @@ CONTAINS
             DO j=1,NTheta
                 CALL COMPUTE_KOCHIN(kwave,Theta(j),HKochin(j))
             END DO
-            CALL WRITE_KOCHIN(ID,ProblemNumber,HKochin,NTheta)
+            CALL WRITE_KOCHIN(ID,ProblemNumber,HKochin,NTheta,Theta)
         END IF
 !       Save free surface elevation
         IF (Switch_FS.EQ.1) THEN
@@ -98,7 +111,7 @@ CONTAINS
         END IF
 !       Save output
         IF (Switch_Potential.EQ.1) THEN
-            CALL WRITE_POTENTIAL(ID,ProblemNumber)
+            CALL WRITE_POTENTIAL(ID,ProblemNumber,PRESSURE)
         END IF    
 !    
     END SUBROUTINE SOLVE_BVP
