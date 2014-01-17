@@ -151,11 +151,11 @@
         READ(10,*)
         READ(10,*) 
         DO c=1,Nbodies
-            READ(10,*)
+            READ(10,*) meshfile
             tX=0.
             tY=0.
             READ(10,*) meshfile
-            lfile=LNBLNK(meshfile)
+              lfile=LNBLNK(meshfile)
             OPEN(11,FILE=meshfile(1:lfile))
             READ(11,*) M,N
             IF ((c.GT.1).AND.(N.NE.Mesh%Isym)) THEN
