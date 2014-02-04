@@ -81,7 +81,7 @@ for c=1:nBodies
     fprintf(fid,['mesh',int2str(c),'\n'],1);
     fprintf(fid,'1 \n %f 0. \n ',tX(c));
     fprintf(fid,'%f %f %f \n',CG(c,:));
-    fprintf(fid,'%g \n 2 \n 0. \n 1.\n',nfobj);
+    fprintf(fid,'%g \n 2 \n 0. \n 1.\n',nfobj(c));
     status=fclose(fid);
 %   Raffinement automatique du maillage et calculs hydrostatiques
     system('.\Mesh\Mesh.exe >Mesh\Mesh.log');    
