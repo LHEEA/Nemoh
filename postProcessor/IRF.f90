@@ -105,7 +105,7 @@
                     IRF%K(i,j,k)=0.
                     DO l=1,Results%Nw-1
 !                        IRF%K(i,j,k)=IRF%K(i,j,k)-REAL(Results%Force(l,j,k))*COS(2.*PI/Results%Period(l)*IRF%Time(i))*2.*PI*ABS(1./Results%Period(l)-1./Results%Period(l+1))
-                        IRF%K(i,j,k)=IRF%K(i,j,k)-0.5*(Results%RadiationDamping(l,j,k)*COS(Results%w(l)*IRF%Time(i))+Results%RadiationDamping(l+1,j,k)*COS(Results%w(l+1)*IRF%Time(i)))*(Results%w(l+1)-Results%w(l))                    
+                        IRF%K(i,j,k)=IRF%K(i,j,k)+0.5*(Results%RadiationDamping(l,j,k)*COS(Results%w(l)*IRF%Time(i))+Results%RadiationDamping(l+1,j,k)*COS(Results%w(l+1)*IRF%Time(i)))*(Results%w(l+1)-Results%w(l))                    
                     END DO 
                     IRF%K(i,j,k)=IRF%K(i,j,k)*2./PI         
                 END DO
