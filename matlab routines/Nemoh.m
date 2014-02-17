@@ -100,7 +100,7 @@ for k=1:nw
     ligne=fscanf(fid,'%f',1+12*nBodies)
     w(i)=ligne(1);
     for j=1:6*nBodies
-        Famp(k,j)=ligne(2*j+1);
+        Famp(k,j)=ligne(2*j);
         Fphi(k,j)=ligne(2*j+1);
     end;
 end;
