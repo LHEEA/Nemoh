@@ -86,7 +86,7 @@ for c=1:nBodies
 %   Raffinement automatique du maillage et calculs hydrostatiques
     system('.\Mesh\Mesh.exe >Mesh\Mesh.log');    
 %   Visualisation du maillage
-    clear x y z NN nftri tri u v w;
+    clear x y z NN nftri tri u v w xu yv zw;
     fid=fopen([nomrep,'\Mesh\mesh',int2str(c),'.tec'],'r');
     ligne=fscanf(fid,'%s',2);
     nx(c)=fscanf(fid,'%g',1);
