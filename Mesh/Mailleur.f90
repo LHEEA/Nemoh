@@ -125,7 +125,7 @@
 !	REAL,PARAMETER :: njmn=3		! Nombre minimum de points de discretisation
 	INTEGER :: njmn
 
-	OPEN(10,FILE='mesh.cal')
+	OPEN(10,FILE='Mesh.cal')
 	DO i=1,5
 	    READ(10,*)
 	END DO

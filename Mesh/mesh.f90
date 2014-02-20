@@ -80,7 +80,7 @@
 	WRITE(*,*) ' -> Read input data '
 	WRITE(*,*) ' '
 	CALL ReadTID(ID,'ID.dat') 
-	OPEN(10,FILE='mesh.cal')
+	OPEN(10,FILE='Mesh.cal')
 	READ(10,*) DSCRPT%ID
 	DSCRPT%lID=LNBLNK(DSCRPT%ID)
 	READ(10,*) Nsym
@@ -104,7 +104,7 @@
 	END DO
 	CLOSE(10)
 !   Prise en compte d'une collerette ?
-	OPEN(10,FILE='mesh.cal')
+	OPEN(10,FILE='Mesh.cal')
 	DO i=1,6
 	    READ(10,*)
 	END DO

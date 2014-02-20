@@ -7,6 +7,28 @@ FFLAGS= -c
 #LIBRAIRIES  
 #LFLAGS= -L./ -lVAWTBEMT -lstdc++
 
+#SOURCES FORTRAN Mesh(modules de maillage)
+SRCM=./Common/Identification.f90\
+./Mesh/calCol.f90\
+./Mesh/coque.f90\
+./Mesh/ExMaillage.f90\
+./Mesh/hydre.f90\
+./Mesh/Mailleur.f90\
+./Mesh/mesh.f90\
+
+# LISTE DES .o preProc
+#TRANSFORME f90 en o  
+OBJM=$(SRCM:.f90=.o)
+
+#Liste pour transformer ./*/*.o en .o dans le OBJP (cf Yoann pour automatisation)  
+OBJM2=Identification.o\
+calCol.o\
+coque.o\
+ExMaillage.o\
+hydre.o\
+Mailleur.o\
+mesh.o\
+
 #SOURCES FORTRAN preProc(modules de preprocessing)
 SRCP=./Common/Identification.f90\
 ./Common/Environment.f90\
@@ -108,7 +130,15 @@ IRF.o\
 Plot_WaveElevation.o\
 Main.o\
 
-build: pre solver post clean
+build: msh pre solver post clean
+
+#
+#Build Mesh executable
+msh:	mesh
+#Rules to Build MAIN EXECUTABLE  (dependances et regle d'execution)
+mesh:	$(OBJM) 
+		$(FC) -o mesh $(OBJM2)
+
 
 #
 #Build preProc executable
