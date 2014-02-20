@@ -58,19 +58,19 @@
     CALL ReadTID(ID,'ID.dat')    
     WRITE(*,'(A,$)') '.'
 !   Read environement
-    CALL ReadTEnvironment(Environment,ID%ID(1:ID%lID)//'/nemoh.cal') 
+    CALL ReadTEnvironment(Environment,ID%ID(1:ID%lID)//'/Nemoh.cal') 
 !   Read results
-    CALL ReadTResults(Results,ID%ID(1:ID%lID)//'/results/forces.dat',ID%ID(1:ID%lID)//'/results/index.dat',ID%ID(1:ID%lID)//'/results/FKForce.tec')
-    CALL SaveTResults(Results,ID%ID(1:ID%lID)//'/results')
+    CALL ReadTResults(Results,ID%ID(1:ID%lID)//'/Results/Forces.dat',ID%ID(1:ID%lID)//'/Results/index.dat',ID%ID(1:ID%lID)//'/Results/FKForce.tec')
+    CALL SaveTResults(Results,ID%ID(1:ID%lID)//'/Results')
     WRITE(*,*) '. Done !'
     WRITE(*,*) ' '
 !
 !   --- Compute IRFs -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 !
-    CALL Initialize_IRF(IRF,Results,ID%ID(1:ID%lID)//'/nemoh.cal')  
+    CALL Initialize_IRF(IRF,Results,ID%ID(1:ID%lID)//'/Nemoh.cal')  
     IF (IRF%Switch.EQ.1) THEN
         CALL Compute_IRF(IRF,Results)
-        CALL Save_IRF(IRF,ID%ID(1:ID%lID)//'/results/IRF.tec')
+        CALL Save_IRF(IRF,ID%ID(1:ID%lID)//'/Results/IRF.tec')
     END IF
 !
 !   --- Compute RAOs -------------------------------------------------------------------------------------------------------------------------------------------------------------------

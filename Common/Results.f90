@@ -15,7 +15,8 @@
 !   limitations under the License. 
 !
 !   Contributors list:
-!   - A. Babarit  
+!   - A. Babarit / Ecole Centrale de Nantes 
+!   - C. Peyrard / EDF R&D
 !
 !--------------------------------------------------------------------------------------
     MODULE MResults
@@ -167,7 +168,9 @@
         IMPLICIT NONE	    
         TYPE(TResults) :: Results
         CHARACTER*(*) :: namedir
-        INTEGER :: i,j,k
+        INTEGER :: i,j,k,l
+        REAL :: PI
+        PI=4.*ATAN(1.0)
         OPEN(10,FILE=namedir//'/RadiationCoefficients.tec')
         WRITE(10,'(A)') 'VARIABLES="w (rad/s)"'
         DO k=1,Results%Nintegration
@@ -204,6 +207,45 @@
             END DO
         END DO
         CLOSE(10)
+!       Added by Christophe Peyrard
+!       Save hydrodynamic database with Aquaplus format
+        OPEN(10,FILE=namedir//'/CA.dat')
+        WRITE(10,'(A,I5)') 'Nb de periode : ',Results%Nw
+        DO l=1,Results%Nw
+	        WRITE(10,'(F7.4)') Results%w(l)
+	        DO j=1,Results%Nradiation
+	            WRITE(10,'(6(X,E13.6))') (Results%RadiationDamping(l,j,k),k=1,Results%Nradiation)
+	        END DO
+        END DO
+        CLOSE(10)
+        OPEN(10,FILE=namedir//'/CM.dat')
+        WRITE(10,'(A,I5)') 'Nb de periode : ',Results%Nw
+        DO l=1,Results%Nw
+	        WRITE(10,'(F7.4)') Results%w(l)
+	        DO j=1,Results%Nradiation
+	            WRITE(10,'(6(X,E13.6))') (Results%AddedMass(l,j,k),k=1,Results%Nradiation)
+	        END DO
+        END DO
+        CLOSE(10)
+        OPEN(10,FILE=namedir//'/Fe.dat')
+        WRITE(10,'(A)') 'VARIABLES="Period (s)" "|Fx| (N/m)" "|Fy| (N/m)" "|Fz| (N/m)" "|Cx| (N)" "|Cy| (N)" "|Cz| (N)" "ang(Fx) (°)" "ang(Fy) (°)" "ang(Fz) (°)" "ang(Cx) (°)" "ang(Cy) (°)" "ang(Cz) (°)"'
+        WRITE(10,'(A,I2,A)') 'Zone t="Corps ',1,'"'
+        DO j=1,Results%Nbeta
+            WRITE(10,'(A,F7.3,A,I6,A)') 'Zone t="Diffraction force - beta = ',Results%beta(j)*180./PI,' deg",I=',Results%Nw,',F=POINT'
+            DO l=1,Results%Nw
+!           Be careful of the phase referential
+!           In Nemoh, PHI = -g/w * CIH CEXP(k.x), so ETA= i w/g * PHI = -i CEXP(k.x)
+!           Thus, in time domain ETA = sin(k.x -wt) 
+!           Forces/Phase shift in Fe.dat are given with the following form : F= Force * sin(-wt-phase), so a phase shift of -PI/2 is necessary
+                WRITE(10,'(F7.4,6(X,E13.6),6(X,F7.2))') Results%w(l),(ABS(Results%DiffractionForce(l,j,k)+Results%FroudeKrylovForce(l,j,k)),k=1,Results%Nintegration),  &
+                                                            (180.D0/PI*( -ATAN2(IMAG(Results%DiffractionForce(l,j,k)+Results%FroudeKrylovForce(l,j,k)),        &
+                                                                               REAL(Results%DiffractionForce(l,j,k)+Results%FroudeKrylovForce(l,j,k)) )        &
+                                                                         -PI/2D0 ) ,                                                                           &
+                                                               k=1,Results%Nintegration)
+            END DO
+        END DO
+        CLOSE(10)
+!       End of addition
         END SUBROUTINE SaveTResults
 !       --- 
         SUBROUTINE DeleteTResults(Results)

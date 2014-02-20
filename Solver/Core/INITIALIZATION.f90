@@ -41,7 +41,7 @@ CONTAINS
     TYPE(TMesh) :: Mesh    
 !
 !   Read input file and geometry
-    OPEN(10,file=ID%ID(1:ID%lID)//'/nemoh.cal',form='formatted',status='old')
+    OPEN(10,file=ID%ID(1:ID%lID)//'/Nemoh.cal',form='formatted',status='old')
     READ(10,*)
     READ(10,*) RHO
     READ(10,*) G
