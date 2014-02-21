@@ -6,7 +6,7 @@
 --- Description of floating bodies -----------------------------------------------------------------------------------------------
 1				! Number of bodies
 --- Body 1 -----------------------------------------------------------------------------------------------------------------------
-mesh\Rotated_cube.dat		! Name of mesh file
+Rotated_cube.dat		! Name of mesh file
 341	280			! Number of points and number of panels 	
 6				! Number of degrees of freedom
 1 1. 0.	0. 0. 0. 0.		! Surge

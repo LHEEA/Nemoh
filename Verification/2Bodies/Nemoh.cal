@@ -6,7 +6,7 @@
 --- Description of floating bodies -----------------------------------------------------------------------------------------------
 2				! Number of bodies
 --- Body 1 -----------------------------------------------------------------------------------------------------------------------
-mesh\Cube.dat			! Name of mesh file
+Cube.dat			! Name of mesh file
 352 280				! Number of points and number of panels 	
 6				! Number of degrees of freedom
 1 1. 0.	0. 0. 0. 0.		! Surge
@@ -24,7 +24,7 @@ mesh\Cube.dat			! Name of mesh file
 2 0. 0. 1. 0. 0. -2.5		! Moment force in z direction about a point
 0				! Number of lines of additional information 
 --- Body 2 -----------------------------------------------------------------------------------------------------------------------
-mesh\Rotated_cube.dat		! Name of mesh file
+Rotated_cube.dat		! Name of mesh file
 341	280			! Number of points and number of panels 	
 6				! Number of degrees of freedom
 1 1. 0.	0. 0. 0. 0.		! Surge

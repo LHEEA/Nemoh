@@ -6,7 +6,7 @@
 --- Description of floating bodies -----------------------------------------------------------------------------------------------
 1				! Number of bodies
 --- Body 1 -----------------------------------------------------------------------------------------------------------------------
-mesh\cylinder.dat		! Name of mesh file
+Cylinder.dat			! Name of mesh file
 540	300			! Number of points and number of panels 	
 6				! Number of degrees of freedom
 1 1. 0.	0. 0. 0. 0.		! Surge
