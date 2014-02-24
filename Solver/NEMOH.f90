@@ -174,10 +174,10 @@
     END PROGRAM Main
 !----------------------------------------------------------------
 
-    SUBROUTINE CREK(NPINTE)
+    SUBROUTINE CREK
     USE COM_VAR
     IMPLICIT NONE
-    INTEGER:: I,J,JZ,IR,NPINTE
+    INTEGER:: I,J,JZ,IR
     REAL:: AKZ,AKR
     JZ=46
     IR=328
@@ -197,7 +197,7 @@
 
     DO 8009 J=1,JZ
       DO 8008 I=1,IR
-	CALL VNS(NPINTE,XZ(J),XR(I),I,J)                                           
+	CALL VNS(XZ(J),XR(I),I,J)                                           
 8008 CONTINUE
 8009 CONTINUE
 
@@ -206,18 +206,18 @@
     END SUBROUTINE
 !---------------------------------------------------------                                                                    
 
-      SUBROUTINE VNS(NPINTE,AKZ,AKR,I,J) 
+      SUBROUTINE VNS(AKZ,AKR,I,J) 
       USE COM_VAR
       USE ELEMENTARY_FNS
     IMPLICIT NONE         
-      INTEGER:: I,J,NPINTE,IT
+      INTEGER:: I,J,IT
       REAL:: AKZ,AKR,PI,CT,ST,CQIT,TETA
       REAL:: QQT(NPINTE),CQT(NPINTE)
       REAL:: FD1JX,FD1JZ,FD2JX,FD2JZ
       COMPLEX:: IM,C1,C2,ZIK,GZ,CEX            
       IM=(0.,1.)                                                                
       PI=4.*ATAN(1.)
-      CALL COFINT(NPINTE,CQT,QQT)         
+      CALL COFINT(CQT,QQT)         
       FD1JX=0.                                                              
       FD1JZ=0.                                                              
       FD2JX=0.                                                              
@@ -249,10 +249,10 @@
       END SUBROUTINE  
 !-------------------------------------------------------------------
 
-      SUBROUTINE COFINT(NPINTE,CQT,QQT)  
+      SUBROUTINE COFINT(CQT,QQT)  
       USE COM_VAR
     IMPLICIT NONE 
-      INTEGER :: J,NPINTE
+      INTEGER :: J
       REAL:: PI,QQT(NPINTE),CQT(NPINTE)
 
       PI=4.*ATAN(1.)

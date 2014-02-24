@@ -111,7 +111,7 @@ CONTAINS
 	    XNQ=SQRT(XNX**2+XNY**2+XNZ**2)                                           
 	    IF(XNQ.LE.EPPM)THEN                                                         !
 	        WRITE(*,*) 
-            WRITE(*,'(A,I7,A)') 'Error: area of panel ',i,' is very small'
+            WRITE(*,'(A,I7,A)') 'Error: area of panel ',i,' is too small'
             WRITE(*,'(A,E14.7)') '       - Area = ',0.5*XNQ
             WRITE(*,'(A,E14.7)') '       - XG   = ',0.25*(X(M1(I))+X(M2(I))+X(M3(I))+X(M4(I)))
             WRITE(*,'(A,E14.7)') '       - YG   = ',0.25*(Y(M1(I))+Y(M2(I))+Y(M3(I))+Y(M4(I)))
@@ -135,7 +135,7 @@ CONTAINS
         PSCA=-YN(I)*YAVER                                                         
         IF(PSCA.GT.0.)THEN  
             WRITE(*,*) 
-            WRITE(*,'(A,I7,A)') 'Error: normal vector of panel ',i,' points towards the x axis'                                                     
+            WRITE(*,'(A,I7,A)') 'Warning: normal vector of panel ',i,' points towards the x axis'                                                     
         ENDIF                                                                                         
         XI1=T1UNX*(X(K)-XAVER)+T1UNY*(Y(K)-YAVER)+T1UNZ*(Z(K)-ZAVER)              
         XI2=T1UNX*(X(L)-XAVER)+T1UNY*(Y(L)-YAVER)+T1UNZ*(Z(L)-ZAVER)              

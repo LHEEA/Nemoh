@@ -85,9 +85,10 @@
     REAL :: VSXP1,VSXP2,VSYP1,VSYP2,VSZP1,VSZP2 
     REAL :: VSXM1,VSXM2,VSYM1,VSYM2,VSZM1,VSZM2
     !Values used in interpolation of infinite part of the Greens function
+    INTEGER,PARAMETER :: NPINTE=251
     REAL :: XR(328),XZ(46),APD1X(328,46),APD1Z(328,46),APD2X(328,46),APD2Z(328,46)   
     INTEGER:: NQ
-    REAL:: CQ(101),QQ(101),AMBDA(31),AR(31)
+    REAL:: CQ(NPINTE),QQ(NPINTE),AMBDA(31),AR(31)
     
     ! --- Reading and writing units -----------------------------------
     ! File for visualization of potential
