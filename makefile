@@ -55,7 +55,7 @@ SRCS=./Solver/Core/COM_VAR.f90\
 ./Common/Environment.f90\
 ./Common/Identification.f90\
 ./Common/Mesh.f90\
-./Solver/Core/BODYCONDITIONS.f90\
+./Solver/Core/Bodyconditions.f90\
 ./Solver/Core/PREPARE_MESH.f90\
 ./Solver/Core/INITIALIZATION.f90\
 ./Solver/Core/OUTPUT.f90\
