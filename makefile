@@ -1,9 +1,9 @@
 # makefile written by Christophe Peyrard from EDF R&D
 
 #COMPILATEUR  
-FC=ifort
+FC=gfortran
 #OPTIONS  
-FFLAGS= -c
+FFLAGS= -c  -ffree-form
 #LIBRAIRIES  
 #LFLAGS= -L./ -lVAWTBEMT -lstdc++
 
@@ -85,7 +85,7 @@ OBJS2=COM_VAR.o\
 Environment.o\
 Identification.o\
 Mesh.o\
-BODYCONDITIONS.o\
+Bodyconditions.o\
 PREPARE_MESH.o\
 INITIALIZATION.o\
 OUTPUT.o\

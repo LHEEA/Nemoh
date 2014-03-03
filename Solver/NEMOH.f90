@@ -32,7 +32,7 @@
     USE MIdentification
     USE MMesh
     USE MBodyConditions
-    USE iflport
+!   USE iflport
     USE SOLVE_BEM
     USE OUTPUT
     USE INITIALIZATION
@@ -130,7 +130,8 @@
             NVEL(c)=BodyConditions%NormalVelocity(c,j)
         END DO
 !       Solve BVP
-        CALL SOLVE_BVP(j,ID,2.*PI/BodyConditions%Omega(j),NVEL,PRESSURE,BodyConditions%Switch_Kochin(j),NTheta,Theta,HKochin,BodyConditions%Switch_Freesurface(j),MeshFS,BodyConditions%Switch_Potential(j))
+        CALL SOLVE_BVP(j,ID,2.*PI/BodyConditions%Omega(j),NVEL,PRESSURE,BodyConditions%Switch_Kochin(j), & 
+	NTheta,Theta,HKochin,BodyConditions%Switch_Freesurface(j),MeshFS,BodyConditions%Switch_Potential(j))
 !       Calculate force coefficients
         DO i=1,Nintegration
             DO c=1,Mesh%Npanels*2**Mesh%Isym
