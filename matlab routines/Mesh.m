@@ -1,12 +1,12 @@
 % 
 % --> function [Mass,Inertia,KH,XB,YB,ZB]=Mesh(nBodies,n,X,tX,CG,nfobj)
 %
-% Purpose : Mesh generation of a symmetric body
-% for use with Aquaplus
+% Purpose : Mesh generation of a symmetric body for use with Nemoh. Because
+%           of symmetry, only half of the body must be described. 
 %
 % Inputs : description of body surface in large panels
 %   - nBodies           : number of bodies
-%   - n                 : number of panels
+%   - n(nBodies)        : number of panels
 %   - X(nBodies,n,4,3)  : coordinates of nodes of each panel
 %   - tX(nBodies)       : translations
 %   - CG(nBodies,3)     : position of gravity centre
@@ -42,6 +42,18 @@ ZB=zeros(nBodies,1);
 WPA=zeros(nBodies,1);
 nx=zeros(nBodies,1);
 nf=zeros(nBodies,1);
+% Symmetry check
+sgn=X(1,1,1,2);
+for c=1:nBodies
+    for d=1:n(c)
+        for i=1:4
+            if (sgn*X(c,d,i,2) < 0)
+                input('\n Be careful: it is assumed that a symmetry about the (xOz) plane is used. \n Only one half of the mesh must be descrided. \n The mesh will not be generated. \n');
+                return;
+            end;
+        end;
+    end;
+end
 % Sauvegarde de la description du maillage
 for c=1:nBodies
     fprintf('\n -> Meshing body number %g \n',c);
