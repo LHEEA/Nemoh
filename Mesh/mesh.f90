@@ -26,7 +26,7 @@
 	PROGRAM Mesh
 
     USE MIdentification
-!    USE iflport
+    USE iflport
 
 	IMPLICIT NONE
 	
@@ -187,7 +187,7 @@
 	WRITE(10,'(A,F7.3,A,F7.3)') ' XF = ',XF+xG,' - XG = ',xG
 	WRITE(10,'(A,F7.3,A,F7.3)') ' YF = ',YF+yG,' - YG = ',yG
 	WRITE(10,'(A,F7.3,A,F7.3)') ' ZF = ',ZF,' - ZG = ',zG
-	WRITE(10,'(A,E14.7)') ' Displacement :',DEPLACEMENT
+	WRITE(10,'(A,E14.7)') ' Displacement = ',DEPLACEMENT
 	WRITE(10,'(A,E14.7)') ' Waterplane area = ',SF
 	CLOSE(10)
 !	Sauvegarde de la description du maillage et de la partie immergee

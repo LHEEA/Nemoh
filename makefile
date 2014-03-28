@@ -1,9 +1,9 @@
 # makefile written by Christophe Peyrard from EDF R&D
 
 #COMPILATEUR  
-FC=gfortran
+FC=~/intel/bin/ifort
 #OPTIONS  
-FFLAGS= -c  -ffree-form
+FFLAGS= -c
 #LIBRAIRIES  
 #LFLAGS= -L./ -lVAWTBEMT -lstdc++
 

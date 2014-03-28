@@ -99,7 +99,7 @@
             Eta(i,j)=EtaI(i,j)+EtaP(i,j)
         END DO
     END DO
-    OPEN(10,FILE=ID%ID(1:ID%lID)//'/Results/WaveField.tec')
+    OPEN(10,FILE=ID%ID(1:ID%lID)//'/results/WaveField.tec')
     WRITE(10,'(A)') 'VARIABLES="X" "Y" "etaI_C" "etaI_S" "etaP_C" "etaC_S" "etaI_C+etaP_C" "etaI_S+etaI_P" "|etaP|" "|etaI+etaP|"'
     WRITE(10,'(A,E14.7,A,I6,A,I6,A)') 'ZONE t="Wave frequency - w =',w,'",N=',Nx*Ny,', E=',(Nx-1)*(Nx-1),' , F=FEPOINT,ET=QUADRILATERAL'
     DO i=1,Nx

@@ -207,7 +207,7 @@
         END DO
     END DO 
     DEALLOCATE(NDS)
-    OPEN(11,FILE=ID%ID(1:ID%lID)//'/Mesh/Integration.dat')
+    OPEN(11,FILE=ID%ID(1:ID%lID)//'/mesh/Integration.dat')
     WRITE(11,*) Nintegration
     DO j=1,Nintegration
         WRITE(11,*) (FNDS(j,c),c=1,Mesh%Npanels*2**Mesh%Isym)
@@ -282,7 +282,7 @@
 !
 !   --- Generate Free Surface visualisation file ----------------------------------------------------------------------
 !
-    OPEN(11,FILE=ID%ID(1:ID%lID)//'/Mesh/Freesurface.dat')
+    OPEN(11,FILE=ID%ID(1:ID%lID)//'/mesh/Freesurface.dat')
     WRITE(11,*) Nx*Ny,(Nx-1)*(Ny-1)
     DO i=1,Nx
         DO j=1,Ny
@@ -298,7 +298,7 @@
 !
 !   --- Generate Kochin file ----------------------------------------------------------------------------------------
 !
-    OPEN(11,FILE=ID%ID(1:ID%lID)//'/Mesh/Kochin.dat')
+    OPEN(11,FILE=ID%ID(1:ID%lID)//'/mesh/Kochin.dat')
     WRITE(11,*) NTheta    
     IF (Ntheta.GT.0) THEN
         IF (NTheta.GT.1) THEN

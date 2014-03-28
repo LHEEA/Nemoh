@@ -79,7 +79,7 @@
         END SUBROUTINE CopyTMesh
 !       ---
         SUBROUTINE ReadTMesh(Mesh,ID)
-!        USE iflport
+        USE iflport
         USE MIdentification
         IMPLICIT NONE
         TYPE(TMesh) :: Mesh
@@ -91,13 +91,13 @@
         Npoints=0
         Npanels=0
         Nbodies=0
-        OPEN(10,FILE=ID%ID(1:ID%lID)//'/Mesh/L10.dat')
+        OPEN(10,FILE=ID%ID(1:ID%lID)//'/mesh/L10.dat')
         READ(10,*)
         READ(10,*) i,Npoints,Npanels,Nbodies
          CLOSE(10) 
         CALL CreateTMesh(Mesh,Npoints,Npanels,Nbodies)
 !       Read mesh
-        OPEN(10,FILE=ID%ID(1:ID%lID)//'/Mesh/L12.dat')
+        OPEN(10,FILE=ID%ID(1:ID%lID)//'/mesh/L12.dat')
         READ(10,*) i,Mesh%Isym
         IF (i.NE.2) THEN
             WRITE(*,*) ' '
@@ -114,7 +114,7 @@
         END DO
         READ(10,*)
         CLOSE(10)
-        OPEN(10,FILE=ID%ID(1:ID%lID)//'/Mesh/L10.dat')
+        OPEN(10,FILE=ID%ID(1:ID%lID)//'/mesh/L10.dat')
         READ(10,*)
         READ(10,*) j
         IF (j.NE.Mesh%Isym) THEN

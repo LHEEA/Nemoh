@@ -42,8 +42,7 @@
         BodyConditions%Nproblems=Nproblems
         BodyConditions%Npanels=Npanels
         ALLOCATE(BodyConditions%NormalVelocity(Npanels,Nproblems))
-        ALLOCATE(BodyConditions%Omega(Nproblems),BodyConditions%Switch_Potential(Nproblems), &
-	BodyConditions%Switch_FreeSurface(Nproblems),BodyConditions%Switch_Kochin(Nproblems),BodyConditions%Switch_Type(Nproblems))
+        ALLOCATE(BodyConditions%Omega(Nproblems),BodyConditions%Switch_Potential(Nproblems),BodyConditions%Switch_FreeSurface(Nproblems),BodyConditions%Switch_Kochin(Nproblems),BodyConditions%Switch_Type(Nproblems))
         END SUBROUTINE CreateTBodyConditions
 !       --- 
         SUBROUTINE CopyTBodyConditions(BodyConditionsTarget,BodyConditionsSource)
@@ -92,8 +91,7 @@
         SUBROUTINE DeleteTBodyConditions(BodyConditions)
         IMPLICIT NONE
         TYPE(TBodyConditions) :: BodyConditions
-        DEALLOCATE(BodyConditions%Omega,BodyConditions%Switch_potential,BodyConditions%Switch_FreeSurface, &
-	BodyConditions%Switch_Kochin,BodyConditions%Switch_Type)
+        DEALLOCATE(BodyConditions%Omega,BodyConditions%Switch_potential,BodyConditions%Switch_FreeSurface,BodyConditions%Switch_Kochin,BodyConditions%Switch_Type)
         DEALLOCATE(BodyConditions%NormalVelocity)
         END SUBROUTINE DeleteTBodyConditions  
 !       ---

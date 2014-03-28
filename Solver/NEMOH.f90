@@ -32,7 +32,7 @@
     USE MIdentification
     USE MMesh
     USE MBodyConditions
-!   USE iflport
+    USE iflport
     USE SOLVE_BEM
     USE OUTPUT
     USE INITIALIZATION
@@ -83,7 +83,7 @@
     ALLOCATE(NVEL(NFA*2**NSYMY),PRESSURE(NFA*2**NSYMY))
     WRITE(*,'(A,$)') '.'
 !   Initialise Force matrix
-    OPEN(10,FILE=ID%ID(1:ID%lID)//'/Mesh/Integration.dat')
+    OPEN(10,FILE=ID%ID(1:ID%lID)//'/mesh/Integration.dat')
     READ(10,*) Nintegration
     ALLOCATE(NDS(Nintegration,NFA*2**NSYMY))
     DO i=1,Nintegration
@@ -91,7 +91,7 @@
     END DO
     CLOSE(10)
 !   Initialise Kochin function calculation
-    OPEN(10,FILE=ID%ID(1:ID%lID)//'/Mesh/Kochin.dat')
+    OPEN(10,FILE=ID%ID(1:ID%lID)//'/mesh/Kochin.dat')
     READ(10,*) Ntheta 
     ALLOCATE(Theta(Ntheta))
     IF (Ntheta.GT.0) THEN        
@@ -102,7 +102,7 @@
     ALLOCATE(HKochin(NTheta))
     CLOSE(10)
 !   Initialise free surface calculation points
-    OPEN(10,FILE=ID%ID(1:ID%lID)//'/Mesh/Freesurface.dat')
+    OPEN(10,FILE=ID%ID(1:ID%lID)//'/mesh/Freesurface.dat')
     READ(10,*) MeshFS%Npoints,MeshFS%Npanels 
     IF (MeshFS%Npoints.GT.0) THEN
         CALL CreateTMesh(MeshFS,MeshFS%Npoints,MeshFS%Npanels,1)
@@ -130,8 +130,7 @@
             NVEL(c)=BodyConditions%NormalVelocity(c,j)
         END DO
 !       Solve BVP
-        CALL SOLVE_BVP(j,ID,2.*PI/BodyConditions%Omega(j),NVEL,PRESSURE,BodyConditions%Switch_Kochin(j), & 
-	NTheta,Theta,HKochin,BodyConditions%Switch_Freesurface(j),MeshFS,BodyConditions%Switch_Potential(j))
+        CALL SOLVE_BVP(j,ID,2.*PI/BodyConditions%Omega(j),NVEL,PRESSURE,BodyConditions%Switch_Kochin(j),NTheta,Theta,HKochin,BodyConditions%Switch_Freesurface(j),MeshFS,BodyConditions%Switch_Potential(j))
 !       Calculate force coefficients
         DO i=1,Nintegration
             DO c=1,Mesh%Npanels*2**Mesh%Isym
@@ -148,7 +147,7 @@
 !
     WRITE(*,*) ' -> Save results ' 
     WRITE(*,*) ' '
-    OPEN(10,FILE=ID%ID(1:ID%lID)//'/Results/Forces.dat')
+    OPEN(10,FILE=ID%ID(1:ID%lID)//'/results/Forces.dat')
     ALLOCATE(line(BodyConditions%Nproblems*2))
     DO c=1,Nintegration
         DO j=1,BodyConditions%Nproblems

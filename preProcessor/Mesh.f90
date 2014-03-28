@@ -91,7 +91,7 @@
         END SUBROUTINE CopyTMesh
 !       ---
         SUBROUTINE ReadTMesh(Mesh,ID)
-!        USE iflport
+        USE iflport
         USE MIdentification
         IMPLICIT NONE
         TYPE(TMesh) :: Mesh
@@ -217,8 +217,7 @@
                 STOP
             END IF 
             DO j=1,3
-                Mesh%XM(j,i)=1./3*(Mesh%X(j,Mesh%P(1,i))+Mesh%X(j,Mesh%P(2,i))+Mesh%X(j,Mesh%P(4,i)))*A1/Mesh%A(i)+ &
-                1./3*(Mesh%X(j,Mesh%P(2,i))+Mesh%X(j,Mesh%P(3,i))+Mesh%X(j,Mesh%P(4,i)))*A2/Mesh%A(i)
+                Mesh%XM(j,i)=1./3*(Mesh%X(j,Mesh%P(1,i))+Mesh%X(j,Mesh%P(2,i))+Mesh%X(j,Mesh%P(4,i)))*A1/Mesh%A(i)+1./3*(Mesh%X(j,Mesh%P(2,i))+Mesh%X(j,Mesh%P(3,i))+Mesh%X(j,Mesh%P(4,i)))*A2/Mesh%A(i)
             END DO
             U=W1+W2
             DO j=1,3
@@ -228,7 +227,7 @@
 !       Export mesh
         INQUIRE (DIRECTORY=ID%ID(1:ID%lID)//'/mesh', EXIST=ex) 
         IF (.NOT.ex) M=SYSTEM('mkdir '//ID%ID(1:ID%lID)//'/mesh')
-        OPEN(10,FILE=ID%ID(1:ID%lID)//'/Mesh/L12.dat')
+        OPEN(10,FILE=ID%ID(1:ID%lID)//'/mesh/L12.dat')
         WRITE(10,'(I3,X,I3)') 2,Mesh%Isym
         DO i=1,Mesh%Npoints
             WRITE(10,'(I6,3(X,E14.7))') i,(Mesh%X(j,i),j=1,3)    
@@ -239,7 +238,7 @@
         END DO
         WRITE(10,'(4(X,I6))') 0,0,0,0
         CLOSE(10)
-        OPEN(10,FILE=ID%ID(1:ID%lID)//'/Mesh/L10.dat')
+        OPEN(10,FILE=ID%ID(1:ID%lID)//'/mesh/L10.dat')
         WRITE(10,*) 
         WRITE(10,'(4(X,I6))') Mesh%Isym,Mesh%Npoints,Mesh%Npanels,Mesh%Nbodies
         DO i=1,Mesh%Npanels
@@ -247,7 +246,7 @@
         END DO
         WRITE(10,*) 0
         CLOSE(10)
-        OPEN(10,file=ID%ID(1:ID%lID)//'/Mesh/Mesh.tec')
+        OPEN(10,file=ID%ID(1:ID%lID)//'/mesh/Mesh.tec')
         WRITE(10,'(A)') 'VARIABLES="X" "Y" "Z" "NX" "NY" "NZ" "A"'
 	    WRITE(10,*) 'ZONE N=',Mesh%Npoints,', E=',Mesh%Npanels,' , F=FEPOINT,ET=QUADRILATERAL'
 	    DO i=1,Mesh%Npoints
