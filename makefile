@@ -169,6 +169,11 @@ postProc:	$(OBJO)
 %.o:	%.f90
 	$(FC) $(FFLAGS) $<
 
+
+#Copy to local bin directory
+install: build
+	cp mesh preProc solver postProc ~/bin/
+
 # Remove *.o and main executable
 clean:
 	rm *.o *.mod   
