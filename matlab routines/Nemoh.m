@@ -124,5 +124,5 @@ end;
 status=fclose(fid);
 % Expression des efforts d excitation de houle sous la forme Famp*exp(i*Fphi)
 i=sqrt(-1);
-Fe=Famp.*(cos(Fphi*pi/180.)+i*sin(Fphi*pi/180.));
+Fe = Famp.*((cos(Fphi)+i*sin(Fphi)));
 end
