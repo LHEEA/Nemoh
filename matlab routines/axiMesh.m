@@ -61,10 +61,10 @@ fprintf('\n --> Number of nodes             : %g',nx);
 fprintf('\n --> Number of panels (max 2000) : %g \n',nf);
 nomrep=input('\n - Directory name for storage of results : ');
 system(['mkdir ',nomrep]);
-system(['mkdir ',nomrep,'\Mesh']);
-system(['mkdir ',nomrep,'\Results']);
+system(['mkdir ',nomrep,'/Mesh']);
+system(['mkdir ',nomrep,'/results']);
 % Creation des fichiers de calcul du maillage
-fid=fopen('mesh.cal','w');
+fid=fopen('Mesh.cal','w');
 fprintf(fid,'axisym \n',1);
 fprintf(fid,'1 \n 0. 0. \n ');
 zG=input(' - Vertical position of gravity center : ');
@@ -86,10 +86,10 @@ for i=1:nf
 end;
 status=fclose(fid);
 % Raffinement automatique du maillage et calculs hydrostatiques
-system('.\Mesh\Mesh.exe >Mesh\Mesh.log');
+system('mesh >Mesh.log');
 % Visualisation du maillage
 clear x y z NN nx nf nftri tri u v w;
-fid=fopen([nomrep,'\Mesh\axisym.tec'],'r');
+fid=fopen([nomrep,'/Mesh/axisym.tec'],'r');
 ligne=fscanf(fid,'%s',2);
 nx=fscanf(fid,'%g',1);
 ligne=fscanf(fid,'%s',2);
@@ -137,7 +137,7 @@ quiver3(xu,yv,zw,u,v,w);
 title('Mesh for Nemoh');
 clear KH;
 KH=zeros(6,6);
-fid=fopen([nomrep,'\Mesh\KH.dat'],'r');
+fid=fopen([nomrep,'/Mesh/KH.dat'],'r');
 for i=1:6   
     ligne=fscanf(fid,'%g %g',6);
     KH(i,:)=ligne;
@@ -145,7 +145,7 @@ end;
 status=fclose(fid);
 clear XB YB ZB Mass WPA Inertia
 Inertia=zeros(6,6);
-fid=fopen([nomrep,'\Mesh\Hydrostatics.dat'],'r');
+fid=fopen([nomrep,'/Mesh/Hydrostatics.dat'],'r');
 ligne=fscanf(fid,'%s',2);
 XB=fscanf(fid,'%f',1);
 ligne=fgetl(fid);
@@ -162,7 +162,7 @@ ligne=fscanf(fid,'%s',2);
 WPA=fscanf(fid,'%f',1);
 status=fclose(fid);
 clear ligne
-fid=fopen([nomrep,'\Mesh\Inertia_hull.dat'],'r');
+fid=fopen([nomrep,'/Mesh/Inertia_hull.dat'],'r');
 for i=1:3
     ligne=fscanf(fid,'%g %g',3);
     Inertia(i+3,4:6)=ligne;
@@ -180,7 +180,7 @@ fprintf(fid,'0.	0.              ! XEFF YEFF		! M		! Wave measurement point\n');
 fprintf(fid,'--- Description of floating bodies -----------------------------------------------------------------------------------------------\n');
 fprintf(fid,'1				! Number of bodies\n');
 fprintf(fid,'--- Body 1 -----------------------------------------------------------------------------------------------------------------------\n');
-fprintf(fid,[nomrep,'\\mesh\\axisym.dat		! Name of mesh file\n']);
+fprintf(fid,['''',nomrep,'/Mesh/axisym.dat''		! Name of mesh file\n']);
 fprintf(fid,'%g %g			! Number of points and number of panels 	\n',nx,nf);
 fprintf(fid,'6				! Number of degrees of freedom\n');
 fprintf(fid,'1 1. 0.	0. 0. 0. 0.		! Surge\n');
