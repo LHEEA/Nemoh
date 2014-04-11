@@ -82,7 +82,7 @@
 	end do	
 	! Maillage AQUAPLUS
 	! Fichier Tecplot
-	open(10,file=ID%ID(1:ID%lID)//'/Mesh/'//DSCRPT%ID(1:DSCRPT%lID)//'.tec')
+	open(10,file=ID%ID(1:ID%lID)//'/mesh/'//DSCRPT%ID(1:DSCRPT%lID)//'.tec')
 	write(10,*) 'ZONE N=',np,', E=',nf,' , F=FEPOINT,ET=QUADRILATERAL'
 	do i=1,np
 		write(10,'(6(2X,E14.7))') X(i),Y(i),Z(i),0.0,0.0,0.0
@@ -96,7 +96,7 @@
 	end do
 	close(10)
 	! Fichier de maillage
-	open(10,file=ID%ID(1:ID%lID)//'/Mesh/'//DSCRPT%ID(1:DSCRPT%lID)//'.dat')
+	open(10,file=ID%ID(1:ID%lID)//'/mesh/'//DSCRPT%ID(1:DSCRPT%lID)//'.dat')
 	write(10,'(20X,I1,10X,I1)') 2,1
 	do i=1,np
 		write(10,'(10X,I4,3(10X,F14.7))') i,X(i),Y(i),Z(i)
@@ -108,7 +108,7 @@
 	write(10,'(4(10X,I1))') 0,0,0,0
 	close(10)
 	! Fichiers de maillage
-	open(10,file=ID%ID(1:ID%lID)//'/Mesh/'//DSCRPT%ID(1:DSCRPT%lID)//'_info.dat')
+	open(10,file=ID%ID(1:ID%lID)//'/mesh/'//DSCRPT%ID(1:DSCRPT%lID)//'_info.dat')
 	write(10,'(I7,X,I7,A)') np,nf, ' Number of points and number of panels'
 	close(10)
 	
