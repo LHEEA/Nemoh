@@ -61,8 +61,8 @@ fprintf('\n --> Number of nodes             : %g',nx);
 fprintf('\n --> Number of panels (max 2000) : %g \n',nf);
 nomrep=input('\n - Directory name for storage of results : ');
 system(['mkdir ',nomrep]);
-system(['mkdir ',nomrep,'/mesh']);
-system(['mkdir ',nomrep,'/results']);
+system(['mkdir ',nomrep,filesep,'mesh']);
+system(['mkdir ',nomrep,filesep,'results']);
 % Creation des fichiers de calcul du maillage
 fid=fopen('Mesh.cal','w');
 fprintf(fid,'axisym \n',1);
@@ -75,7 +75,7 @@ status=fclose(fid);
 fid=fopen('ID.dat','w');
 fprintf(fid,['% g \n',nomrep,' \n'],length(nomrep));
 status=fclose(fid);
-fid=fopen([nomrep,'/mesh/axisym'],'w');
+fid=fopen([nomrep,filesep,'mesh',filesep,'axisym'],'w');
 fprintf(fid,'%g \n',nx);
 fprintf(fid,'%g \n',nf);
 for i=1:nx
@@ -86,10 +86,15 @@ for i=1:nf
 end;
 status=fclose(fid);
 % Raffinement automatique du maillage et calculs hydrostatiques
-system('mesh >Mesh.log');
+l = isunix;
+if l == 1
+    system('mesh >Mesh.log');
+else
+    system('.\Mesh\Mesh.exe >Mesh\Mesh.log');
+end
 % Visualisation du maillage
 clear x y z NN nx nf nftri tri u v w;
-fid=fopen([nomrep,'/mesh/axisym.tec'],'r');
+fid=fopen([nomrep,filesep,'mesh',filesep,'axisym.tec'],'r');
 ligne=fscanf(fid,'%s',2);
 nx=fscanf(fid,'%g',1);
 ligne=fscanf(fid,'%s',2);
@@ -137,7 +142,7 @@ quiver3(xu,yv,zw,u,v,w);
 title('Mesh for Nemoh');
 clear KH;
 KH=zeros(6,6);
-fid=fopen([nomrep,'/mesh/KH.dat'],'r');
+fid=fopen([nomrep,filesep,'mesh',filesep,'KH.dat'],'r');
 for i=1:6   
     ligne=fscanf(fid,'%g %g',6);
     KH(i,:)=ligne;
@@ -145,7 +150,7 @@ end;
 status=fclose(fid);
 clear XB YB ZB Mass WPA Inertia
 Inertia=zeros(6,6);
-fid=fopen([nomrep,'/mesh/Hydrostatics.dat'],'r');
+fid=fopen([nomrep,filesep,'mesh',filesep,'Hydrostatics.dat'],'r');
 ligne=fscanf(fid,'%s',2);
 XB=fscanf(fid,'%f',1);
 ligne=fgetl(fid);
@@ -162,7 +167,7 @@ ligne=fscanf(fid,'%s',2);
 WPA=fscanf(fid,'%f',1);
 status=fclose(fid);
 clear ligne
-fid=fopen([nomrep,'/mesh/Inertia_hull.dat'],'r');
+fid=fopen([nomrep,filesep,'mesh',filesep,'Inertia_hull.dat'],'r');
 for i=1:3
     ligne=fscanf(fid,'%g %g',3);
     Inertia(i+3,4:6)=ligne;
@@ -171,7 +176,7 @@ Inertia(1,1)=Mass;
 Inertia(2,2)=Mass;
 Inertia(3,3)=Mass;
 % Write Nemoh input file
-fid=fopen([nomrep,'/Nemoh.cal'],'w');
+fid=fopen([nomrep,filesep,'Nemoh.cal'],'w');
 fprintf(fid,'--- Environment ------------------------------------------------------------------------------------------------------------------ \n');
 fprintf(fid,'1000.0				! RHO 			! KG/M**3 	! Fluid specific volume \n');
 fprintf(fid,'9.81				! G			! M/S**2	! Gravity \n');
@@ -180,7 +185,7 @@ fprintf(fid,'0.	0.              ! XEFF YEFF		! M		! Wave measurement point\n');
 fprintf(fid,'--- Description of floating bodies -----------------------------------------------------------------------------------------------\n');
 fprintf(fid,'1				! Number of bodies\n');
 fprintf(fid,'--- Body 1 -----------------------------------------------------------------------------------------------------------------------\n');
-fprintf(fid,['''',nomrep,'/mesh/axisym.dat''		! Name of mesh file\n']);
+fprintf(fid,['''',nomrep,filesep,'mesh',filesep,'axisym.dat''		! Name of mesh file\n']);
 fprintf(fid,'%g %g			! Number of points and number of panels 	\n',nx,nf);
 fprintf(fid,'6				! Number of degrees of freedom\n');
 fprintf(fid,'1 1. 0.	0. 0. 0. 0.		! Surge\n');

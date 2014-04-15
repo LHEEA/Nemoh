@@ -27,8 +27,8 @@ function [Mass,Inertia,KH,XB,YB,ZB]=Mesh(nBodies,n,X,tX,CG,nfobj)
 status=close('all');
 nomrep=input('\n - Directory name for storage of results : ');
 system(['mkdir ',nomrep]);
-system(['mkdir ',nomrep,'/mesh']);
-system(['mkdir ',nomrep,'/results']);
+system(['mkdir ',nomrep,filesep,'mesh']);
+system(['mkdir ',nomrep,filesep,'results']);
 fid=fopen('ID.dat','w');
 fprintf(fid,['% g \n',nomrep,' \n'],length(nomrep));
 status=fclose(fid);
@@ -58,7 +58,7 @@ end
 for c=1:nBodies
     fprintf('\n -> Meshing body number %g \n',c);
     clear x y z tri;
-    fid=fopen([,nomrep,'/mesh/mesh',int2str(c)],'w');
+    fid=fopen([,nomrep,filesep,'mesh',filesep,'mesh',int2str(c)],'w');
     fprintf(fid,'%g \n',4*n(c));
     fprintf(fid,'%g \n',n(c));
     nx(c)=0;
@@ -96,10 +96,15 @@ for c=1:nBodies
     fprintf(fid,'%g \n 2 \n 0. \n 1.\n',nfobj(c));
     status=fclose(fid);
 %   Raffinement automatique du maillage et calculs hydrostatiques
-    system('mesh >Mesh.log');    
+    l = isunix;
+    if l == 1
+        system('mesh >Mesh.log');
+    else
+        system('.\Mesh\Mesh.exe >Mesh\Mesh.log');
+    end
 %   Visualisation du maillage
     clear x y z NN nftri tri u v w xu yv zw;
-    fid=fopen([nomrep,'/mesh/mesh',int2str(c),'.tec'],'r');
+    fid=fopen([nomrep,filesep,'mesh',filesep,'mesh',int2str(c),'.tec'],'r');
     ligne=fscanf(fid,'%s',2);
     nx(c)=fscanf(fid,'%g',1);
     ligne=fscanf(fid,'%s',2);
@@ -145,13 +150,13 @@ for c=1:nBodies
     hold on;
     quiver3(xu,yv,zw,u,v,w);
     title('Mesh for Nemoh');
-    fid=fopen([nomrep,'/mesh/KH.dat'],'r');
+    fid=fopen([nomrep,filesep,'mesh',filesep,'KH.dat'],'r');
     for i=1:6   
         ligne=fscanf(fid,'%g %g',6);
         KH(c,i,:)=ligne;
     end;
     status=fclose(fid);
-    fid=fopen([nomrep,'/mesh/Hydrostatics.dat'],'r');
+    fid=fopen([nomrep,filesep,'mesh',filesep,'Hydrostatics.dat'],'r');
     ligne=fscanf(fid,'%s',2);
     XB(c)=fscanf(fid,'%f',1);
     ligne=fgetl(fid);
@@ -168,7 +173,7 @@ for c=1:nBodies
     WPA(c)=fscanf(fid,'%f',1);
     status=fclose(fid);
     clear ligne
-    fid=fopen([nomrep,'/mesh/Inertia_hull.dat'],'r');
+    fid=fopen([nomrep,filesep,'mesh',filesep,'Inertia_hull.dat'],'r');
     for i=1:3
         ligne=fscanf(fid,'%g %g',3);
         Inertia(c,i+3,4:6)=ligne;
@@ -181,7 +186,7 @@ for c=1:nBodies
     end
 end;
 % Write Nemoh input file
-fid=fopen([nomrep,'/Nemoh.cal'],'w');
+fid=fopen([nomrep,filesep,'Nemoh.cal'],'w');
 fprintf(fid,'--- Environment ------------------------------------------------------------------------------------------------------------------ \n');
 fprintf(fid,'1000.0				! RHO 			! KG/M**3 	! Fluid specific volume \n');
 fprintf(fid,'9.81				! G			! M/S**2	! Gravity \n');
@@ -191,7 +196,7 @@ fprintf(fid,'--- Description of floating bodies --------------------------------
 fprintf(fid,'%g				! Number of bodies\n',nBodies);
 for c=1:nBodies
     fprintf(fid,'--- Body %g -----------------------------------------------------------------------------------------------------------------------\n',c);
-    fprintf(fid,['''',nomrep,'/mesh/mesh',int2str(c),'.dat''		! Name of mesh file\n']);
+    fprintf(fid,['''',nomrep,filesep,'mesh',filesep,'mesh',int2str(c),'.dat''		! Name of mesh file\n']);
     fprintf(fid,'%g %g			! Number of points and number of panels 	\n',nx(c),nf(c));
     fprintf(fid,'6				! Number of degrees of freedom\n');
     fprintf(fid,'1 1. 0.	0. 0. 0. 0.		! Surge\n');
