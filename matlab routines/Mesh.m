@@ -196,7 +196,11 @@ fprintf(fid,'--- Description of floating bodies --------------------------------
 fprintf(fid,'%g				! Number of bodies\n',nBodies);
 for c=1:nBodies
     fprintf(fid,'--- Body %g -----------------------------------------------------------------------------------------------------------------------\n',c);
-    fprintf(fid,['''',nomrep,filesep,'mesh',filesep,'mesh',int2str(c),'.dat''		! Name of mesh file\n']);
+    if isunix 
+        fprintf(fid,['''',nomrep,filesep,'mesh',filesep,'mesh',int2str(c),'.dat''		! Name of mesh file\n']);
+    else
+        fprintf(fid,[nomrep,'\\mesh\\mesh',int2str(c),'.dat      ! Name of mesh file\n']);
+    end;
     fprintf(fid,'%g %g			! Number of points and number of panels 	\n',nx(c),nf(c));
     fprintf(fid,'6				! Number of degrees of freedom\n');
     fprintf(fid,'1 1. 0.	0. 0. 0. 0.		! Surge\n');
