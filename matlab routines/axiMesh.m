@@ -62,7 +62,7 @@ fprintf('\n --> Number of panels (max 2000) : %g \n',nf);
 nomrep=input('\n - Directory name for storage of results : ');
 system(['mkdir ',nomrep]);
 system(['mkdir ',nomrep,'\Mesh']);
-system(['mkdir ',nomrep,'\Results']);
+system(['mkdir ',nomrep,'\results']);
 % Creation des fichiers de calcul du maillage
 fid=fopen('mesh.cal','w');
 fprintf(fid,'axisym \n',1);

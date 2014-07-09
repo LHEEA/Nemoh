@@ -73,35 +73,57 @@ CONTAINS
     COMPLEX,DIMENSION(*) :: PRESSURE
     CHARACTER*5 :: str
     WRITE(str,'(I5)') Pbnumber
-    OPEN(11,FILE=ID%ID(1:ID%lID)//'/results/potential.'//str//'.dat')
+    OPEN(11,FILE=ID%ID(1:ID%lID)//'/results/pressure.'//str//'.dat')
     WRITE(11,*) 'VARIABLES="X" "Y" "Z" "abs(p) (Pa)" "angle(p) (rad)"'
-    WRITE(11,'(A,I7,A,I7,A)') 'ZONE N=',NP*2**NSYMY,',E = ',NFA*2**NSYMY,'F=FEPOINT,ET=QUADRILATERAL'
-    DO i=1,NP
-        WRITE(11,*) X(i),Y(i),Z(i),0.,0.
-    END DO
-    IF (NSYMY.EQ.1) THEN
-        DO i=1,NP
-            WRITE(11,*) X(i),-Y(i),Z(i),0.,0.
-        END DO
-    END IF
+    WRITE(11,'(A,I7,A,I7,A)') 'ZONE N=',4*NFA*2**NSYMY,',E = ',NFA*2**NSYMY,',F=FEPOINT,ET=QUADRILATERAL'
     DO i=1,NFA
-        WRITE(11,*) M1(i),M2(i),M3(i),M4(i)
+        WRITE(11,*) X(M1(i)),Y(M1(i)),Z(M1(i)),ABS(PRESSURE(i)),ATAN2(IMAG(PRESSURE(i)),REAL(PRESSURE(i))) 
+        WRITE(11,*) X(M2(i)),Y(M2(i)),Z(M2(i)),ABS(PRESSURE(i)),ATAN2(IMAG(PRESSURE(i)),REAL(PRESSURE(i))) 
+        WRITE(11,*) X(M3(i)),Y(M3(i)),Z(M3(i)),ABS(PRESSURE(i)),ATAN2(IMAG(PRESSURE(i)),REAL(PRESSURE(i))) 
+        WRITE(11,*) X(M4(i)),Y(M4(i)),Z(M4(i)),ABS(PRESSURE(i)),ATAN2(IMAG(PRESSURE(i)),REAL(PRESSURE(i))) 
     END DO
     IF (NSYMY.EQ.1) THEN
         DO i=1,NFA
-            WRITE(11,*) M1(i)+NFA,M2(i)+NFA,M3(i)+NFA,M4(i)+NFA
+            WRITE(11,*) X(M1(i)),-Y(M1(i)),Z(M1(i)),ABS(PRESSURE(i+NFA)),ATAN2(IMAG(PRESSURE(i+NFA)),REAL(PRESSURE(i+NFA)))
+            WRITE(11,*) X(M2(i)),-Y(M2(i)),Z(M2(i)),ABS(PRESSURE(i+NFA)),ATAN2(IMAG(PRESSURE(i+NFA)),REAL(PRESSURE(i+NFA)))
+            WRITE(11,*) X(M3(i)),-Y(M3(i)),Z(M3(i)),ABS(PRESSURE(i+NFA)),ATAN2(IMAG(PRESSURE(i+NFA)),REAL(PRESSURE(i+NFA)))
+            WRITE(11,*) X(M4(i)),-Y(M4(i)),Z(M4(i)),ABS(PRESSURE(i+NFA)),ATAN2(IMAG(PRESSURE(i+NFA)),REAL(PRESSURE(i+NFA)))
         END DO
-    END IF
-    WRITE(11,'(A,I7)') 'ZONE t="Pressure",F=POINT,I=',NFA
+    END IF  
     DO i=1,NFA
-        WRITE(11,*) XG(i),YG(i),ZG(i),ABS(PRESSURE(i)),ATAN2(IMAG(PRESSURE(i)),REAL(PRESSURE(i))) 
+        WRITE(11,*) 1+(i-1)*4,2+(i-1)*4,3+(i-1)*4,4+(i-1)*4
     END DO
     IF (NSYMY.EQ.1) THEN
         DO i=1,NFA
-            WRITE(11,*)  XG(i),-YG(i),ZG(i),ABS(PRESSURE(i+NFA)),ATAN2(IMAG(PRESSURE(i+NFA)),REAL(PRESSURE(i+NFA))) 
+            WRITE(11,*) 1+(i-1)*4+4*NFA,2+(i-1)*4+4*NFA,3+(i-1)*4+4*NFA,4+(i-1)*4+4*NFA
         END DO
-    END IF
-    CLOSE(11) 
+    END IF  
+!    DO i=1,NP
+!        WRITE(11,*) X(i),Y(i),Z(i),ABS(PRESSURE(i)),ATAN2(IMAG(PRESSURE(i)),REAL(PRESSURE(i))) 
+!    END DO
+!    IF (NSYMY.EQ.1) THEN
+!        DO i=1,NP
+!            WRITE(11,*) X(i),-Y(i),Z(i),ABS(PRESSURE(i+NFA)),ATAN2(IMAG(PRESSURE(i+NFA)),REAL(PRESSURE(i+NFA)))
+!        END DO
+!    END IF
+!    DO i=1,NFA
+!        WRITE(11,*) M1(i),M2(i),M3(i),M4(i)
+!    END DO
+!    IF (NSYMY.EQ.1) THEN
+!        DO i=1,NFA
+!            WRITE(11,*) M1(i)+NP,M2(i)+NP,M3(i)+NP,M4(i)+NP
+!        END DO
+!    END IF
+!    WRITE(11,'(A,I7)') 'ZONE t="Pressure",F=POINT,I=',NFA*2**NSYMY
+!    DO i=1,NFA
+!        WRITE(11,*) XG(i),YG(i),ZG(i),ABS(PRESSURE(i)),ATAN2(IMAG(PRESSURE(i)),REAL(PRESSURE(i))) 
+!    END DO
+!    IF (NSYMY.EQ.1) THEN
+!        DO i=1,NFA
+!            WRITE(11,*)  XG(i),-YG(i),ZG(i),ABS(PRESSURE(i+NFA)),ATAN2(IMAG(PRESSURE(i+NFA)),REAL(PRESSURE(i+NFA))) 
+!        END DO
+!    END IF
+!    CLOSE(11) 
     END SUBROUTINE
   
  END MODULE

@@ -28,7 +28,7 @@ status=close('all');
 nomrep=input('\n - Directory name for storage of results : ');
 system(['mkdir ',nomrep]);
 system(['mkdir ',nomrep,'\Mesh']);
-system(['mkdir ',nomrep,'\Results']);
+system(['mkdir ',nomrep,'\results']);
 fid=fopen('ID.dat','w');
 fprintf(fid,['% g \n',nomrep,' \n'],length(nomrep));
 status=fclose(fid);
