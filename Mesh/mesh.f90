@@ -88,7 +88,7 @@
 	READ(10,*) xG,yG,zG
 	READ(10,*) Nmailmx
 	CLOSE(10)
-	OPEN(10,file=ID%ID(1:ID%lID)//'/Mesh/'//DSCRPT%ID(1:DSCRPT%lID))
+	OPEN(10,file=ID%ID(1:ID%lID)//'/mesh/'//DSCRPT%ID(1:DSCRPT%lID))
 	READ(10,*) Np
 	READ(10,*) nFace
 	DO i=1,Np
@@ -183,7 +183,7 @@
 		WRITE(*,'(A,F7.3,1X,A,F7.3)') ' XF = ',XF+xG,' XG = ',xG
 		WRITE(*,'(A,F7.3,1X,A,F7.3)') ' YF = ',YF+yG,' YG = ',yG
 	END IF
-	OPEN(10,FILE=ID%ID(1:ID%lID)//'/Mesh/Hydrostatics.dat')
+	OPEN(10,FILE=ID%ID(1:ID%lID)//'/mesh/Hydrostatics.dat')
 	WRITE(10,'(A,F7.3,A,F7.3)') ' XF = ',XF+xG,' - XG = ',xG
 	WRITE(10,'(A,F7.3,A,F7.3)') ' YF = ',YF+yG,' - YG = ',yG
 	WRITE(10,'(A,F7.3,A,F7.3)') ' ZF = ',ZF,' - ZG = ',zG
@@ -191,7 +191,7 @@
 	WRITE(10,'(A,E14.7)') ' Waterplane area = ',SF
 	CLOSE(10)
 !	Sauvegarde de la description du maillage et de la partie immergee
-	OPEN(10,file=ID%ID(1:ID%lID)//'/Mesh/Description_Full.tec')
+	OPEN(10,file=ID%ID(1:ID%lID)//'/mesh/Description_Full.tec')
 	WRITE(10,*) 'ZONE N=',4*nFace,',E=',nFace,',F=FEPOINT,ET=QUADRILATERAL'
 	DO i=1,nFace
 		DO j=1,4
@@ -202,7 +202,7 @@
 		WRITE(10,'(I4,3(2X,I4))') 1+(i-1)*4,2+(i-1)*4,3+(i-1)*4,4+(i-1)*4
 	END DO
 	CLOSE(10)
-	OPEN(10,file=ID%ID(1:ID%lID)//'/Mesh/Description_Wetted.tec')
+	OPEN(10,file=ID%ID(1:ID%lID)//'/mesh/Description_Wetted.tec')
 	WRITE(10,*) 'ZONE N=',4*nFacem,',E=',nFacem,',F=FEPOINT,ET=QUADRILATERAL'
 	do i=1,nFacem
 		do j=1,4
@@ -255,7 +255,7 @@
 	END IF
 	KH(4,4)=KH(4,4)+deplacement*1000.*9.81*(ZF-ZG)
 	KH(5,5)=KH(5,5)+deplacement*1000.*9.81*(ZF-ZG)
-	OPEN(10,FILE=ID%ID(1:ID%lID)//'/Mesh/KH.dat')
+	OPEN(10,FILE=ID%ID(1:ID%lID)//'/mesh/KH.dat')
 	DO i=1,6
 		WRITE(10,'(6(1X,E14.7))') (KH(i,j),j=1,6)
 	END DO
@@ -263,10 +263,10 @@
 	write(*,*) ' -> Calculate hull mass and inertia '
 	WRITE(*,*) ' '
     CALL coque(X,Y,Z,NP,facette,NF,Deplacement,Icoque,Gcoque)
-	OPEN(10,FILE=ID%ID(1:ID%lID)//'/Mesh/GC_hull.dat')
+	OPEN(10,FILE=ID%ID(1:ID%lID)//'/mesh/GC_hull.dat')
 	WRITE(10,'(3(1X,E14.7))') Gcoque(1),Gcoque(2),Gcoque(3)
 	CLOSE(10)
-	OPEN(10,FILE=ID%ID(1:ID%lID)//'/Mesh/Inertia_hull.dat')
+	OPEN(10,FILE=ID%ID(1:ID%lID)//'/mesh/Inertia_hull.dat')
 	DO i=1,3
 		WRITE(10,'(3(1X,E14.7))') (Icoque(i,j),j=1,3)
 	END DO

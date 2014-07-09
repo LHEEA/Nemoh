@@ -42,7 +42,7 @@ Rotated_cube.dat		! Name of mesh file
 2 0. 0. 1. 0. 0. -2.5		! Moment force in z direction about a point
 0				! Number of lines of additional information 
 --- Load cases to be solved -------------------------------------------------------------------------------------------------------
-41	0.1	2.0		! Number of wave frequencies, Min, and Max (rad/s)
+4	0.1	2.0		! Number of wave frequencies, Min, and Max (rad/s)
 1	45.	45.		! Number of wave directions, Min and Max (degrees)
 --- Post processing ---------------------------------------------------------------------------------------------------------------
 1	0.1	10.		! IRF 				! IRF calculation (0 for no calculation), time step and duration

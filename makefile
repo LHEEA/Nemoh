@@ -85,7 +85,7 @@ OBJS2=COM_VAR.o\
 Environment.o\
 Identification.o\
 Mesh.o\
-BODYCONDITIONS.o\
+Bodyconditions.o\
 PREPARE_MESH.o\
 INITIALIZATION.o\
 OUTPUT.o\
@@ -138,8 +138,6 @@ msh:	mesh
 #Rules to Build MAIN EXECUTABLE  (dependances et regle d'execution)
 mesh:	$(OBJM) 
 		$(FC) -o mesh $(OBJM2)
-
-
 #
 #Build preProc executable
 pre:	preProc
@@ -168,6 +166,11 @@ postProc:	$(OBJO)
 	$(FC) $(FFLAGS) $<
 %.o:	%.f90
 	$(FC) $(FFLAGS) $<
+
+
+#Copy to local bin directory
+install: build
+	cp mesh preProc solver postProc ~/bin/
 
 # Remove *.o and main executable
 clean:

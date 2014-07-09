@@ -24,13 +24,13 @@ fid=fopen('ID.dat');
 line=fgetl(fid);
 rep=fscanf(fid,'%s',1);
 fclose('all');
-fid=fopen([rep,'\Nemoh.cal'],'r');
+fid=fopen([rep,filesep,'Nemoh.cal'],'r');
 for i=1:6
     ligne=fgetl(fid);
 end
 nBodies=fscanf(fid,'%g',1);
 fclose(fid);
-fid=fopen([rep,'\Nemoh.cal'],'r');
+fid=fopen([rep,filesep,'Nemoh.cal'],'r');
 n=1;
 clear textline;
 textline={};
@@ -63,24 +63,34 @@ while (~feof(fid))
     n=n+1;
 end
 fclose(fid);
-fid = fopen([rep,'\Nemoh.cal'], 'w'); 
+fid = fopen([rep,filesep,'Nemoh.cal'], 'w'); 
 for i=1:n-1
     fprintf(fid, [cell2mat(textline(i)),'\n']);
 end
 fclose(fid);
-fid=fopen([rep,'/input.txt'],'wt');
+fid=fopen([rep,filesep,'input.txt'],'wt');
 fprintf(fid,' \n 0 \n');
 status=fclose(fid);
 % Calcul des coefficients hydrodynamiques
-fprintf('\n------ Starting NEMOH ----------- \n');
-system('.\Nemoh\preProcessor.exe');
-fprintf('------ Solving BVPs ------------- \n');
-system('.\Nemoh\Solver.exe');
-fprintf('------ Postprocessing results --- \n');
-system('.\Nemoh\postProcessor.exe');
+l = isunix;
+if l == 1
+    fprintf('\n------ Starting NEMOH ----------- \n');
+    system('preProc');
+    fprintf('------ Solving BVPs ------------- \n');
+    system('Solver');
+    fprintf('------ Postprocessing results --- \n');
+    system('postProc');
+else
+    fprintf('\n------ Starting NEMOH ----------- \n');
+    system('.\Nemoh\preProcessor.exe');
+    fprintf('------ Solving BVPs ------------- \n');
+    system('.\Nemoh\Solver.exe');
+    fprintf('------ Postprocessing results --- \n');
+    system('.\Nemoh\postProcessor.exe');
+end
 %% Lecture des resultats CA CM Fe
 clear Periode A B Famp Fphi Fe;
-fid=fopen([rep,'\Nemoh.cal'],'r');
+fid=fopen([rep,filesep,'Nemoh.cal'],'r');
 for i=1:6
     ligne=fgetl(fid);
 end
@@ -90,7 +100,7 @@ for i=1:2+18*nBodies
 end
 nw=fscanf(fid,'%g',1);
 fclose(fid);
-fid=fopen([rep,'\Results\ExcitationForce.tec'],'r');
+fid=fopen([rep,filesep,'results',filesep,'ExcitationForce.tec'],'r');
 ligne=fgetl(fid)
 for c=1:6*nBodies
     ligne=fgetl(fid)
@@ -105,7 +115,7 @@ for k=1:nw
     end;
 end;
 status=fclose(fid);
-fid=fopen([rep,'\Results\RadiationCoefficients.tec'],'r');
+fid=fopen([rep,filesep,'results',filesep,'RadiationCoefficients.tec'],'r');
 ligne=fgetl(fid);
 for i=1:6*nBodies
     ligne=fgetl(fid);
