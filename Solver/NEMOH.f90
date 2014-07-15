@@ -155,8 +155,8 @@
                 line(2*j-1)=ABS(Force(c,j))
                 line(2*j)=ATAN2(IMAG(Force(c,j)),REAL(Force(c,j)))
             ELSE
-                line(2*j-1)=-IMAG(Force(c,j))/BodyConditions%Omega(j)
-                line(2*j)=REAL(Force(c,j))
+                line(2*j-1)=IMAG(Force(c,j))/BodyConditions%Omega(j)
+                line(2*j)=-REAL(Force(c,j))
             END IF
         END DO
         WRITE(10,*) (line(j),j=1,2*BodyConditions%Nproblems)      

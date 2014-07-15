@@ -222,7 +222,7 @@
     ALLOCATE(NormalVelocity(Mesh%Npanels*2**Mesh%Isym,(Nbeta+Nradiation)*Nw))
     DO i=1,Nw
         DO j=1,Nbeta
-            CALL ComputeWave(Mesh,w(i),Beta(j),Environment,PRESSURE,NVEL)
+            CALL ComputeDiffractionCondition(Mesh,w(i),Beta(j),Environment,PRESSURE,NVEL)
             DO c=1,Mesh%Npanels*2**Mesh%Isym
                 NormalVelocity(c,j+(i-1)*(Nbeta+Nradiation))=NVEL(c)
             END DO 
@@ -230,7 +230,7 @@
             DO k=1,Nintegration
                 FKForce(i,j,k)=0.
                 DO c=1,Mesh%nPanels*2**Mesh%Isym
-                    FKForce(i,j,k)=FKForce(i,j,k)+PRESSURE(c)*FNDS(k,c)    
+                    FKForce(i,j,k)=FKForce(i,j,k)-PRESSURE(c)*FNDS(k,c)    
                 END DO
             END DO
         END DO

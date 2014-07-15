@@ -42,6 +42,8 @@
     TYPE(TIRF) :: IRF
 !   RAOs
     COMPLEX,DIMENSION(:,:,:),ALLOCATABLE :: RAOs
+!   Plot Wave elevation
+    REAL :: Switch_Plot_WaveElevation
 !   Locals
     REAL                    :: PI
     INTEGER			        :: c,d,M,l,i,j,k
@@ -82,7 +84,10 @@
 !
     WRITE(*,*) ' -> Save results ' 
     WRITE(*,*) ' '
-    CALL Plot_WaveElevation(ID,Environment,1,1,RAOs,Results)
+    CALL Initialize_Plot_WaveElevation(Switch_Plot_WaveElevation,ID%ID(1:ID%lID)//'/Nemoh.cal')   
+    IF (Switch_Plot_WaveElevation.GT.1) THEN
+        CALL Plot_WaveElevation(ID,Environment,1,1,RAOs,Results)
+    END IF
      
 !
 !   --- Finalize -------------------------------------------------------------------------------------------------------------------------------------------------------------------------

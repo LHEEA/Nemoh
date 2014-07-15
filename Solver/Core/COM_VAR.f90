@@ -70,14 +70,18 @@
     REAL :: T
     ! Computed and computed potential on original (B) and symmetric boundary(S)
     COMPLEX, DIMENSION(:), ALLOCATABLE :: ZPB,ZPS
-    ! Source ditribution
+    ! Source distribution
     COMPLEX, DIMENSION(:), ALLOCATABLE :: ZIGB,ZIGS
     
     ! --- Solver ------------------------------------------------------
     ! Which solver: (0) direct solver, (1): GMRES
     INTEGER:: Indiq_solver
-   ! Linear complex matrix to be solved
-    COMPLEX, DIMENSION(:, :), ALLOCATABLE :: ZIJ
+    ! Linear complex matrix to be solved
+    COMPLEX, DIMENSION(:,:), ALLOCATABLE :: ZIJ
+    ! Storage of inverter matrix to speed up computations (influence coefficients depending only on w)
+    COMPLEX, DIMENSION(:,:,:), ALLOCATABLE :: AInv
+    REAL w_previous
+    !
     REAL :: FSP,FSM,VSXP,VSYP,VSZP,VSXM,VSYM,VSZM
     ! Variable for storage of Greens function
     REAL :: SP1,SM1,SP2,SM2 

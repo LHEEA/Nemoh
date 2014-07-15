@@ -40,7 +40,7 @@ CONTAINS
                 VEL(1)=Direction(1)
                 VEL(2)=Direction(2)
                 VEL(3)=Direction(3)
-                NDS(i)=-(Mesh%N(1,i)*VEL(1)+Mesh%N(2,i)*VEL(2)+Mesh%N(3,i)*VEL(3))*Mesh%A(i)
+                NDS(i)=(Mesh%N(1,i)*VEL(1)+Mesh%N(2,i)*VEL(2)+Mesh%N(3,i)*VEL(3))*Mesh%A(i)
             ELSE
                 NDS(i)=0.
             END IF
@@ -49,7 +49,7 @@ CONTAINS
                     VEL(1)=Direction(1)
                     VEL(2)=Direction(2)
                     VEL(3)=Direction(3)
-                    NDS(i+Mesh%Npanels)=-(Mesh%N(1,i)*VEL(1)-Mesh%N(2,i)*VEL(2)+Mesh%N(3,i)*VEL(3))*Mesh%A(i)
+                    NDS(i+Mesh%Npanels)=(Mesh%N(1,i)*VEL(1)-Mesh%N(2,i)*VEL(2)+Mesh%N(3,i)*VEL(3))*Mesh%A(i)
                  ELSE
                     NDS(i+Mesh%Npanels)=0.
                  END IF          
@@ -61,7 +61,7 @@ CONTAINS
                 VEL(1)=Direction(2)*(Mesh%XM(3,i)-Axis(3))-Direction(3)*(Mesh%XM(2,i)-Axis(2))
                 VEL(2)=Direction(3)*(Mesh%XM(1,i)-Axis(1))-Direction(1)*(Mesh%XM(3,i)-Axis(3))
                 VEL(3)=Direction(1)*(Mesh%XM(2,i)-Axis(2))-Direction(2)*(Mesh%XM(1,i)-Axis(1))  
-                NDS(i)=-(Mesh%N(1,i)*VEL(1)+Mesh%N(2,i)*VEL(2)+Mesh%N(3,i)*VEL(3))*Mesh%A(i)
+                NDS(i)=(Mesh%N(1,i)*VEL(1)+Mesh%N(2,i)*VEL(2)+Mesh%N(3,i)*VEL(3))*Mesh%A(i)
             ELSE
                 NDS(i)=0.
             END IF
@@ -70,7 +70,7 @@ CONTAINS
                     VEL(1)=Direction(2)*(Mesh%XM(3,i)-Axis(3))-Direction(3)*(-Mesh%XM(2,i)-Axis(2))
                     VEL(2)=Direction(3)*(Mesh%XM(1,i)-Axis(1))-Direction(1)*(Mesh%XM(3,i)-Axis(3))
                     VEL(3)=Direction(1)*(-Mesh%XM(2,i)-Axis(2))-Direction(2)*(Mesh%XM(1,i)-Axis(1))  
-                    NDS(i+Mesh%Npanels)=-(Mesh%N(1,i)*VEL(1)-Mesh%N(2,i)*VEL(2)+Mesh%N(3,i)*VEL(3))*Mesh%A(i)
+                    NDS(i+Mesh%Npanels)=(Mesh%N(1,i)*VEL(1)-Mesh%N(2,i)*VEL(2)+Mesh%N(3,i)*VEL(3))*Mesh%A(i)
                 ELSE
                     NDS(i+Mesh%Npanels)=0.
                  END IF 

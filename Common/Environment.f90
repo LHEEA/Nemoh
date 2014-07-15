@@ -91,11 +91,11 @@ CONTAINS
     REAL :: wbar,CIH,SIH
     COMPLEX,PARAMETER :: II=CMPLX(0.,1.)
     wbar=(x-Environment%XEFF)*COS(Beta)+(y-Environment%YEFF)*SIN(Beta)
-    Phi=-Environment%g/w*CIH(k,z,Environment%Depth)*CEXP(II*k*wbar)
-    p=-Environment%rho*Environment%g*II*CIH(k,z,Environment%Depth)*CEXP(II*k*wbar)
-    Vx=-Environment%g/w*II*k*COS(beta)*CIH(k,z,Environment%Depth)*CEXP(II*k*wbar)
-    Vy=-Environment%g/w*II*k*SIN(beta)*CIH(k,z,Environment%Depth)*CEXP(II*k*wbar)
-    Vz=-Environment%g/w*k*SIH(k,z,Environment%Depth)*CEXP(II*k*wbar)
+    Phi=-II*Environment%g/w*CIH(k,z,Environment%Depth)*CEXP(II*k*wbar)
+    p=Environment%rho*Environment%g*CIH(k,z,Environment%Depth)*CEXP(II*k*wbar)
+    Vx=Environment%g/w*k*COS(beta)*CIH(k,z,Environment%Depth)*CEXP(II*k*wbar)
+    Vy=Environment%g/w*k*SIN(beta)*CIH(k,z,Environment%Depth)*CEXP(II*k*wbar)
+    Vz=-II*Environment%g/w*k*SIH(k,z,Environment%Depth)*CEXP(II*k*wbar)
     END SUBROUTINE Compute_wave
 
 END MODULE 

@@ -62,6 +62,7 @@ CONTAINS
     NSYM=NSYMY
 !   Initialise Nemoh
     CALL ALLOCATE_DATA
+    w_previous=-1.
     CALL PRE_PROC_MESH(Mesh)
     CALL CREK
 !

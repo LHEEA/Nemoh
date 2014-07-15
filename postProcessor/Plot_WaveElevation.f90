@@ -95,7 +95,7 @@
             ELSE
                 Potential=0.
             END IF
-            EtaP(i,j)=-II*1./Environment%G*II*w*Potential ! -II factor because of the free surface definition (Real(-II*A*exp(II*(kx-wt)))
+            EtaP(i,j)=1./Environment%G*II*w*Potential 
             Eta(i,j)=EtaI(i,j)+EtaP(i,j)
         END DO
     END DO
@@ -116,3 +116,21 @@
     DEALLOCATE(X,Y,etaI,etaP,eta)
 !
     END SUBROUTINE Plot_WaveElevation
+!   
+    SUBROUTINE Initialize_Plot_WaveElevation(Switch_Plot_WaveElevation,namefile)   
+    IMPLICIT NONE	    
+    CHARACTER*(*) :: namefile
+    CHARACTER*20 :: lookfor
+    CHARACTER*80 :: discard
+    INTEGER :: i
+    REAL :: Switch_Plot_WaveElevation
+    OPEN(10,FILE=namefile)
+    READ(10,'(A20)') lookfor
+    DO WHILE (lookfor.NE.'--- Post processing ')
+        READ(10,'(A20,A)') lookfor,discard
+    END DO    
+    DO i=1,3
+        READ(10,*)
+    END DO
+    CLOSE(10)
+    END SUBROUTINE  Initialize_Plot_WaveElevation
