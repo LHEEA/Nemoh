@@ -52,9 +52,9 @@ CONTAINS
     WRITE(str,'(I5)') Pbnumber
     OPEN(11,FILE=ID%ID(1:ID%lID)//'/results/freesurface.'//str//'.dat')
     WRITE(11,*) 'VARIABLES="X" "Y" "abs(eta) (m)" "angle(phi) (rad)" "PRE1" "PRE2"'
-    WRITE(11,'(A,I7,A,I7,A)') 'ZONE N=',MeshFS%Npoints,',E = ',MeshFS%Npanels,'F=FEPOINT,ET=QUADRILATERAL'
+    WRITE(11,'(A,I7,A,I7,A)') 'ZONE N=',MeshFS%Npoints,' ,E = ',MeshFS%Npanels,' ,F=FEPOINT,ET=QUADRILATERAL'
     DO i=1,MeshFS%Npoints
-        WRITE(11,*) MeshFS%X(1,i),MeshFS%X(2,i),ABS(PHI(i)),ATAN2(IMAG(PHI(i)),REAL(PHI(i))),-REAL(PHI(i)),-IMAG(PHI(i)) 
+        WRITE(11,'(6(X,E14.7))') MeshFS%X(1,i),MeshFS%X(2,i),ABS(PHI(i)),ATAN2(IMAG(PHI(i)),REAL(PHI(i))),-REAL(PHI(i)),-IMAG(PHI(i)) 
     END DO
     DO i=1,MeshFS%Npanels
         WRITE(11,*) MeshFS%P(1,i),MeshFS%P(2,i),MeshFS%P(3,i),MeshFS%P(4,i)

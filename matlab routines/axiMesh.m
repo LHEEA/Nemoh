@@ -185,7 +185,11 @@ fprintf(fid,'0.	0.              ! XEFF YEFF		! M		! Wave measurement point\n');
 fprintf(fid,'--- Description of floating bodies -----------------------------------------------------------------------------------------------\n');
 fprintf(fid,'1				! Number of bodies\n');
 fprintf(fid,'--- Body 1 -----------------------------------------------------------------------------------------------------------------------\n');
-fprintf(fid,['''',nomrep,filesep,'mesh',filesep,'axisym.dat''		! Name of mesh file\n']);
+if isunix 
+    fprintf(fid,['''',nomrep,filesep,'mesh',filesep,'axisym.dat''		! Name of mesh file\n']);
+else
+    fprintf(fid,[nomrep,'\\mesh\\axisym.dat      ! Name of mesh file\n']);
+end;
 fprintf(fid,'%g %g			! Number of points and number of panels 	\n',nx,nf);
 fprintf(fid,'6				! Number of degrees of freedom\n');
 fprintf(fid,'1 1. 0.	0. 0. 0. 0.		! Surge\n');
