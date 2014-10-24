@@ -2,7 +2,7 @@
 
 #COMPILATEUR  
 #FC=~/intel/bin/ifort
-FC=gcc
+FC=gfortran
 #OPTIONS  
 FFLAGS= -c
 #LIBRAIRIES  

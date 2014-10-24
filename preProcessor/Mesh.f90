@@ -91,7 +91,7 @@
         END SUBROUTINE CopyTMesh
 !       ---
         SUBROUTINE ReadTMesh(Mesh,ID)
-        USE iflport
+!        USE iflport
         USE MIdentification
         IMPLICIT NONE
         TYPE(TMesh) :: Mesh
@@ -217,7 +217,8 @@
                 STOP
             END IF 
             DO j=1,3
-                Mesh%XM(j,i)=1./3*(Mesh%X(j,Mesh%P(1,i))+Mesh%X(j,Mesh%P(2,i))+Mesh%X(j,Mesh%P(4,i)))*A1/Mesh%A(i)+1./3*(Mesh%X(j,Mesh%P(2,i))+Mesh%X(j,Mesh%P(3,i))+Mesh%X(j,Mesh%P(4,i)))*A2/Mesh%A(i)
+                Mesh%XM(j,i)=1./3*(Mesh%X(j,Mesh%P(1,i))+Mesh%X(j,Mesh%P(2,i))+Mesh%X(j,Mesh%P(4,i)))*A1/Mesh%A(i)+&
+                1./3*(Mesh%X(j,Mesh%P(2,i))+Mesh%X(j,Mesh%P(3,i))+Mesh%X(j,Mesh%P(4,i)))*A2/Mesh%A(i)
             END DO
             U=W1+W2
             DO j=1,3
