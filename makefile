@@ -1,7 +1,8 @@
 # makefile written by Christophe Peyrard from EDF R&D
 
 #COMPILATEUR  
-FC=ifort
+#FC=~/intel/bin/ifort
+FC=gcc
 #OPTIONS  
 FFLAGS= -c
 #LIBRAIRIES  
