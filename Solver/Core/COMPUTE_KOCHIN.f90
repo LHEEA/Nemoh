@@ -94,7 +94,7 @@
 	    IF ((kwave*Depth.GT.18.).OR.(kwave*Depth.LE.0.)) THEN
 	        ZS(i)=ZS(i)/kwave    
 	    ELSE
-	        ZS(i)=0.5*ZS(i)*EXP(kwave*Depth)/SINH(kwave*Depth)/kwave
+	        ZS(i)=0.5*ZS(i)*EXP(kwave*Depth)/SINH(kwave*Depth)*1./kwave
 	    END IF
 	 END DO
      IF (NSYMY.EQ.1) THEN
@@ -137,7 +137,7 @@
 	        IF ((kwave*Depth.GT.18.).OR.(kwave*Depth.LE.0.)) THEN
 	            ZS(i+NFA)=-ZS(i+NFA)/kwave    
 	        ELSE
-	            ZS(i+NFA)=-0.5*ZS(i+NFA)*EXP(kwave*Depth)/SINH(kwave*Depth)/kwave
+	            ZS(i+NFA)=-0.5*ZS(i+NFA)*EXP(kwave*Depth)/SINH(kwave*Depth)*1./kwave
 	        END IF
 	     END DO
      END IF

@@ -120,7 +120,7 @@
  !                       CM(l)=CM(l)+IRF%K(i,j,k)*SIN(2.*PI/Results%Period(l)*IRF%Time(i))*(IRF%Time(i+1)-IRF%Time(i))
                        CM(l)=CM(l)+0.5*(IRF%K(i,j,k)*SIN(Results%w(l)*IRF%Time(i))+IRF%K(i+1,j,k)*SIN(Results%w(l)*IRF%Time(i+1)))*(IRF%Time(i+1)-IRF%Time(i))
                     END DO  
-                    CM(l)=(Results%AddedMass(l,j,k)+CM(l))/Results%w(l)
+                    CM(l)=Results%AddedMass(l,j,k)+CM(l)/Results%w(l)
                     IRF%AddedMass(j,k)=IRF%AddedMass(j,k)+CM(l)   
                 END DO         
                 IRF%AddedMass(j,k)=IRF%AddedMass(j,k)/Results%Nw
