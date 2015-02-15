@@ -262,7 +262,7 @@
 	CLOSE(10)
 	write(*,*) ' -> Calculate hull mass and inertia '
 	WRITE(*,*) ' '
-    CALL coque(X,Y,Z,NP,facette,NF,Deplacement,Icoque,Gcoque)
+    CALL coque(X,Y,Z,NP,facette,NF,Deplacement,Icoque,Gcoque,Nsym)
 	OPEN(10,FILE=ID%ID(1:ID%lID)//'/mesh/GC_hull.dat')
 	WRITE(10,'(3(1X,E14.7))') Gcoque(1),Gcoque(2),Gcoque(3)
 	CLOSE(10)
