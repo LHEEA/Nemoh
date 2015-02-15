@@ -19,7 +19,7 @@
 !
 !--------------------------------------------------------------------------------------
 !
-	SUBROUTINE coque(X,Y,Z,NP,facettes,NF,Deplacement,Icoque,Gcoque)
+	SUBROUTINE coque(X,Y,Z,NP,facettes,NF,Deplacement,Icoque,Gcoque,Nsym)
 
 	IMPLICIT NONE
 
@@ -30,6 +30,7 @@
 	REAL,DIMENSION(*) :: X,Y,Z
 	INTEGER,DIMENSION(4,*) :: Facettes
 	REAL Deplacement
+	INTEGER Nsym
 !	Caracteristiques de la coque
 	REAL,DIMENSION(3) :: Gcoque
 	REAL mcoque
@@ -75,7 +76,11 @@
 	END DO
 	decoque=Deplacement*1000.0/mcoque
 	Gcoque(1)=Gcoque(1)/mcoque
-	Gcoque(2)=Gcoque(2)/mcoque
+	IF (Nsym.EQ.1) THEN
+	    Gcoque(2)=0.
+	ELSE
+	    Gcoque(2)=Gcoque(2)/mcoque
+	END IF
 	Gcoque(3)=Gcoque(3)/mcoque
 	DO i=1,3
 		DO j=1,3
