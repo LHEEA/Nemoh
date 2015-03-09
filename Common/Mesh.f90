@@ -79,7 +79,9 @@
         END SUBROUTINE CopyTMesh
 !       ---
         SUBROUTINE ReadTMesh(Mesh,ID)
+#ifndef GNUFORT
         USE iflport
+#endif
         USE MIdentification
         IMPLICIT NONE
         TYPE(TMesh) :: Mesh

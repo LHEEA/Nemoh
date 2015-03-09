@@ -26,7 +26,9 @@
 	PROGRAM Mesh
 
     USE MIdentification
+#ifndef GNUFORT
     USE iflport
+#endif
 
 	IMPLICIT NONE
 	
