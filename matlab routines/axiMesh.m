@@ -13,7 +13,7 @@
 %   - Inertia   : inertia matrix (estimated assuming mass is distributed on
 %   wetted surface)
 %   - KH        : hydrostatic stiffness matrix
-%   - XB,YB,ZB  : coordintates of buoyancy center
+%   - XB,YB,ZB  : coordinates of buoyancy center
 %
 % Warning : z(i) must be greater than z(i+1)
 %
@@ -22,6 +22,8 @@
 % Written by A. Babarit, LHEEA Lab.
 %
 function [Mass,Inertia,KH,XB,YB,ZB]=axiMesh(r,z,n)
+rho=1025;
+g=9.81;
 status=close('all');
 ntheta=input('\n - Enter number of points for angular discretisation : ');
 theta=[0.:pi/(ntheta-1):pi];
@@ -71,6 +73,7 @@ zG=input(' - Vertical position of gravity center : ');
 fprintf(fid,'%f %f %f \n',[0. 0. zG]);
 nfobj=input(' - Target for number of panels : ');
 fprintf(fid,'%g \n 2 \n 0. \n 1.\n',nfobj);
+fprintf(fid,'%f \n %f \n',[rho g]);
 status=fclose(fid);
 fid=fopen('ID.dat','w');
 fprintf(fid,['% g \n',nomrep,' \n'],length(nomrep));
@@ -178,8 +181,8 @@ Inertia(3,3)=Mass;
 % Write Nemoh input file
 fid=fopen([nomrep,filesep,'Nemoh.cal'],'w');
 fprintf(fid,'--- Environment ------------------------------------------------------------------------------------------------------------------ \n');
-fprintf(fid,'1000.0				! RHO 			! KG/M**3 	! Fluid specific volume \n');
-fprintf(fid,'9.81				! G			! M/S**2	! Gravity \n');
+fprintf(fid,'%f				! RHO 			! KG/M**3 	! Fluid specific volume \n',rho);
+fprintf(fid,'%f				! G			! M/S**2	! Gravity \n',g);
 fprintf(fid,'0.                 ! DEPTH			! M		! Water depth\n');
 fprintf(fid,'0.	0.              ! XEFF YEFF		! M		! Wave measurement point\n');
 fprintf(fid,'--- Description of floating bodies -----------------------------------------------------------------------------------------------\n');

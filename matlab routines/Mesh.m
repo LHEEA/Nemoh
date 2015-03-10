@@ -17,13 +17,15 @@
 %   - Inertia(nBodies,6,6)  : inertia matrices (estimated assuming mass is distributed on
 %   wetted surface)
 %   - KH(nBodies,6,6)       : hydrostatic stiffness matrices
-%   - XB,YB,ZB              : coordinaates of buoyancy centers
+%   - XB,YB,ZB              : coordinates of buoyancy centers
 %
 % Copyright Ecole Centrale de Nantes 2014
 % Licensed under the Apache License, Version 2.0
 % Written by A. Babarit, LHEEA Lab.
 %
 function [Mass,Inertia,KH,XB,YB,ZB]=Mesh(nBodies,n,X,tX,CG,nfobj)
+rho=1025;
+g=9.81;
 status=close('all');
 nomrep=input('\n - Directory name for storage of results : ');
 system(['mkdir ',nomrep]);
@@ -94,6 +96,7 @@ for c=1:nBodies
     fprintf(fid,'1 \n %f 0. \n ',tX(c));
     fprintf(fid,'%f %f %f \n',CG(c,:));
     fprintf(fid,'%g \n 2 \n 0. \n 1.\n',nfobj(c));
+    fprintf(fid,'%f \n %f \n',[rho g]);
     status=fclose(fid);
 %   Raffinement automatique du maillage et calculs hydrostatiques
     l = isunix;
@@ -188,8 +191,8 @@ end;
 % Write Nemoh input file
 fid=fopen([nomrep,filesep,'Nemoh.cal'],'w');
 fprintf(fid,'--- Environment ------------------------------------------------------------------------------------------------------------------ \n');
-fprintf(fid,'1000.0				! RHO 			! KG/M**3 	! Fluid specific volume \n');
-fprintf(fid,'9.81				! G			! M/S**2	! Gravity \n');
+fprintf(fid,'%f				! RHO 			! KG/M**3 	! Fluid specific volume \n',rho);
+fprintf(fid,'%f				! G			! M/S**2	! Gravity \n',g);
 fprintf(fid,'0.                 ! DEPTH			! M		! Water depth\n');
 fprintf(fid,'0.	0.              ! XEFF YEFF		! M		! Wave measurement point\n');
 fprintf(fid,'--- Description of floating bodies -----------------------------------------------------------------------------------------------\n',c);

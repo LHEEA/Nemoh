@@ -67,6 +67,7 @@
 	REAL DEPLACEMENT,XF,YF,ZF,SF
 	REAL,DIMENSION(6,6) :: KH
 	REAL :: xG,yG,zG
+	REAL :: RHO,G
 !   Calcul coque
 	REAL,DIMENSION(3,3) :: Icoque
 	REAL,DIMENSION(3) :: Gcoque
@@ -110,6 +111,8 @@
 	END DO
 	READ(10,*) Tcol
 	READ(10,*) lambda
+	READ(10,*) RHO
+	READ(10,*) G
 	CLOSE(10)
 !   Mise a l echelle
     IF ((lambda).NE.(1.)) THEN
@@ -149,7 +152,7 @@
 		END DO
 		Np=Np+4
 	END DO	
-	CALL HYDRO(X,Y,Z,NP,FACETTE,NF,DEPLACEMENT,XF,YF,ZF,SF,KH,Xm,Ym,Zm,NPm,FACETTEm,NFm)
+	CALL HYDRO(X,Y,Z,NP,FACETTE,NF,DEPLACEMENT,XF,YF,ZF,SF,KH,Xm,Ym,Zm,NPm,FACETTEm,NFm,RHO,G)
 	IF (Tcol.GT.0) THEN
 		CALL calCol(NFm,Xm,Ym,Zm,Facettem,Tcol,nFacemx)
     END IF
@@ -234,7 +237,7 @@
 		X(j)=X(j)-xG
 		Y(j)=Y(j)-yG
 	END DO
-	CALL HYDRO(X,Y,Z,NP,FACETTE,NF,DEPLACEMENT,XF,YF,ZF,SF,KH,Xm,Ym,Zm,NPm,FACETTEm,NFm)
+	CALL HYDRO(X,Y,Z,NP,FACETTE,NF,DEPLACEMENT,XF,YF,ZF,SF,KH,Xm,Ym,Zm,NPm,FACETTEm,NFm,RHO,G)
 	DO j=1,NP
 		X(j)=X(j)+xG
 		Y(j)=Y(j)+yG
@@ -253,8 +256,8 @@
 		KH(5,4)=0.
 		KH(5,5)=2.*KH(5,5)
 	END IF
-	KH(4,4)=KH(4,4)+deplacement*1000.*9.81*(ZF-ZG)
-	KH(5,5)=KH(5,5)+deplacement*1000.*9.81*(ZF-ZG)
+	KH(4,4)=KH(4,4)+deplacement*RHO*G*(ZF-ZG)
+	KH(5,5)=KH(5,5)+deplacement*RHO*G*(ZF-ZG)
 	OPEN(10,FILE=ID%ID(1:ID%lID)//'/mesh/KH.dat')
 	DO i=1,6
 		WRITE(10,'(6(1X,E14.7))') (KH(i,j),j=1,6)
@@ -262,7 +265,7 @@
 	CLOSE(10)
 	write(*,*) ' -> Calculate hull mass and inertia '
 	WRITE(*,*) ' '
-    CALL coque(X,Y,Z,NP,facette,NF,Deplacement,Icoque,Gcoque,Nsym)
+    CALL coque(X,Y,Z,NP,facette,NF,Deplacement,Icoque,Gcoque,Nsym,rho)
 	OPEN(10,FILE=ID%ID(1:ID%lID)//'/mesh/GC_hull.dat')
 	WRITE(10,'(3(1X,E14.7))') Gcoque(1),Gcoque(2),Gcoque(3)
 	CLOSE(10)

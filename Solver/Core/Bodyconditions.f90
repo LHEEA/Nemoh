@@ -28,7 +28,7 @@
         INTEGER,DIMENSION(:),ALLOCATABLE :: Switch_Potential
         INTEGER,DIMENSION(:),ALLOCATABLE :: Switch_FreeSurface
         INTEGER,DIMENSION(:),ALLOCATABLE :: Switch_Kochin
-        INTEGER,DIMENSION(:),ALLOCATABLE :: Switch_Type
+        REAL,DIMENSION(:),ALLOCATABLE :: Switch_Type
     END TYPE TBodyConditions
 !
     CONTAINS
