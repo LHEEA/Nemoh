@@ -32,7 +32,9 @@
     USE MIdentification
     USE MMesh
     USE MBodyConditions
+#ifndef GNUFORT
     USE iflport
+#endif
     USE SOLVE_BEM
     USE OUTPUT
     USE INITIALIZATION

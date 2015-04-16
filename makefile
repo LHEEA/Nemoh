@@ -1,11 +1,18 @@
 # makefile written by Christophe Peyrard from EDF R&D
 
-#COMPILATEUR  
-FC=ifort
-#OPTIONS  
-FFLAGS= -c
-#LIBRAIRIES  
-#LFLAGS= -L./ -lVAWTBEMT -lstdc++
+#COMPILATEUR
+gtest=$(shell which gfortran 2> /dev/null | grep -o gfortran)
+itest=$(shell which ifort 2> /dev/null | grep -o ifort)
+
+ifeq ($(gtest), gfortran)
+	FC=gfortran
+	FFLAGS=-cpp -DGNUFORT -O2 -ffree-line-length-none -c
+endif
+
+ifeq ($(itest), ifort)
+	FC=ifort
+	FFLAGS=-c -cpp
+endif
 
 #SOURCES FORTRAN Mesh(modules de maillage)
 SRCM=./Common/Identification.f90\
@@ -174,4 +181,4 @@ install: build
 
 # Remove *.o and main executable
 clean:
-	rm *.o *.mod   
+	rm *.o *.mod

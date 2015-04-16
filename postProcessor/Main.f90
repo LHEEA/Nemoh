@@ -29,7 +29,9 @@
     USE MEnvironment
     USE MResults
     USE MIRF
+#ifndef GNUFORT
     USE iflport
+#endif
 !    
     IMPLICIT NONE
 !   ID
