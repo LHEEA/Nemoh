@@ -452,7 +452,7 @@
 	REAL,DIMENSION(3) :: PG,P0G,PG1,PG2,PG3,PG4,PG5,PG6
 	REAL,DIMENSION(3) :: AB,AC,AD,U,V,W
 	REAL,DIMENSION(6,6) :: KH
-	REAL VOLUME,V1,V2,V3,V4,V5,V6,SF,RHO,G
+	REAL VOLUME,V1,V2,V3,V4,V5,V6,SF,RHO,G,S1,S2
 	INTEGER I
 
 	DO I=1,2
@@ -487,8 +487,12 @@
 	AC=P03-P01
 	AD=P04-P01
 	CALL PRDVCT(AB,AC,U)
+	U=0.5*U
+	S1=SQRT(U(1)*U(1)+U(2)*U(2)+U(3)*U(3))
 	CALL PRDVCT(AC,AD,V)
-	W=0.5*(U+V)
+	V=0.5*V
+	S2=SQRT(V(1)*V(1)+V(2)*V(2)+V(3)*V(3))
+	W=(U+V)
 	SF=SQRT(W(1)*W(1)+W(2)*W(2)+W(3)*W(3))
 !	SIGNE DU VOLUME ET DE LA SURFACE EN FONCTION DE L ORIENTATION DE LA FACETTE
 	AB=P2-P1
@@ -499,58 +503,68 @@
 	W=U+V
 	IF (W(3).GT.0.0) THEN
 		VOLUME=-1.0*VOLUME
+		S1=-1.*S1
+		S2=-1.*S2
 		SF=-1.0*SF
 	END IF
 !	Calcul des contributions elementaires a la matrice de raideur hydrostatique
+    IF (SF.EQ.0) THEN 
+        P0G=0.
+    ELSE
+        P0G=1./3.*(S1*(P01+P02+P03)+S2*(P01+P03+P04))/SF
+    END IF
+!    IF (SF.EQ.0) THEN 
+!        WRITE(*,'(A,E14.7,A)') 'WARNING: At least one panel with 0 area has been found!'
+!    END IF
     
 	! Ajout d'un test pour prendre en compte les facettes triangulaires	
-      IF ( P01(1)==P02(1) ) THEN
-	     IF (P01(2)==P02(2)) THEN
-		 	IF (P01(3)==P02(3)) THEN
-        	   P0G=(1./3.)*(P02+P03+P04)
-		 	ELSE
-			   P0G=0.25*(P01+P02+P03+P04)
-			END IF
-		 ELSE
-		    P0G=0.25*(P01+P02+P03+P04)
-		 END IF
-		 
-      ELSEIF ( P02(1)==P03(1) ) THEN
-	     IF ( P02(2)==P03(2) ) THEN
-		 	IF ( P02(3)==P03(3) ) THEN     
-			   P0G=(1./3.)*(P01+P03+P04)
-		 	ELSE
-			   P0G=0.25*(P01+P02+P03+P04)
-		    END IF
-	     ELSE
-	        P0G=0.25*(P01+P02+P03+P04)
-		 END IF 
+!     IF ( P01(1)==P02(1) ) THEN
+!	     IF (P01(2)==P02(2)) THEN
+!		 	IF (P01(3)==P02(3)) THEN
+ !       	   P0G=(1./3.)*(P02+P03+P04)
+!		 	ELSE
+!			   P0G=0.25*(P01+P02+P03+P04)
+!			END IF
+!		 ELSE
+!		    P0G=0.25*(P01+P02+P03+P04)
+!		 END IF
+!		 
+ !     ELSEIF ( P02(1)==P03(1) ) THEN
+!	     IF ( P02(2)==P03(2) ) THEN
+!		 	IF ( P02(3)==P03(3) ) THEN     
+!			   P0G=(1./3.)*(P01+P03+P04)
+!		 	ELSE
+!			   P0G=0.25*(P01+P02+P03+P04)
+!		    END IF
+!	     ELSE
+!	        P0G=0.25*(P01+P02+P03+P04)
+!		 END IF 
+!		 	  
+ !     ELSEIF ( P03(1)==P04(1) ) THEN
+!	     IF ( P03(2)==P04(2) ) THEN
+!		 	IF ( P03(3)==P04(3) ) THEN             	  
+!			   P0G=(1./3.)*(P01+P02+P04)
+!			ELSE
+!			   P0G=0.25*(P01+P02+P03+P04)
+!		 	END IF
+!		 ELSE
+!			P0G=0.25*(P01+P02+P03+P04)
+!		 END IF 
+!		 	  
+ !     ELSEIF ( P04(1)==P01(1) ) THEN
+!	     IF (P04(2)==P01(2)) THEN
+!		 	IF (P04(3)==P01(3)) THEN   
+!			   P0G=(1./3.)*(P01+P02+P03)
+!			ELSE
+!			   P0G=0.25*(P01+P02+P03+P04)
+!		 	END IF
+!		 ELSE
+!		    P0G=0.25*(P01+P02+P03+P04)
+!		 END IF 
 		 	  
-      ELSEIF ( P03(1)==P04(1) ) THEN
-	     IF ( P03(2)==P04(2) ) THEN
-		 	IF ( P03(3)==P04(3) ) THEN             	  
-			   P0G=(1./3.)*(P01+P02+P04)
-			ELSE
-			   P0G=0.25*(P01+P02+P03+P04)
-		 	END IF
-		 ELSE
-			P0G=0.25*(P01+P02+P03+P04)
-		 END IF 
-		 	  
-      ELSEIF ( P04(1)==P01(1) ) THEN
-	     IF (P04(2)==P01(2)) THEN
-		 	IF (P04(3)==P01(3)) THEN   
-			   P0G=(1./3.)*(P01+P02+P03)
-			ELSE
-			   P0G=0.25*(P01+P02+P03+P04)
-		 	END IF
-		 ELSE
-		    P0G=0.25*(P01+P02+P03+P04)
-		 END IF 
-		 	  
-      ELSE
-    	 P0G=0.25*(P01+P02+P03+P04)
-      END IF
+!      ELSE
+!    	 P0G=0.25*(P01+P02+P03+P04)
+!      END IF
 	! 
 	
 	KH=0.
