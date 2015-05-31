@@ -104,7 +104,7 @@
 	end do
 	write(10,'(10X,I4,3(10X,F4.2))') 0,0.,0.,0.
 	do i=1,nf
-		write(10,'(4(10X,I4))') facette(1,i),facette(2,i),facette(3,i),facette(4,i)
+		write(10,'(4(10X,I6))') facette(1,i),facette(2,i),facette(3,i),facette(4,i)
 	end do
 	write(10,'(4(10X,I1))') 0,0,0,0
 	close(10)
