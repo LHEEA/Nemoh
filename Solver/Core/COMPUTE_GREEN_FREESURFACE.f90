@@ -219,7 +219,7 @@ MODULE COMPUTE_GREEN_FREESURFACE
       WH=DPI/T
       WR=WH
       TR=DPI/WR
-      AK0=WR**2/9.81
+      AK0=WR**2/G
       AKP=AK0/DPI
       AKP2=AK0/DPI2
       NJJ=NSYMY+1
