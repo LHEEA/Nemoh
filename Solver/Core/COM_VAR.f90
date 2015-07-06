@@ -60,6 +60,10 @@
     REAL, DIMENSION(:), ALLOCATABLE :: XN,YN,ZN
     ! Array of centre of gravity for each panel
     REAL, DIMENSION(:), ALLOCATABLE :: XG,YG,ZG
+    ! Array of Gauss points for each panel
+    REAL, DIMENSION(:,:), ALLOCATABLE :: XGA,YGA,ZGA,XJAC
+    !Number of Gauss points
+    INTEGER:: NG
     ! Array for surface area of the panels
     REAL, DIMENSION(:), ALLOCATABLE :: AIRE
     
@@ -89,11 +93,11 @@
     REAL :: VSXP1,VSXP2,VSYP1,VSYP2,VSZP1,VSZP2 
     REAL :: VSXM1,VSXM2,VSYM1,VSYM2,VSZM1,VSZM2
     !Values used in interpolation of infinite part of the Greens function
-    INTEGER,PARAMETER :: NPINTE=251
-    REAL :: XR(328),XZ(46),APD1X(328,46),APD1Z(328,46),APD2X(328,46),APD2Z(328,46)   
-    INTEGER:: NQ
+    INTEGER,PARAMETER :: NPINTE=5001
+    REAL :: XR(676),XZ(124),APD1X(676,124),APD1Z(676,124),APD2X(676,124),APD2Z(676,124)
+    INTEGER:: NQ,IIR,JJZ
     REAL:: CQ(NPINTE),QQ(NPINTE),AMBDA(31),AR(31)
-    
+
     ! --- Reading and writing units -----------------------------------
     ! File for visualization of potential
     INTEGER :: Sav_potential

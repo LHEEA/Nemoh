@@ -179,26 +179,28 @@
     SUBROUTINE CREK
     USE COM_VAR
     IMPLICIT NONE
-    INTEGER:: I,J,JZ,IR
+    INTEGER:: I,J
     REAL:: AKZ,AKR
-    JZ=46
-    IR=328
-    DO 8006 J=1,JZ
-      AKZ=AMIN1(10**(J/5.-6),10**(J/8.-4.5),16.)
-      XZ(J)=-AKZ     
+      JJZ=124
+      IIR=676
+    DO 8006 J=1,JJZ
+      AKZ=10**(J/10.-10)
+     XZ(J)=-AKZ
 8006 CONTINUE
-    XR(1)=0.
-    DO 8007 I=2,IR
-      IF(I.LT.40)THEN
-	AKR=AMIN1(10**((I-1.)/5-6),4./3.+ABS((I-32.)/3.))
+      X(1)=1.e-8
+    DO 8007 I=2,IIR
+      IF(I.LT.81)THEN
+      AKR=AMIN1(10**((I-1.)/5-6),4./3.+ABS((I-32.)/3.))
+      AKR=10**((I-1.)/10-8)
+!      print *,i,akr,10**((I-1.)/10-6)
       ELSE
-	AKR=4./3.+ABS((I-32.)/3.)
+      AKR=1+ABS((I-81.)/6.)
       ENDIF
       XR(I)=AKR
 8007 CONTINUE
 
-    DO 8009 J=1,JZ
-      DO 8008 I=1,IR
+    DO 8009 J=1,JJZ
+      DO 8008 I=1,IIR
 	CALL VNS(XZ(J),XR(I),I,J)                                           
 8008 CONTINUE
 8009 CONTINUE

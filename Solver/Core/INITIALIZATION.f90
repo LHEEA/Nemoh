@@ -33,12 +33,15 @@ CONTAINS
     USE MMesh
 !
     IMPLICIT NONE
+    LOGICAL FICHEX
 !   ID
     TYPE(TID) :: ID
 !   Geometry
     INTEGER :: NF,NSYM
     REAL :: XF,YF
-    TYPE(TMesh) :: Mesh    
+    TYPE(TMesh) :: Mesh
+    
+    INTEGER :: I,J
 !
 !   Read input file and geometry
     OPEN(10,file=ID%ID(1:ID%lID)//'/Nemoh.cal',form='formatted',status='old')
@@ -64,7 +67,16 @@ CONTAINS
     CALL ALLOCATE_DATA
     w_previous=-1.
     CALL PRE_PROC_MESH(Mesh)
+    INQUIRE(FILE='GRIN.QAT',EXIST=FICHEX)
+    IF(.NOT.FICHEX)THEN
     CALL CREK
+     OPEN(UNIT=44,FILE='GRIN.QAT',FORM='UNFORMATTED',STATUS='NEW')
+      WRITE(44)IIR,JJZ,(X(I),I=1,IIR),(Z(J),J=1,JJZ)
+      ELSE
+     OPEN(UNIT=44,FILE='GRIN.QAT',FORM='UNFORMATTED',STATUS='OLD')
+      READ(44)IIR,JJZ,(X(I),I=1,IIR),(Z(J),J=1,JJZ)
+      ENDIF
+
 !
     END SUBROUTINE INITIALIZE  
 

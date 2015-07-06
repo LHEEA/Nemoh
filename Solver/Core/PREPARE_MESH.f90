@@ -78,7 +78,7 @@ CONTAINS
 !----------------------------------------------------------------------------
 
     SUBROUTINE GOMG
-    
+
     USE COM_VAR
     
     IMPLICIT NONE
@@ -92,7 +92,7 @@ CONTAINS
     REAL:: DPOINT,T2,TI1,TT1,TT2,TT3,TT4,BA,BB,BC,BD,DNUL,DST,U
     INTEGER :: NSYM                                             
        
-    NSYM=NSYMY+1                                                              
+    NSYM=NSYMY+1
     EPPM=1.E-25
     DO I=1,IMX                                                         
 	    K=M1(I)                                                                   
@@ -142,7 +142,7 @@ CONTAINS
         XI3=T1UNX*(X(M)-XAVER)+T1UNY*(Y(M)-YAVER)+T1UNZ*(Z(M)-ZAVER)              
         XI4=T1UNX*(X(N)-XAVER)+T1UNY*(Y(N)-YAVER)+T1UNZ*(Z(N)-ZAVER)            
         ETA1=T2UNX*(X(K)-XAVER)+T2UNY*(Y(K)-YAVER)+T2UNZ*(Z(K)-ZAVER)             
-        ETA2=T2UNX*(X(L)-XAVER)+T2UNY*(Y(L)-YAVER)+T2UNZ*(Z(L)-ZAVER)             
+        ETA2=T2UNX*(X(L)-XAVER)+T2UNY*(Y(L)-YAVER)+T2UNZ*(Z(L)-ZAVER)
         ETA3=T2UNX*(X(M)-XAVER)+T2UNY*(Y(M)-YAVER)+T2UNZ*(Z(M)-ZAVER)             
         ETA4=T2UNX*(X(N)-XAVER)+T2UNY*(Y(N)-YAVER)+T2UNZ*(Z(N)-ZAVER)             
         XIO=(XI4*(ETA1-ETA2)+XI2*(ETA4-ETA1))/(3.*(ETA2-ETA4))
@@ -176,7 +176,164 @@ CONTAINS
        TT4=SQRT(XIN4*XIN4+ETAN4*ETAN4)                                         
        TDIS(I)=MAX(TT1,TT2,TT3,TT4)                                         
     END DO
+    
+      NG=4
+      CALL SOMGO(I)
+      IF(NG.EQ.1)THEN
+		  XGA(1,I)=XG(I)
+		  YGA(1,I)=YG(I)
+		  ZGA(1,I)=ZG(I)
+      ENDIF
+      DO L=1,NG
+		XJAC(L,I)=XJAC(L,I)/AIRE(I)
+      END DO
+      PRINT *,'NG = ',NG
+      
     RETURN
+    
     END SUBROUTINE
+
+! ----------------------------------------------------------------------
+
+      SUBROUTINE SOMGO(J)
+
+    USE COM_VAR
+    
+    IMPLICIT NONE
+
+    INTEGER:: I,J,L,IMETH
+    REAL:: XAVER,YAVER,ZAVER
+    REAL:: T1X,T1Y,T1Z,T2X,T2Y,T2Z,XNQ,XNX,XNY,XNZ
+    REAL:: AT1,AT2,AT3,AT4,AT5,AT6,AT7,AT8,AT9
+    REAL:: XL1,XL2,XL3,XL4,X41,X32,X34,X21,Y41,Y32,Y34,Y21
+    REAL:: A,B,C,D,AA,BB,CC,DD,EPSN,XG1,YG1
+    REAL:: TT,YL1,YL2,YL3,YL4
+!~     REAL, DIMENSION(:)::XJAC,XGA,YGA,ZGA
+!~     INTEGER:: M1,M2,M3,M4
+
+!~ C
+!~ C     PREPARATION DU CALCUL DES COEFFICIENTS D'INFLUENCE:
+!~ C     DETERMINATION DE LA POSITION DES POINTS DE GAUSS
+!~ C---------------------GAUSS 1 4 9 OU 16--------------------------------
+!~ C     ET DU JACOBIEN POUR CHAQUE FACETTE
+!~ C      NG =1,4,9 OU 16
+
+      REAL :: XX(16,4),YY(16,4),WG(16,4)
+
+      DATA((XX(I,L),I=1,16),L=1,4)/ &
+       16*0., &
+      .57735027, .57735027,-.57735027,-.57735027,12*0., &
+      .77459667, .77459667, .77459667,3*0.,-.77459667, &
+      -.77459667,-.77459667,7*0., &
+      .86113631, .86113631, .86113631, .86113631, &
+      .33998104, .33998104, .33998104, .33998104, &
+      -.33998104,-.33998104,-.33998104,-.33998104, &
+      -.86113631,-.86113631,-.86113631,-.86113631/
+      DATA((YY(I,L),I=1,16),L=1,4)/ &
+       16*0., &
+      -.57735027,.57735027,-.57735027,.57735027,12*0., &
+      -.77459667,0.,.77459667,-.77459667,0.,.77459667, &
+      -.77459667,0.,.77459667,7*0., &
+      -.86113363,-.33998104,.33998104,.86113363, &
+      -.86113363,-.33998104,.33998104,.86113363, &
+      -.86113363,-.33998104,.33998104,.86113363, &
+      -.86113363,-.33998104,.33998104,.86113363/
+      DATA((WG(I,L),I=1,16),L=1,4)/ &
+       1,15*0., &
+      .25,.25,.25,.25,12*0., &
+      .07716049,.12345679,.07716049,.12345679,.19753086, &
+      .12345679,.07716049,.12345679,.07716049,7*0., &
+      .30250748E-1,.56712963E-1,.56712963E-1,.30250748E-1, &
+      .56712963E-1,.10632333,.10632333,.56712963E-1, &
+      .56712963E-1,.10632333,.10632333,.56712963E-1, &
+      .30250748E-1,.56712963E-1,.56712963E-1,.30250748E-1/
+
+
+      IF(NG.EQ.1)THEN
+		IMETH=1
+      ELSE
+      IF(NG.EQ.4)THEN
+		IMETH=2
+      ELSE
+      IF(NG.EQ.9) THEN
+		IMETH=3
+      ELSE
+      IF(NG.EQ.16) THEN
+		IMETH=4
+      ELSE
+		WRITE(*,*)'ARGUMENT INCORRECT DANS SOMGO'
+      STOP
+      ENDIF
+      ENDIF
+      ENDIF
+      ENDIF
+      
+      T1X=X(M3(J))-X(M1(J))
+      T1Y=Y(M3(J))-Y(M1(J))
+      T1Z=Z(M3(J))-Z(M1(J))
+      T2X=X(M4(J))-X(M2(J))
+      T2Y=Y(M4(J))-Y(M2(J))
+      T2Z=Z(M4(J))-Z(M2(J))
+      XNX=T2Y*T1Z-T1Y*T2Z
+      XNY=T1X*T2Z-T2X*T1Z
+      XNZ=T2X*T1Y-T1X*T2Y
+      XNQ=SQRT(XNX**2+XNY**2+XNZ**2)
+      AT3=XNX/XNQ
+      AT6=XNY/XNQ
+      AT9=XNZ/XNQ
+      TT=SQRT(T1X**2+T1Y**2+T1Z**2)
+      AT1=T1X/TT
+      AT4=T1Y/TT
+      AT7=T1Z/TT
+      AT2=AT6*AT7-AT9*AT4
+      AT5=AT9*AT1-AT3*AT7
+      AT8=AT3*AT4-AT6*AT1
+!~       XG=0.25*(X(M1(J))+X(M2(J))+X(M3(J))+X(M4(J)))
+!~       YG=0.25*(Y(M1(J))+Y(M2(J))+Y(M3(J))+Y(M4(J)))
+!~       ZG=0.25*(Z(M1(J))+Z(M2(J))+Z(M3(J))+Z(M4(J)))
+      XL1=AT1*(X(M1(J))-XG(J))+AT4*(Y(M1(J))-YG(J))+AT7*(Z(M1(J))-ZG(J))
+      YL1=AT2*(X(M1(J))-XG(J))+AT5*(Y(M1(J))-YG(J))+AT8*(Z(M1(J))-ZG(J))
+      XL2=AT1*(X(M2(J))-XG(J))+AT4*(Y(M2(J))-YG(J))+AT7*(Z(M2(J))-ZG(J))
+      YL2=AT2*(X(M2(J))-XG(J))+AT5*(Y(M2(J))-YG(J))+AT8*(Z(M2(J))-ZG(J))
+      XL3=AT1*(X(M3(J))-XG(J))+AT4*(Y(M3(J))-YG(J))+AT7*(Z(M3(J))-ZG(J))
+      YL3=AT2*(X(M3(J))-XG(J))+AT5*(Y(M3(J))-YG(J))+AT8*(Z(M3(J))-ZG(J))
+      XL4=AT1*(X(M4(J))-XG(J))+AT4*(Y(M4(J))-YG(J))+AT7*(Z(M4(J))-ZG(J))
+      YL4=AT2*(X(M4(J))-XG(J))+AT5*(Y(M4(J))-YG(J))+AT8*(Z(M4(J))-ZG(J))
+!~ C
+!~ C    DETERMINATION DU JACOBIEN EN CHACUN DES POINTS DE GAUSS
+!~ C
+      X41=XL4-XL1
+      X32=XL3-XL2
+      Y34=YL3-YL4
+      Y21=YL2-YL1
+      Y41=YL4-YL1
+      Y32=YL3-YL2
+      X34=XL3-XL4
+      X21=XL2-XL1
+      DO 15 L=1,NG
+      A=(1.-YY(L,IMETH))*X41+(1+YY(L,IMETH))*X32
+      B=(1.-XX(L,IMETH))*Y21+(1+XX(L,IMETH))*Y34
+      C=(1.-XX(L,IMETH))*X21+(1+XX(L,IMETH))*X34
+      D=(1.-YY(L,IMETH))*Y41+(1+YY(L,IMETH))*Y32
+      XJAC(L,J)=ABS(A*B-C*D)*WG(L,IMETH)*.25
+   15 CONTINUE
+!~ C
+!~ C    COORDONNES ABSOLUES DES POINTS DE GAUSS
+!~ C
+      EPSN=0.
+      DO 20 L=1,NG
+      AA=.25*(1-XX(L,IMETH))*(1-YY(L,IMETH))
+      BB=.25*(1-XX(L,IMETH))*(1+YY(L,IMETH))
+      CC=.25*(1+XX(L,IMETH))*(1+YY(L,IMETH))
+      DD=.25*(1+XX(L,IMETH))*(1-YY(L,IMETH))
+      XG1=AA*XL1+BB*XL2+CC*XL3+DD*XL4
+      YG1=AA*YL1+BB*YL2+CC*YL3+DD*YL4
+      XGA(L,J)=XG(J)+AT1*XG1+AT2*YG1+AT3*EPSN
+      YGA(L,J)=YG(J)+AT4*XG1+AT5*YG1+AT6*EPSN
+      ZGA(L,J)=ZG(J)+AT7*XG1+AT8*YG1+AT9*EPSN
+  20  CONTINUE
+
+      RETURN
+      END SUBROUTINE
 
 END MODULE

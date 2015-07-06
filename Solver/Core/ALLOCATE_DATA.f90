@@ -28,6 +28,8 @@
 	! Array of centre of gravity for each panel
 	!  ALLOCATE(XG(2**NSYMY*NFA),YG(2**NSYMY*NFA),ZG(2**NSYMY*NFA))
 	  ALLOCATE(XG(2*NFA),YG(2*NFA),ZG(2*NFA))
+        ! Array of Gauss points for each panel
+         ALLOCATE(XGA(NFA,16),YGA(NFA,16),ZGA(NFA,16),XJAC(NFA,16))
 	! Array for surface area of the panels
 	  ALLOCATE(AIRE(NFA))
 	!vertices of the panel, size NFA(no of facettes)
