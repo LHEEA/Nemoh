@@ -11,7 +11,7 @@ endif
 
 ifeq ($(itest), ifort)
 	FC=ifort
-	FFLAGS=-c -cpp
+	FFLAGS=-c -cpp -g
 endif
 
 #SOURCES FORTRAN Mesh(modules de maillage)
