@@ -24,13 +24,14 @@
 MODULE COMPUTE_GREEN_INFD
 
   USE COM_VAR
+  USE FIC_COM
   USE ELEMENTARY_FNS
 
   IMPLICIT NONE
 
   CONTAINS   
 !-------------------------------------------------------------------------------!
-      SUBROUTINE VAVINFD(KKK,XGI,YGI,ZGI,ISP,IFP) 
+      SUBROUTINE VAVINFD(KKK,XGI,YGI,ZGI,ISP,IFP)
                                                   
       INTEGER:: ISP,IFP
       INTEGER:: KKK,I,J,IMXX,MK,NJJ,JJ,L,MH,MY,MZ,MJJ
@@ -48,7 +49,7 @@ MODULE COMPUTE_GREEN_INFD
       PI=4.*PI4                                                             
       DPI=2.*PI
       QPI=4.*PI
-      NJJ=2*(NSYMY+1)                                                           
+      NJJ=NSYMY+1
       DH=0.
       MK=(-1)**(KKK+1)
       IF(KKK.EQ.1)IMXX=IMX
@@ -56,11 +57,11 @@ MODULE COMPUTE_GREEN_INFD
 
        I=ISP
        J=IFP                                                  
-       XOI=XGI                                                             
+       XOI=XGI
        YOI=YGI
        ZOI=ZGI
-      if(zgi.gt.zer)zoi=2*ZER
-	DO 25 JJ=1,NJJ
+       if(zgi.gt.zer)zoi=2*ZER
+	DO 25 JJ=1,2*NJJ
 	MJJ=(-1)**(JJ+1)                                                          
 	MY=(-1)**(JJ/3+2)
 	MZ=(-1)**(JJ/2+2)
@@ -185,7 +186,7 @@ MODULE COMPUTE_GREEN_INFD
 	    W=VXS(1)-MK*(VXS(2)-VXS(3))-VXS(4)                               
 	    VSXM=-W/QPI                                                            
 	    W=VYS(1)-MK*(VYS(2)-VYS(3))-VYS(4)                             
-	    VSYM=-W/QPI                                                            
+	    VSYM=-W/QPI
 	    W=VZS(1)-MK*(VZS(2)-VZS(3))-VZS(4)                             
 	    VSZM=-W/QPI                                                          
 	  ELSE                                                                      
@@ -210,7 +211,7 @@ MODULE COMPUTE_GREEN_INFD
   SUBROUTINE VNSINFD(KKK,ISP,IFP,XGI,YGI,ZGI)  
 
       INTEGER:: ISP,IFP
-      INTEGER:: I,J,L,JJ,KK(5),NJJ,IJUMP,BX,KI,KJ,IT,KKK,IMXX,LLL
+      INTEGER:: I,J,L,JJ,KK(5),NJJ,BX,KI,KJ,IT,KKK,IMXX,LLL
       REAL:: XGI,YGI,ZGI,ZGAJ,PL5
       REAL:: FS1(NFA,2),FS2(NFA,2)
       REAL:: VSX1(NFA,2),VSY1(NFA,2),VSZ1(NFA,2)                                
@@ -219,19 +220,19 @@ MODULE COMPUTE_GREEN_INFD
       REAL:: WH,WR,AK0,ZERG
       REAL:: EPS,ADPI,ADPI2,AKAIR,AKDPI,AKDPI2,AKP4
       REAL:: AKR,AKZ,DD,PSURR,QJJJ,RRR,ZZZ,YMJJJ,ZMIII,CVX,CVY,VR1,VR2
-      REAL:: CSK,DSK,EPZ,F1,F2,F3,F4,F5,CT,ST,TETA
-      REAL:: PD1X,PD2X,PD1Z,PD2Z,SIK,SQ,VZ1,VZ2,XL1,XL2,XL3,XL4,XL5
-      REAL:: ZL1,ZL2,ZL3,ZL4,ZL5
+      REAL:: CSK,DSK,EPZ,CT,ST,TETA,pcos,psin
+      REAL:: PD1X,PD2X,PD1Z,PD2Z,SIK,SQ,VZ1,VZ2
+      REAL:: XL1,XL2,XL3,XL4,XL5,ZL1,ZL2,ZL3,ZL4,ZL5
       COMPLEX*8 ZIJ(5),CEX(5),GZ(5)
       COMPLEX*8 ZI,C1,C2,ASD,BSD,CSD,ZA,ZB,ZVS
-      REAL:: U1,U2,U3,U4,U5,XU
       REAL:: ASA
+      REAL:: U1,U2,U3,U4,U5,XU,F1,F2,F3,F4,F5
 
       PL5(U1,U2,U3,U4,U5,XU)=((XU-U1)*(XU-U2)*(XU-U3)*(XU-U4))/&
-     ((U5-U1)*(U5-U2)*(U5-U3)*(U5-U4))
+      ((U5-U1)*(U5-U2)*(U5-U3)*(U5-U4))
       PI4=ATAN(1.)
       PI=4.*PI4                                                             
-      DPI=2.*PI                                                                 
+      DPI=2.*PI
       QPI=4.*PI
       ZI=(0.,1.)
       DPI2=2.*PI**2                                                             
@@ -247,16 +248,23 @@ MODULE COMPUTE_GREEN_INFD
 
       AK0=WR**2/G
       NJJ=NSYMY+1                                     
-      IJUMP=0                                                           
 
       I=ISP  !source point  !Plutot field point
       J=IFP  !field point   !Plutot source point 
                                                
       ZMIII=ZGI
       ZMIII=min(ZGI,0.999*ZERG/AK0)
-
- 	DO 22 JJ=1,NJJ                                                            
+      njj=nsymy+1
+ 	DO 22 JJ=1,NJJ
  	 BX=(-1)**(JJ+1)
+      FS1(J,JJ)=0.
+      FS2(J,JJ)=0.
+      VSX1(J,JJ)=0.
+      VSX2(J,JJ)=0.
+      VSY1(J,JJ)=0.
+      VSY2(J,JJ)=0.
+      VSZ1(J,JJ)=0.
+      VSZ2(J,JJ)=0.
       asa=0
       if(asa.eq.0)then
       DO 211 LLL=1,NG
@@ -276,19 +284,19 @@ MODULE COMPUTE_GREEN_INFD
 	      ELSE
 		PSURR=0.
 	      ENDIF
-              IF(AKZ.LT.-1.5E-10)THEN !3B
-                IF(AKZ.GT.-251.)THEN  !4B
-                  IF(AKR.LT.100)THEN  !5B
-                  KJ=10*(ALOG10(-AKZ)+10.)
-                  KJ=MAX(KJ,3)
-                  KJ=MIN(KJ,122)
-                  IF(AKR.LT.1.)THEN
-                  KI=10*(ALOG10(AKR+1.E-10)+8)+1
-                  ELSE
-                  KI=6*AKR+75
-                  ENDIF
-                  KI=MAX(KI,3)
-                  KI=MIN(KI,674)
+      IF(AKZ.LT.-1.5E-10)THEN !3B
+      IF(AKZ.GT.-251.)THEN !4B
+      IF(AKR.LT.100)THEN !5B
+      KJ=10*(ALOG10(-AKZ)+10.)
+      KJ=MAX(KJ,3)
+      KJ=MIN(KJ,122)
+      IF(AKR.LT.1.)THEN
+      KI=10*(ALOG10(AKR+1.E-10)+8)+1
+      ELSE
+      KI=6*AKR+75
+      ENDIF
+      KI=MAX(KI,3)
+      KI=MIN(KI,674)
       XL1=PL5(XR(KI+2),XR(KI-1),XR(KI  ),XR(KI+1),XR(KI-2),AKR)
       XL2=PL5(XR(KI-2),XR(KI  ),XR(KI+1),XR(KI+2),XR(KI-1),AKR)
       XL3=PL5(XR(KI-1),XR(KI+1),XR(KI+2),XR(KI-2),XR(KI  ),AKR)
@@ -323,7 +331,7 @@ MODULE COMPUTE_GREEN_INFD
       PD2Z=ZL1*F1+ZL2*F2+ZL3*F3+ZL4*F4+ZL5*F5
 		  ELSE !5E
 		    EPZ=EXP(AKZ)
-		    AKP4=AKR-PI4                                        
+		    AKP4=AKR-PI4
 		    SQ=SQRT(DPI/AKR)
 		    CSK=COS(AKP4)
 		    SIK=SIN(AKP4)
@@ -472,7 +480,7 @@ MODULE COMPUTE_GREEN_INFD
     22 CONTINUE    
                                                               
       IF(NSYMY.EQ.1)THEN !11B        
-	  AKAIR=AK0*AIRE(J)                  
+	  AKAIR=AK0*AIRE(J)
 	  ADPI2=AKAIR/DPI2
 	  ADPI=AKAIR/DPI
 	  SM1=FSM-(FS1(J,1)-FS1(J,2))*ADPI2                             
@@ -494,30 +502,35 @@ MODULE COMPUTE_GREEN_INFD
 	  VSZP2=-(VSZ2(J,1)+VSZ2(J,2))*AKDPI                                    
 	  VSZM2=-(VSZ2(J,1)-VSZ2(J,2))*AKDPI                                 
       ELSE   !11E
-	  AKAIR=AK0*AIRE(J)                  
+	  AKAIR=AK0*AIRE(J)
 	  ADPI2=AKAIR/DPI2
 	  ADPI=AKAIR/DPI
-	  SP1=FSP-FS1(J,1)*ADPI2                                              
-	  SM1=SP1                                                             
-	  SP2=-FS2(J,1)*ADPI                                                    
+	  SP1=FSP-FS1(J,1)*ADPI2
+	  SM1=SP1
+	  SP2=-FS2(J,1)*ADPI
 	  SM2=SP2
 	  AKDPI2=ADPI2*AK0
 	  AKDPI=ADPI*AK0
 	  VSXP1=VSXP-VSX1(J,1)*AKDPI2                                        
 	  VSXM1=VSXP1                                                        
-	  VSYP1=VSYP-VSY1(J,1)*AKDPI2                                        
+	  VSYP1=VSYP-VSY1(J,1)*AKDPI2
 	  VSYM1=VSYP1                                                        
-	  VSZP1=VSZP-VSZ1(J,1)*AKDPI2                                       
+	  VSZP1=VSZP-VSZ1(J,1)*AKDPI2
 	  VSZM1=VSZP1                                                        
 	  VSXP2=-VSX2(J,1)*AKDPI                                            
 	  VSXM2=VSXP2                                                        
 	  VSYP2=-VSY2(J,1)*AKDPI                                             
-	  VSYM2=VSYP2                                                      
-	  VSZP2=-VSZ2(J,1)*AKDPI                                             
+	  VSYM2=VSYP2
+	  VSZP2=-VSZ2(J,1)*AKDPI
 	  VSZM2=VSZP2                                                         
       ENDIF !11F
-                            
-      RETURN                                                                    
+!      print *,i,xgi,ygi,zgi
+!      print *,j,xga(1,j),yga(1,j),zga(1,j)
+!      print *,sp1,vsxp1,vsyp1,vszp1
+!      print *,sm1,vsxm1,vsym1,vszm1
+!      print *,sp2,vsxp2,vsyp2,vszp2
+!      print *,sm2,vsxm2,vsym2,vszm2
+      RETURN
       END SUBROUTINE
 !-------------------------------------------------------------------------------!
       SUBROUTINE CINT_INFD(AKK,N)
@@ -661,5 +674,6 @@ MODULE COMPUTE_GREEN_INFD
 	PL2=((XU-U1)*(XU-U2))/((U3-U1)*(U3-U2))
 	RETURN
       END FUNCTION
+
 
 END MODULE

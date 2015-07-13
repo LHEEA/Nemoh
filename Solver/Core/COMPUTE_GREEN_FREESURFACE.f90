@@ -24,6 +24,7 @@
 MODULE COMPUTE_GREEN_FREESURFACE
 
   USE COM_VAR
+  USE FIC_COM
   USE ELEMENTARY_FNS
 
   IMPLICIT NONE
@@ -219,6 +220,7 @@ MODULE COMPUTE_GREEN_FREESURFACE
       QPI=4.*PI
       DPI2=2.*PI**2
       EPS=0.0001
+      ZERG=-1.E-8
       WH=DPI/T
       WR=WH
       TR=DPI/WR
@@ -480,8 +482,6 @@ MODULE COMPUTE_GREEN_FREESURFACE
       AR(NEXP1)=2.
       COE3=-1./(8.*PI**2)
       COE4=-A/(8.*PI)
-!       print*,'A',A,AMH,AKH,NEXP
-!       read*
       ZMIII=min(ZPO,0.999*ZERG/AM0)
       DO 122 JJ=1,NJJ
       BX=(-1)**(JJ+1)
@@ -497,8 +497,6 @@ MODULE COMPUTE_GREEN_FREESURFACE
       ZZZ1=ZMIII+ZG(J)
       AKZ1=AM0*ZZZ1
       DD1=SQRT(RRR**2+ZZZ1**2)
-!                   print*,'ZZ',ZZZ1,DD1
-!       read*
       IF(DD1.GT.EPS)THEN
       RR1=AM0*DD1
       PSR1=PI/RR1

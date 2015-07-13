@@ -24,6 +24,7 @@
 MODULE COMPUTE_GREEN_FD
 
   USE COM_VAR
+  USE FIC_COM
   USE ELEMENTARY_FNS
   IMPLICIT NONE
 
@@ -45,9 +46,9 @@ MODULE COMPUTE_GREEN_FD
 
       PI4=ATAN(1.)
       PI=4.*PI4                                                             
-      DPI=2.*PI                                                                 
+      DPI=2.*PI
       QPI=4.*PI
-      NJJ=2*(NSYMY+1)
+      NJJ=NSYMY+1
       DH=2*Depth
       MK=(-1)**(KKK+1)
       IF(KKK.EQ.1)IMXX=IMX
@@ -57,9 +58,10 @@ MODULE COMPUTE_GREEN_FD
        J=IFP                                                  
        XOI=XGI                                                             
        YOI=YGI
-       if(ZG(i).gt.ZER) ZOI=2*ZER
-	DO 25 JJ=1,NJJ
-	MJJ=(-1)**(JJ+1)                                                          
+       ZOI=ZGI
+       if(ZGI.gt.ZER) ZOI=2*ZER
+	DO 25 JJ=1,2*NJJ
+	MJJ=(-1)**(JJ+1)
 	MY=(-1)**(JJ/3+2)
 	MZ=(-1)**(JJ/2+2)
 	MH=(1-(-1)**(JJ/2+2))/2
@@ -67,20 +69,20 @@ MODULE COMPUTE_GREEN_FD
 	YOJ=YG(J)*MY                                                            
 	ZOJ=ZG(J)*MZ-DH*MH                                               
 	A3J=XN(J)                                                               
-	A6J=YN(J)*MY                                                            
+	A6J=YN(J)*MY
 	A9J=ZN(J)*MZ                                                           
 	RO=SQRT((XOI-XOJ)**2+(YOI-YOJ)**2+(ZOI-ZOJ)**2)
-	IF(RO.GT.7.*TDIS(J))THEN                                               
+	IF(RO.GT.7.*TDIS(J))THEN
 	  AIJS(JJ)=AIRE(J)/RO                                                     
-	  ASRO=AIJS(JJ)/RO**2                                                       
-	  VXS(JJ)=-(XOI-XOJ)*ASRO                                              
+	  ASRO=AIJS(JJ)/RO**2
+	  VXS(JJ)=-(XOI-XOJ)*ASRO
 	  VYS(JJ)=-(YOI-YOJ)*ASRO
-	  VZS(JJ)=-(ZOI-ZOJ)*ASRO                                              
+	  VZS(JJ)=-(ZOI-ZOJ)*ASRO 
 	ELSE
-	  AIJS(JJ)=0.                                                               
-	  VXS(JJ)=0.                                                                
+	  AIJS(JJ)=0.
+	  VXS(JJ)=0.
 	  VYS(JJ)=0.                                                                
-	  VZS(JJ)=0.                                                                
+	  VZS(JJ)=0.
 	  KK(1)=M1(J)                                                               
 	  KK(2)=M2(J)                                                               
 	  KK(3)=M3(J)                                                               
@@ -104,7 +106,7 @@ MODULE COMPUTE_GREEN_FD
 	  RR(5)=RR(1)
 	  DRX(5)=DRX(1)                                                           
 	  DRY(5)=DRY(1)                                                           
-	  DRZ(5)=DRZ(1)                                                           
+	  DRZ(5)=DRZ(1)
 	  GZ=(XOI-XOJ)*A3J+(YOI-YOJ)*A6J+(ZOI-ZOJ)*A9J
 	  DO 29 L=1,4                                                               
 	  DK=SQRT((TXN(L+1)-TXN(L))**2+(TYN(L+1)-TYN(L))**2+(TZN(L+1)-TZN(L))**2)
@@ -124,15 +126,15 @@ MODULE COMPUTE_GREEN_FD
 	    ANL=RR(L+1)+RR(L)+DK                                                      
 	    DNL=RR(L+1)+RR(L)-DK                                                      
 	    DEN=ANL/DNL                                                               
-	    ALDEN=ALOG(DEN)                                                           
+	    ALDEN=ALOG(DEN)
 	      IF(ABS(GZ).GE.1.E-4*TDIS(J))THEN                                       
 	      AT=ATAN(ARG)
 	      ELSE
 	      AT=0.                                                                     
 	      ENDIF                                                                  
 	    AIJS(JJ)=AIJS(JJ)+GY*ALDEN-2.*ABS(GZ)*AT                                  
-	    DAT=2.*AT*SGN                                                             
-	    ANTX=GYX*DDK                                                              
+	    DAT=2.*AT*SGN
+	    ANTX=GYX*DDK
 	    ANTY=GYY*DDK                                                              
 	    ANTZ=GYZ*DDK                                                              
 	    ANLX=DRX(L+1)+DRX(L)                                                      
@@ -142,7 +144,7 @@ MODULE COMPUTE_GREEN_FD
 	    DS=2.*(RR(L+1)+RR(L))*SGN                                                 
 	    DNTX=DR*ANLX+A3J*DS                                                     
 	    DNTY=DR*ANLY+A6J*DS                                                     
-	    DNTZ=DR*ANLZ+A9J*DS                                                     
+	    DNTZ=DR*ANLZ+A9J*DS
 	    DENL=ANL*DNL                                                              
 	    DENT=ANT*ANT+DNT*DNT                                                      
 	    ATX=(ANTX*DNT-DNTX*ANT)/DENT                                              
@@ -154,8 +156,8 @@ MODULE COMPUTE_GREEN_FD
 	    VZS(JJ)=VZS(JJ)+GYZ*ALDEN+GY*ANLZ*DLOGG-2.*ABS(GZ)*ATZ-DAT*A9J            
 	    ENDIF
       29 CONTINUE                                                                  
-	  IF(I.EQ.J.AND.JJ.EQ.1)THEN                                               
-	  VXS(1)=VXS(1)-DPI*A3J                                                   
+	  IF(I.EQ.J.AND.JJ.EQ.1)THEN
+	  VXS(1)=VXS(1)-DPI*A3J
 	  VYS(1)=VYS(1)-DPI*A6J                                                   
       IF(ZGI.GT.ZER)THEN
       VZS(1)=VZS(1)+DPI*A9J
@@ -171,19 +173,19 @@ MODULE COMPUTE_GREEN_FD
 	ENDIF
     25 CONTINUE                                                                  
 	  IF(NSYMY.EQ.1)THEN                                                       
-	    W=AIJS(1)-MK*(AIJS(2)+AIJS(3))+AIJS(4)                                   
-	    FSP=-W/QPI                                                            
-	    W=AIJS(1)-MK*(AIJS(2)-AIJS(3))-AIJS(4)                                  
-	    FSM=-W/QPI                                                            
+	    W=AIJS(1)-MK*(AIJS(2)+AIJS(3))+AIJS(4)
+	    FSP=-W/QPI
+	    W=AIJS(1)-MK*(AIJS(2)-AIJS(3))-AIJS(4)
+	    FSM=-W/QPI
 	    W=VXS(1)-MK*(VXS(2)+VXS(3))+VXS(4)                                 
-	    VSXP=-W/QPI                                                           
+	    VSXP=-W/QPI
 	    W=VYS(1)-MK*(VYS(2)+VYS(3))+VYS(4)                               
 	    VSYP=-W/QPI                                                            
 	    W=VZS(1)-MK*(VZS(2)+VZS(3))+VZS(4)                              
 	    VSZP=-W/QPI                                                            
-	    W=VXS(1)-MK*(VXS(2)-VXS(3))-VXS(4)                               
+	    W=VXS(1)-MK*(VXS(2)-VXS(3))-VXS(4)
 	    VSXM=-W/QPI                                                            
-	    W=VYS(1)-MK*(VYS(2)-VYS(3))-VYS(4)                             
+	    W=VYS(1)-MK*(VYS(2)-VYS(3))-VYS(4)
 	    VSYM=-W/QPI                                                            
 	    W=VZS(1)-MK*(VZS(2)-VZS(3))-VZS(4)                             
 	    VSZM=-W/QPI                                                          
@@ -201,9 +203,8 @@ MODULE COMPUTE_GREEN_FD
 	    VSZP=-W/QPI                                                            
 	    VSZM=VSZP                                                                                                                           
 	  ENDIF                                                                     
-
-       RETURN                                                              
-      END SUBROUTINE 
+       RETURN
+      END SUBROUTINE
 !-------------------------------------------------------------------------------!
                                                                       
       SUBROUTINE VNSFD(AM0,AMH,NEXP,ISP,IFP,XGI,YGI,ZGI)                     
@@ -211,7 +212,7 @@ MODULE COMPUTE_GREEN_FD
       INTEGER::ISP,IFP
       REAL:: AM0,AMH,XGI,YGI,ZGI,ZGAJ,PL5
       REAL:: FS1(NFA,2),FS2(NFA,2)
-      INTEGER::I,J,JJ,IJUMP,NJJ,NEXP,NEXP1
+      INTEGER::I,J,JJ,NJJ,NEXP,NEXP1
       INTEGER::KK(5),BX,BKL,IT,KE,KI,KJ1,KJ2,KJ3,KJ4,KL,L
       REAL:: H,A,ADPI,ADPI2,AKH,COE1,COE2,COE3,COE4,EPS,ZERG                 
       REAL:: PI,PI4,DPI,QPI,WH
@@ -245,7 +246,7 @@ MODULE COMPUTE_GREEN_FD
 
       PL5(U1,U2,U3,U4,U5,XU)=((XU-U1)*(XU-U2)*(XU-U3)*(XU-U4))/&
       ((U5-U1)*(U5-U2)*(U5-U3)*(U5-U4))
-     PI4=ATAN(1.)
+      PI4=ATAN(1.)
       PI=4.*ATAN(1.)                                                             
       DPI=2.*PI
       QPI=4.*PI
@@ -254,12 +255,12 @@ MODULE COMPUTE_GREEN_FD
       WH=DPI/T
       AKH=AMH*TANH(AMH)
       A=(AMH+AKH)**2/(H*(AMH**2-AKH**2+AKH))
-      NEXP1=NEXP+1                                                              
+      NEXP1=NEXP+1
       AMBDA(NEXP1)=0.                                                           
       AR(NEXP1)=2. 
       ADPI2=-A/(8.*PI**2)
       ADPI=-A/(8*PI)
-      COE1=ADPI2/AM0                                                       
+      COE1=ADPI2/AM0
       COE2=ADPI/AM0                                                           
       COE3=ADPI2
       COE4=ADPI                                                           
@@ -287,12 +288,12 @@ MODULE COMPUTE_GREEN_FD
       if(asa.eq.0)then
      DO 211 L=1,NG
 	      QJJJ=BX*YN(J)
-	      YMJJJ=BX*YG(J)
+	      YMJJJ=BX*YGA(L,J)
 	      COF1=COE3*AIRE(J)
 	      COF2=COE4*AIRE(J)
 	      COF3=AM0*COF1                                             
 	      COF4=AM0*COF2                                             
-	      RRR=SQRT((XGI-XG(J))**2+(YGI-YMJJJ)**2)
+	      RRR=SQRT((XGI-XGA(L,J))**2+(YGI-YMJJJ)**2)
 	      AKR=AM0*RRR
              ZGAJ=MIN(ZGA(L,J),ZER)
 	      ZZZ1=ZMIII+ZGAJ
@@ -353,7 +354,7 @@ MODULE COMPUTE_GREEN_FD
       PD2Z1=ZL11*F1+ZL21*F2+ZL31*F3+ZL41*F4+ZL51*F5
 		  ELSE                           !0003E
 		    EPZ1=EXP(AKZ1)
-		    AKP4=AKR-PI4                                        
+		    AKP4=AKR-PI4
 		    SQ=SQRT(DPI/AKR)
 		    CSK=COS(AKP4)
 		    SIK=SIN(AKP4)
@@ -431,6 +432,7 @@ MODULE COMPUTE_GREEN_FD
 	      ENDIF                              !0004F
 
 	      ZZZ3=ZMIII-ZGAJ-2*H
+	      AKZ3=AM0*ZZZ3
 	      DD3=SQRT(RRR**2+ZZZ3**2)
 	      IF(DD3.GT.EPS)THEN
 		RR3=AM0*DD3
@@ -580,9 +582,6 @@ MODULE COMPUTE_GREEN_FD
      XL3*APD2X(KI  ,KJ1+2)+XL4*APD2X(KI+1,KJ1+2)+XL5*APD2X(KI+2,KJ1+2)
       PD2X1=ZL11*F1+ZL21*F2+ZL31*F3+ZL41*F4+ZL51*F5
 		      ELSE
-			DSK=0.5/AKR
-			SCDS=PI*SQ*(CSK-DSK*SIK)
-			SSDS=SQ*(SIK+DSK*CSK)
 			PD1X1=-PSURR1*AKR-EPZ1*SCDS
 			PD2X1=EPZ1*SSDS
 		      ENDIF
@@ -700,7 +699,7 @@ MODULE COMPUTE_GREEN_FD
 		      PD2X4=0.
 		      VR24=0.
 		    ENDIF  
-		  ENDIF 
+		  ENDIF
 		  C1V3=-COF3*(PD1X1+PD1X2+PD1X3+PD1X4)
 		  C2V3=COF4*(VR21+VR22+VR23+VR24)
                   CVX=(XGI-XGA(L,J))/RRR
@@ -710,7 +709,7 @@ MODULE COMPUTE_GREEN_FD
       VSY1(J,JJ)=VSY1(J,JJ)+C1V3*CVY*XJAC(L,J)
       VSY2(J,JJ)=VSY2(J,JJ)+C2V3*CVY*XJAC(L,J)
 		  ELSE                                 !601E
-		    VSX1(J,JJ)=0.                                 
+		    VSX1(J,JJ)=0.
 		    VSX2(J,JJ)=0.                                    
 		    VSY1(J,JJ)=0.                                 
 		    VSY2(J,JJ)=0.                                    
@@ -718,11 +717,11 @@ MODULE COMPUTE_GREEN_FD
       VSZ1(J,JJ)=VSZ1(J,JJ)+COF3*(PD1Z1-PD1Z2+PD1Z3-PD1Z4)*XJAC(L,J)
       VSZ2(J,JJ)=VSZ2(J,JJ)+COF4*(VZ21-VZ22+VZ23-VZ24)*XJAC(L,J)
 		ENDIF                                   !501F
-	
-      XPG=XG(I)-XGA(L,J)
+
+                XPG=XGI-XGA(L,J)
 		YPG=YGI-YMJJJ
 		ACT=-0.5*AIRE(J)/QPI
-		DO 7234 KE=1,NEXP1           
+		DO 7234 KE=1,NEXP1
 		  AQT=ACT*AR(KE)
 		  ZPG1=ZMIII-2.*H+H*AMBDA(KE)-ZGAJ
 		  ZPG2=-ZMIII-H*AMBDA(KE)-ZGAJ
@@ -732,7 +731,7 @@ MODULE COMPUTE_GREEN_FD
 		  RO1=SQRT(RR1)
 		  IF(RO1.GT.EPS)THEN
 		    FTS1=AQT/RO1                                                     
-		    ASRO1=FTS1/RR1                                              
+		    ASRO1=FTS1/RR1
 		  ELSE
 		    FTS1=0.
 		    ASRO1=0.
@@ -797,7 +796,7 @@ MODULE COMPUTE_GREEN_FD
 		FS1(J,JJ)=0.
 		FS2(J,JJ)=0.                                    
 		VSX1(J,JJ)=0.
-		VSX2(J,JJ)=0.                                         
+		VSX2(J,JJ)=0.
 		VSY1(J,JJ)=0.                                      
 		VSY2(J,JJ)=0.                                         
 		VSZ1(J,JJ)=0.                                       
@@ -916,8 +915,8 @@ MODULE COMPUTE_GREEN_FD
     7122 CONTINUE 
 
       IF(NSYMY.EQ.1)THEN  !101B
-        
-	  SM1=FSM+FS1(J,1)-FS1(J,2)                                           
+
+	  SM1=FSM+FS1(J,1)-FS1(J,2)
 	  SP1=FSP+FS1(J,1)+FS1(J,2)                                           
 	  SM2=FS2(J,1)-FS2(J,2)                                                  
 	  SP2=FS2(J,1)+FS2(J,2)                                                  
@@ -932,7 +931,7 @@ MODULE COMPUTE_GREEN_FD
 	  VSYP2=VSY2(J,1)+VSY2(J,2)                                              
 	  VSYM2=VSY2(J,1)-VSY2(J,2)                                              
 	  VSZP2=VSZ2(J,1)+VSZ2(J,2)                                              
-	  VSZM2=VSZ2(J,1)-VSZ2(J,2)   
+	  VSZM2=VSZ2(J,1)-VSZ2(J,2)
       ELSE      !101E
 	  SP1=FSP+FS1(J,1)                                                    
 	  SM1=SP1                                                             
@@ -951,6 +950,12 @@ MODULE COMPUTE_GREEN_FD
 	  VSZP2=VSZ2(J,1)                                                        
 	  VSZM2=VSZP2                                                              
       ENDIF !101F
+!      print *,i,xgi,ygi,zgi
+!      print *,j,xga(1,j),yga(1,j),zga(1,j)
+!      print *,sp1,vsxp1,vsyp1,vszp1
+!      print *,sm1,vsxm1,vsym1,vszm1
+!      print *,sp2,vsxp2,vsyp2,vszp2
+!      print *,sm2,vsxm2,vsym2,vszm2
 
       RETURN                                                                    
       END SUBROUTINE  
@@ -1107,19 +1112,19 @@ MODULE COMPUTE_GREEN_FD
       SC=0.
       AR=0.
       NEXR=31                                           
-      PRECI=1.E-02                                                              
+      PRECI=1.E-02
       ISTIR=0                                                                   
       NMAX=4*(NEXR-1)                                                           
       NK=4                                                                      
       A=-0.1                                                                    
       B=20.                                                                     
    62 CONTINUE                                                                  
-      NM=NK                                                                     
+      NM=NK
       NJ=4*NM                                                                                                                                   
       NPP=NJ+1                                                                   
       H=(B-A)/NJ                                                                
       DO 10 I=1,NPP                                                              
-      XT(I)=A+(I-1)*H                                                            
+      XT(I)=A+(I-1)*H
       YT(I)=FF(XT(I),AK0,AM0)                                                 
    10 CONTINUE                                                                  
       ISOR=0                                                                         
@@ -1141,14 +1146,14 @@ MODULE COMPUTE_GREEN_FD
    30 CONTINUE                                                                  
       DIF=YY-TT                                                                  
       ERMOY=ERMOY+DIF                                                           
-      ERMAX=AMAX1(ERMAX,ABS(DIF))                                               
+      ERMAX=AMAX1(ERMAX,ABS(DIF))
       IF(ABS(DIF).GT.PRECI)ISOR=1                                               
    20 CONTINUE                                                                  
       ERMOY=ERMOY/NMO                                                        
  !     WRITE(*,1111)NM,ERMAX,ERMOY                                              
  1111 FORMAT(5X,I2,'EXPONENTIELLES  ECART MAXI = ',E10.3,'ECART MOYEN = ',E10.3/)                                                              
       IF(ISTIR.EQ.1)GOTO 61                                                     
-      IF(ISOR)63,61,63                                                          
+      IF(ISOR)63,61,63
    63 CONTINUE                                                                  
       NK=NK+2                                                                   
       IF(NK-(NEXR-1))62,62,65                                                   
@@ -1182,7 +1187,7 @@ MODULE COMPUTE_GREEN_FD
       JJ=NM-J+I                                                     
  1    S(I,J)=YT(JJ)                                                              
       II=NM+I                                                         
- 2    S(I,NM+1)=-YT(II)                                              
+ 2    S(I,NM+1)=-YT(II)
       EPS=1.E-20
                                                                 
       CALL HOUSRS(S,NMAX,K,NM,1,EPS)          
@@ -1196,7 +1201,7 @@ MODULE COMPUTE_GREEN_FD
       COM(I)=CMPLX(VR(I),VC(I))                                             
       COM(I)=CLOG(COM(I))/H                                                     
       VR(I)=REAL(COM(I))                                                  
-      VC(I)=AIMAG(COM(I))                                  
+      VC(I)=AIMAG(COM(I))
     6 CONTINUE                                                                  
       I=1                                                                       
       J=0                                                                       
@@ -1206,7 +1211,7 @@ MODULE COMPUTE_GREEN_FD
       I=I+1                                                                     
       GO TO 101                                                                 
   110 IF(ABS(VR(I)-VR(I+1))-1.E-5)120,120,121                                   
-  120 J=J+1                                                                     
+  120 J=J+1
       VCOM(J)=VR(I)                                                             
       I=I+2                                                                     
       GO TO 101                                                                 
@@ -1249,12 +1254,12 @@ MODULE COMPUTE_GREEN_FD
       A(I,J)=S                                                                  
     1 CONTINUE                                                                  
       DO 5 I=1,NEXP                                                             
-      S=0                                                                       
+      S=0
       DO 6 L=1,NPP                                                               
       TTT=TEXP(I)*XT(L)                                                          
       IF(TTT+30)6,7,7                                                           
     7 S=S+EXP(TTT)*YT(L)                                                         
-    6 CONTINUE                                                                  
+    6 CONTINUE
       A(I,NEXP+1)=S                                                             
     5 CONTINUE                                                                  
       N=NEXP                                                                    
@@ -1281,7 +1286,7 @@ MODULE COMPUTE_GREEN_FD
       IF(IR-1)42,42,2                                                           
     2 IF(C(IR))3,1,3                                                            
     3 IER=0                                                                     
-      J=IR                                                                      
+      J=IR
       L=0                                                                       
       A=C(IR)                                                                   
       DO 8 I=1,IR                                                               
