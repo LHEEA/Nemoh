@@ -233,15 +233,10 @@
         DO j=1,Results%Nbeta
             WRITE(10,'(A,F7.3,A,I6,A)') 'Zone t="Diffraction force - beta = ',Results%beta(j)*180./PI,' deg",I=',Results%Nw,',F=POINT'
             DO l=1,Results%Nw
-!           Be careful of the phase referential
-!           In Nemoh, PHI = -g/w * CIH CEXP(k.x), so ETA= i w/g * PHI = -i CEXP(k.x)
-!           Thus, in time domain ETA = sin(k.x -wt) 
-!           Forces/Phase shift in Fe.dat are given with the following form : F= Force * sin(-wt-phase), so a phase shift of -PI/2 is necessary
                 WRITE(10,'(F7.4,6(X,E13.6),6(X,F7.2))') Results%w(l),(ABS(Results%DiffractionForce(l,j,k)+Results%FroudeKrylovForce(l,j,k)),k=1,Results%Nintegration),  &
-                                                            (180.D0/PI*( -ATAN2(IMAG(Results%DiffractionForce(l,j,k)+Results%FroudeKrylovForce(l,j,k)),        &
-                                                                               REAL(Results%DiffractionForce(l,j,k)+Results%FroudeKrylovForce(l,j,k)) )        &
-                                                                         -PI/2D0 ) ,                                                                           &
-                                                               k=1,Results%Nintegration)
+                                                            (180.D0/PI*( ATAN2(IMAG(Results%DiffractionForce(l,j,k)+Results%FroudeKrylovForce(l,j,k)),        &
+                                                                               REAL(Results%DiffractionForce(l,j,k)+Results%FroudeKrylovForce(l,j,k)) )),        &
+                                                                      k=1,Results%Nintegration)
             END DO
         END DO
         CLOSE(10)
