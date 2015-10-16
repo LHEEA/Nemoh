@@ -57,16 +57,17 @@ Integration.o\
 Main.o\
 
 
-#SOURCES FORTRAN Solver(modules de preprocessing)
-SRCS=./Solver/Core/COM_VAR.f90\
+#SOURCES FORTRAN Solver
+SRCS=./Solver/Core/FIC_COM.f90\
+./Solver/Core/COM_VAR.f90\
 ./Common/Environment.f90\
 ./Common/Identification.f90\
 ./Common/Mesh.f90\
 ./Solver/Core/Bodyconditions.f90\
+./Solver/Core/ELEMENTARY_FNS.f90\
 ./Solver/Core/PREPARE_MESH.f90\
 ./Solver/Core/INITIALIZATION.f90\
 ./Solver/Core/OUTPUT.f90\
-./Solver/Core/ELEMENTARY_FNS.f90\
 ./Solver/Core/M_SOLVER.f90\
 ./Solver/Core/ALLOCATE_DATA.f90\
 ./Solver/Core/COMPUTE_GREEN_INFD.f90\
@@ -93,10 +94,11 @@ Environment.o\
 Identification.o\
 Mesh.o\
 Bodyconditions.o\
+FIC_COM.o\
+ELEMENTARY_FNS.o\
 PREPARE_MESH.o\
 INITIALIZATION.o\
 OUTPUT.o\
-ELEMENTARY_FNS.o\
 M_SOLVER.o\
 ALLOCATE_DATA.o\
 COMPUTE_GREEN_INFD.o\
@@ -113,7 +115,7 @@ DEALLOCATE_DATA.o\
 #./Solver/Core/SOLVE_BEM_INFD_ITERATIVE.o
 
 
-#SOURCES FORTRAN preProc(modules de preprocessing)
+#SOURCES FORTRAN postProc(modules de postprocessing)
 SRCO=./Common/Identification.f90\
 ./Common/Environment.f90\
 ./Common/Results.f90\

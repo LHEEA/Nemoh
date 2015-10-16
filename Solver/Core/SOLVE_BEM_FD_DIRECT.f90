@@ -82,7 +82,7 @@ MODULE SOLVE_BEM_FD_DIRECT
       VSZM=0.
       ZOL=CMPLX(0.,0.)
       ZIJ=CMPLX(0.,0.)
-!--------------------------------------------                                                                                                                          
+!--------------------------------------------
     GM=0.
     NP1=NP-1
     DO 7100 I=1,NP1
@@ -144,16 +144,20 @@ MODULE SOLVE_BEM_FD_DIRECT
     DO ISYM=1,NJJ
         BX=(-1)**(ISYM+1)
         DO I=1,IMX
+        IF(ZG(I).NE.0.)THEN
     	    IF (NSYMY.EQ.1) THEN
     	        B(I)=(NVEL(I)+BX*NVEL(I+NFA))*0.5
     	    ELSE
     	        B(I)=NVEL(I)
     	    END IF
+    	ELSE
+    	        B(I)=0.
+    	ENDIF
     	END DO
     	DO I=1,IMX
     	    ZOL(I,(ISYM-1)+1)=(0.,0.)
     	    DO K=1,IMX
-    	        ZOL(I,(ISYM-1)+1)=ZOL(I,(ISYM-1)+1)+AInv(I,K,(ISYM-1)+1)*B(K)    
+    	        ZOL(I,(ISYM-1)+1)=ZOL(I,(ISYM-1)+1)+AInv(I,K,(ISYM-1)+1)*B(K)
     	    END DO
     	END DO
     END DO
@@ -174,12 +178,14 @@ MODULE SOLVE_BEM_FD_DIRECT
     ZPB=(0.,0.)
     ZPS=(0.,0.)
     DO I=1,IMX
+    IF(ZG(I).LT.0.)THEN
 	    DO J=1,IMX
 	        call VAVFD(2,XG(I),YG(I),ZG(I),I,J)
             call VNSFD(AM0,AMH,NEXP,I,J,XG(I),YG(I),ZG(I))  
 	        ZPB(I)=ZPB(I)+0.5*(ZIGB(J)*CMPLX(SP1+SM1,SP2+SM2)+ZIGS(J)*CMPLX(SP1-SM1,SP2-SM2))
 	        ZPS(I)=ZPS(I)+0.5*(ZIGS(J)*CMPLX(SP1+SM1,SP2+SM2)+ZIGB(J)*CMPLX(SP1-SM1,SP2-SM2))
         END DO
+        ENDIF
     END DO
     
 END SUBROUTINE

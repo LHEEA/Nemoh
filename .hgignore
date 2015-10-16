@@ -1,0 +1,16 @@
+###############################
+# Use glob syntax
+###############################
+syntax: glob
+
+*.o
+*.mod
+*.orig
+
+mesh
+preProc
+solver
+postProc
+
+#structure/**
+#delhommeau/**

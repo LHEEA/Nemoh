@@ -91,7 +91,7 @@
 			P(J,3)=Z(FACETTES(K,I))
 			K=K+1
 		END DO
-		IF (ZMN.LT.0.0) THEN
+		IF (ZMN.LE.0.0) THEN ! Keep mesh points at z=0 to keep free surface mesh
 			! CAS OU Z2 ET Z4 SONT POSITIFS
 			IF ((P(2,3).GT.0.0).AND.(P(4,3).GT.0.0)) THEN
 				J=2

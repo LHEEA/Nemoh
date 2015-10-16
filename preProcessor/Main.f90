@@ -205,9 +205,9 @@
         DO c=1,Mesh%Npanels*2**Mesh%Isym
             FNDS(j,c)=NDS(c)
         END DO
-    END DO 
+    END DO
     DEALLOCATE(NDS)
-    OPEN(11,FILE=ID%ID(1:ID%lID)//'/mesh/Integration.dat')
+    OPEN(11,FILE=ID%ID(1:ID%lID)//'/mesh/Integration.dat',status='unknown')
     WRITE(11,*) Nintegration
     DO j=1,Nintegration
         WRITE(11,*) (FNDS(j,c),c=1,Mesh%Npanels*2**Mesh%Isym)
