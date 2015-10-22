@@ -11,7 +11,7 @@ endif
 
 ifeq ($(itest), ifort)
 	FC=ifort
-	FFLAGS=-c -cpp
+	FFLAGS=-c -cpp -O3
 endif
 
 #SOURCES FORTRAN Mesh(modules de maillage)
@@ -184,3 +184,4 @@ install: build
 # Remove *.o and main executable
 clean:
 	rm *.o *.mod
+

@@ -242,13 +242,12 @@ MODULE COMPUTE_GREEN_INFD
       WH=DPI/T
       WR=WH
       IF(ABS(WR).LT.1.E-4)THEN
-       WRITE(*,*)'ABS(WR)  = ',ABS(WR),' < 1.E-4'
-       STOP
+		WRITE(*,*)'ABS(WR)  = ',ABS(WR),' < 1.E-4'
+        STOP
       ENDIF
 
       AK0=WR**2/G
       NJJ=NSYMY+1                                     
-      IJUMP=0                                                           
 
       I=ISP  !source point  !Plutot field point
       J=IFP  !field point   !Plutot source point 
@@ -257,7 +256,7 @@ MODULE COMPUTE_GREEN_INFD
       ZMIII=min(ZGI,0.999*ZERG/AK0)
       njj=nsymy+1
  	DO 22 JJ=1,NJJ
- 	 BX=(-1)**(JJ+1)
+ 	  BX=(-1)**(JJ+1)
       FS1(J,JJ)=0.
       FS2(J,JJ)=0.
       VSX1(J,JJ)=0.
@@ -268,175 +267,178 @@ MODULE COMPUTE_GREEN_INFD
       VSZ2(J,JJ)=0.
       asa=0
       if(asa.eq.0)then
-      DO 211 LLL=1,NG
-      YMJJJ=YGA(LLL,J)*BX
-      QJJJ=YN(J)*BX
-      RRR=SQRT((XGI-XGA(LLL,J))**2+(YGI-YMJJJ)**2)
+        DO 211 LLL=1,NG
+          YMJJJ=YGA(LLL,J)*BX
+          QJJJ=YN(J)*BX
+          RRR=SQRT((XGI-XGA(LLL,J))**2+(YGI-YMJJJ)**2)
 	      YMJJJ=YGA(LLL,J)*BX
 	      QJJJ=YN(J)*BX
 	      RRR=SQRT((XGI-XGA(LLL,J))**2+(YGI-YMJJJ)**2)
 	      AKR=AK0*RRR
-              ZGAJ=MIN(ZGA(LLL,J),ZER)
-              ZZZ=ZMIII+ZGAJ
+          ZGAJ=MIN(ZGA(LLL,J),ZER)
+          ZZZ=ZMIII+ZGAJ
 	      AKZ=AK0*ZZZ
 	      DD=SQRT(RRR**2+ZZZ**2)
 	      IF(DD.GT.EPS)THEN
-		PSURR=PI/(AK0*DD)**3
+		    PSURR=PI/(AK0*DD)**3
 	      ELSE
-		PSURR=0.
+		    PSURR=0.
 	      ENDIF
-      IF(AKZ.LT.-1.5E-10)THEN !3B
-      IF(AKZ.GT.-251.)THEN !4B
-      IF(AKR.LT.100)THEN !5B
-      KJ=10*(ALOG10(-AKZ)+10.)
-      KJ=MAX(KJ,3)
-      KJ=MIN(KJ,122)
-      IF(AKR.LT.1.)THEN
-      KI=10*(ALOG10(AKR+1.E-10)+8)+1
-      ELSE
-      KI=6*AKR+75
-      ENDIF
-      KI=MAX(KI,3)
-      KI=MIN(KI,674)
-      XL1=PL5(XR(KI+2),XR(KI-1),XR(KI  ),XR(KI+1),XR(KI-2),AKR)
-      XL2=PL5(XR(KI-2),XR(KI  ),XR(KI+1),XR(KI+2),XR(KI-1),AKR)
-      XL3=PL5(XR(KI-1),XR(KI+1),XR(KI+2),XR(KI-2),XR(KI  ),AKR)
-      XL4=PL5(XR(KI  ),XR(KI+2),XR(KI-2),XR(KI-1),XR(KI+1),AKR)
-      XL5=PL5(XR(KI+1),XR(KI-2),XR(KI-1),XR(KI  ),XR(KI+2),AKR)
-      ZL1=PL5(XZ(KJ+2),XZ(KJ-1),XZ(KJ  ),XZ(KJ+1),XZ(KJ-2),AKZ)
-      ZL2=PL5(XZ(KJ-2),XZ(KJ  ),XZ(KJ+1),XZ(KJ+2),XZ(KJ-1),AKZ)
-      ZL3=PL5(XZ(KJ-1),XZ(KJ+1),XZ(KJ+2),XZ(KJ-2),XZ(KJ  ),AKZ)
-      ZL4=PL5(XZ(KJ  ),XZ(KJ+2),XZ(KJ-2),XZ(KJ-1),XZ(KJ+1),AKZ)
-      ZL5=PL5(XZ(KJ+1),XZ(KJ-2),XZ(KJ-1),XZ(KJ  ),XZ(KJ+2),AKZ)
-      F1=XL1*APD1Z(KI-2,KJ-2)+XL2*APD1Z(KI-1,KJ-2)+XL3*APD1Z(KI  ,KJ-2)+&
-     XL4*APD1Z(KI+1,KJ-2)+XL5*APD1Z(KI+2,KJ-2)
-      F2=XL1*APD1Z(KI-2,KJ-1)+XL2*APD1Z(KI-1,KJ-1)+XL3*APD1Z(KI  ,KJ-1)+&
-     XL4*APD1Z(KI+1,KJ-1)+XL5*APD1Z(KI+2,KJ-1)
-      F3=XL1*APD1Z(KI-2,KJ  )+XL2*APD1Z(KI-1,KJ  )+XL3*APD1Z(KI  ,KJ  )+&
-     XL4*APD1Z(KI+1,KJ  )+XL5*APD1Z(KI+2,KJ  )
-      F4=XL1*APD1Z(KI-2,KJ+1)+XL2*APD1Z(KI-1,KJ+1)+XL3*APD1Z(KI  ,KJ+1)+&
-     XL4*APD1Z(KI+1,KJ+1)+XL5*APD1Z(KI+2,KJ+1)
-      F5=XL1*APD1Z(KI-2,KJ+2)+XL2*APD1Z(KI-1,KJ+2)+XL3*APD1Z(KI  ,KJ+2)+&
-     XL4*APD1Z(KI+1,KJ+2)+XL5*APD1Z(KI+2,KJ+2)
-      PD1Z=ZL1*F1+ZL2*F2+ZL3*F3+ZL4*F4+ZL5*F5
-      F1=XL1*APD2Z(KI-2,KJ-2)+XL2*APD2Z(KI-1,KJ-2)+XL3*APD2Z(KI  ,KJ-2)+&
-     XL4*APD2Z(KI+1,KJ-2)+XL5*APD2Z(KI+2,KJ-2)
-      F2=XL1*APD2Z(KI-2,KJ-1)+XL2*APD2Z(KI-1,KJ-1)+XL3*APD2Z(KI  ,KJ-1)+&
-     XL4*APD2Z(KI+1,KJ-1)+XL5*APD2Z(KI+2,KJ-1)
-      F3=XL1*APD2Z(KI-2,KJ  )+XL2*APD2Z(KI-1,KJ  )+XL3*APD2Z(KI  ,KJ  )+&
-     XL4*APD2Z(KI+1,KJ  )+XL5*APD2Z(KI+2,KJ  )
-      F4=XL1*APD2Z(KI-2,KJ+1)+XL2*APD2Z(KI-1,KJ+1)+XL3*APD2Z(KI  ,KJ+1)+&
-     XL4*APD2Z(KI+1,KJ+1)+XL5*APD2Z(KI+2,KJ+1)
-      F5=XL1*APD2Z(KI-2,KJ+2)+XL2*APD2Z(KI-1,KJ+2)+XL3*APD2Z(KI  ,KJ+2)+&
-     XL4*APD2Z(KI+1,KJ+2)+XL5*APD2Z(KI+2,KJ+2)
-      PD2Z=ZL1*F1+ZL2*F2+ZL3*F3+ZL4*F4+ZL5*F5
-		  ELSE !5E
-		    EPZ=EXP(AKZ)
-		    AKP4=AKR-PI4
-		    SQ=SQRT(DPI/AKR)
-		    CSK=COS(AKP4)
-		    SIK=SIN(AKP4)
-		    PD1Z=PSURR*AKZ-PI*EPZ*SQ*SIK
-		    PD2Z=EPZ*SQ*CSK
-		  ENDIF !5F
-		    VZ1=PD1Z-PSURR*AKZ
-		    VZ2=PD2Z
-		ELSE !4E
-		  PD1Z=PSURR*AKZ
-		  PD2Z=0.
-		  VZ1=0.
-		  VZ2=0.
-		ENDIF !4F
+          IF(AKZ.LT.-1.5E-10)THEN !3B
+            IF(AKZ.GT.-251.)THEN !4B
+              IF(AKR.LT.100)THEN !5B
+                KJ=10*(ALOG10(-AKZ)+10.)
+                KJ=MAX(KJ,3)
+                KJ=MIN(KJ,122)
+                IF(AKR.LT.1.)THEN
+                  KI=10*(ALOG10(AKR+1.E-10)+8)+1
+                ELSE
+                  KI=6*AKR+75
+                ENDIF
+                KI=MAX(KI,3)
+                KI=MIN(KI,674)
+                
+                XL1=PL5(XR(KI+2),XR(KI-1),XR(KI  ),XR(KI+1),XR(KI-2),AKR)
+                XL2=PL5(XR(KI-2),XR(KI  ),XR(KI+1),XR(KI+2),XR(KI-1),AKR)
+                XL3=PL5(XR(KI-1),XR(KI+1),XR(KI+2),XR(KI-2),XR(KI  ),AKR)
+                XL4=PL5(XR(KI  ),XR(KI+2),XR(KI-2),XR(KI-1),XR(KI+1),AKR)
+                XL5=PL5(XR(KI+1),XR(KI-2),XR(KI-1),XR(KI  ),XR(KI+2),AKR)
+                ZL1=PL5(XZ(KJ+2),XZ(KJ-1),XZ(KJ  ),XZ(KJ+1),XZ(KJ-2),AKZ)
+                ZL2=PL5(XZ(KJ-2),XZ(KJ  ),XZ(KJ+1),XZ(KJ+2),XZ(KJ-1),AKZ)
+                ZL3=PL5(XZ(KJ-1),XZ(KJ+1),XZ(KJ+2),XZ(KJ-2),XZ(KJ  ),AKZ)
+                ZL4=PL5(XZ(KJ  ),XZ(KJ+2),XZ(KJ-2),XZ(KJ-1),XZ(KJ+1),AKZ)
+                ZL5=PL5(XZ(KJ+1),XZ(KJ-2),XZ(KJ-1),XZ(KJ  ),XZ(KJ+2),AKZ)
+                F1=XL1*APD1Z(KI-2,KJ-2)+XL2*APD1Z(KI-1,KJ-2)+XL3*APD1Z(KI  ,KJ-2)+&
+                    XL4*APD1Z(KI+1,KJ-2)+XL5*APD1Z(KI+2,KJ-2)
+                F2=XL1*APD1Z(KI-2,KJ-1)+XL2*APD1Z(KI-1,KJ-1)+XL3*APD1Z(KI  ,KJ-1)+&
+                    XL4*APD1Z(KI+1,KJ-1)+XL5*APD1Z(KI+2,KJ-1)
+                F3=XL1*APD1Z(KI-2,KJ  )+XL2*APD1Z(KI-1,KJ  )+XL3*APD1Z(KI  ,KJ  )+&
+                    XL4*APD1Z(KI+1,KJ  )+XL5*APD1Z(KI+2,KJ  )
+                F4=XL1*APD1Z(KI-2,KJ+1)+XL2*APD1Z(KI-1,KJ+1)+XL3*APD1Z(KI  ,KJ+1)+&
+                    XL4*APD1Z(KI+1,KJ+1)+XL5*APD1Z(KI+2,KJ+1)
+                F5=XL1*APD1Z(KI-2,KJ+2)+XL2*APD1Z(KI-1,KJ+2)+XL3*APD1Z(KI  ,KJ+2)+&
+                    XL4*APD1Z(KI+1,KJ+2)+XL5*APD1Z(KI+2,KJ+2)
+                PD1Z=ZL1*F1+ZL2*F2+ZL3*F3+ZL4*F4+ZL5*F5
+                F1=XL1*APD2Z(KI-2,KJ-2)+XL2*APD2Z(KI-1,KJ-2)+XL3*APD2Z(KI  ,KJ-2)+&
+                    XL4*APD2Z(KI+1,KJ-2)+XL5*APD2Z(KI+2,KJ-2)
+                F2=XL1*APD2Z(KI-2,KJ-1)+XL2*APD2Z(KI-1,KJ-1)+XL3*APD2Z(KI  ,KJ-1)+&
+                    XL4*APD2Z(KI+1,KJ-1)+XL5*APD2Z(KI+2,KJ-1)
+                F3=XL1*APD2Z(KI-2,KJ  )+XL2*APD2Z(KI-1,KJ  )+XL3*APD2Z(KI  ,KJ  )+&
+                    XL4*APD2Z(KI+1,KJ  )+XL5*APD2Z(KI+2,KJ  )
+                F4=XL1*APD2Z(KI-2,KJ+1)+XL2*APD2Z(KI-1,KJ+1)+XL3*APD2Z(KI  ,KJ+1)+&
+                    XL4*APD2Z(KI+1,KJ+1)+XL5*APD2Z(KI+2,KJ+1)
+                F5=XL1*APD2Z(KI-2,KJ+2)+XL2*APD2Z(KI-1,KJ+2)+XL3*APD2Z(KI  ,KJ+2)+&
+                    XL4*APD2Z(KI+1,KJ+2)+XL5*APD2Z(KI+2,KJ+2)
+                PD2Z=ZL1*F1+ZL2*F2+ZL3*F3+ZL4*F4+ZL5*F5
+		      ELSE !5E
+		        EPZ=EXP(AKZ)
+		        AKP4=AKR-PI4
+		        SQ=SQRT(DPI/AKR)
+		        CSK=COS(AKP4)
+		        SIK=SIN(AKP4)
+		        PD1Z=PSURR*AKZ-PI*EPZ*SQ*SIK
+		        PD2Z=EPZ*SQ*CSK
+		      ENDIF !5F
+		      VZ1=PD1Z-PSURR*AKZ
+		      VZ2=PD2Z
+		    ELSE !4E
+		      PD1Z=PSURR*AKZ
+		      PD2Z=0.
+		      VZ1=0.
+		      VZ2=0.
+		    ENDIF !4F
  	      ENDIF !3F
-       FS1(J,JJ)=FS1(J,JJ)+XJAC(LLL,J)*PD1Z
-       FS2(J,JJ)=FS2(J,JJ)+XJAC(LLL,J)*PD2Z
-      IF(I.LE.IMX)THEN !6B
-		IF(RRR.GT.EPS)THEN !7B
-		  IF(AKZ.LE.-1.5E-10)THEN !8B
-		     IF(AKZ.LE.-1.5E-10)THEN !9B
-		      IF(AKR.LT.100)THEN !10B
-      F1=XL1*APD1X(KI-2,KJ-2)+XL2*APD1X(KI-1,KJ-2)+XL3*APD1X(KI  ,KJ-2)+&
-     XL4*APD1X(KI+1,KJ-2)+XL5*APD1X(KI+2,KJ-2)
-      F2=XL1*APD1X(KI-2,KJ-1)+XL2*APD1X(KI-1,KJ-1)+XL3*APD1X(KI  ,KJ-1)+&
-     XL4*APD1X(KI+1,KJ-1)+XL5*APD1X(KI+2,KJ-1)
-      F3=XL1*APD1X(KI-2,KJ  )+XL2*APD1X(KI-1,KJ  )+XL3*APD1X(KI  ,KJ  )+&
-     XL4*APD1X(KI+1,KJ  )+XL5*APD1X(KI+2,KJ  )
-      F4=XL1*APD1X(KI-2,KJ+1)+XL2*APD1X(KI-1,KJ+1)+XL3*APD1X(KI  ,KJ+1)+&
-     XL4*APD1X(KI+1,KJ+1)+XL5*APD1X(KI+2,KJ+1)
-      F5=XL1*APD1X(KI-2,KJ+2)+XL2*APD1X(KI-1,KJ+2)+XL3*APD1X(KI  ,KJ+2)+&
-     XL4*APD1X(KI+1,KJ+2)+XL5*APD1X(KI+2,KJ+2)
-      PD1X=ZL1*F1+ZL2*F2+ZL3*F3+ZL4*F4+ZL5*F5
-      F1=XL1*APD2X(KI-2,KJ-2)+XL2*APD2X(KI-1,KJ-2)+XL3*APD2X(KI  ,KJ-2)+&
-     XL4*APD2X(KI+1,KJ-2)+XL5*APD2X(KI+2,KJ-2)
-      F2=XL1*APD2X(KI-2,KJ-1)+XL2*APD2X(KI-1,KJ-1)+XL3*APD2X(KI  ,KJ-1)+&
-     XL4*APD2X(KI+1,KJ-1)+XL5*APD2X(KI+2,KJ-1)
-      F3=XL1*APD2X(KI-2,KJ  )+XL2*APD2X(KI-1,KJ  )+XL3*APD2X(KI  ,KJ  )+&
-     XL4*APD2X(KI+1,KJ  )+XL5*APD2X(KI+2,KJ  )
-      F4=XL1*APD2X(KI-2,KJ+1)+XL2*APD2X(KI-1,KJ+1)+XL3*APD2X(KI  ,KJ+1)+&
-     XL4*APD2X(KI+1,KJ+1)+XL5*APD2X(KI+2,KJ+1)
-      F5=XL1*APD2X(KI-2,KJ+2)+XL2*APD2X(KI-1,KJ+2)+XL3*APD2X(KI  ,KJ+2)+&
-     XL4*APD2X(KI+1,KJ+2)+XL5*APD2X(KI+2,KJ+2)
-      PD2X=ZL1*F1+ZL2*F2+ZL3*F3+ZL4*F4+ZL5*F5
-		      ELSE !10E
-			DSK=0.5/AKR
-!                       PD1X=-PSURR*AKR-PI*EPZ*SQ*(CSK-DSK*SIK) !coorection par GD le 17/09/2010
-                        PD1X=-PSURR*AKR+PI*EPZ*SQ*(CSK-DSK*SIK)
-			PD2X=EPZ*SQ*(SIK+DSK*CSK)
-		      ENDIF !10F
-		      VR1=-PD1X-PSURR*AKR
-		      VR2=-PD2X
-		    ELSE !9E
-		      PD1X=-PSURR*AKR
-		      PD2X=0.
-		      VR1=0.
-		      VR2=0.
-		    ENDIF !9F
-		  ENDIF !8F
-		    CVX=(XGI-XGA(LLL,J))/RRR
-		    CVY=(YGI-YMJJJ)/RRR
-      VSX1(J,JJ)=VSX1(J,JJ)+XJAC(LLL,J)*VR1*CVX
-      VSX2(J,JJ)=VSX2(J,JJ)+XJAC(LLL,J)*VR2*CVX
-      VSY1(J,JJ)=VSY1(J,JJ)+XJAC(LLL,J)*VR1*CVY
-      VSY2(J,JJ)=VSY2(J,JJ)+XJAC(LLL,J)*VR2*CVY
-      VSZ1(J,JJ)=VSZ1(J,JJ)+XJAC(LLL,J)*VZ1
-      VSZ2(J,JJ)=VSZ2(J,JJ)+XJAC(LLL,J)*VZ2
-		ELSE !7E
-		    VSX1(J,JJ)=0.
-		    VSX2(J,JJ)=0.
-		    VSY1(J,JJ)=0.
-		    VSY2(J,JJ)=0.
-      VSZ1(J,JJ)=VSZ1(J,JJ)+XJAC(LLL,J)*VZ1
-      VSZ2(J,JJ)=VSZ2(J,JJ)+XJAC(LLL,J)*VZ2
-		ENDIF !7F
+
+          FS1(J,JJ)=FS1(J,JJ)+XJAC(LLL,J)*PD1Z
+          FS2(J,JJ)=FS2(J,JJ)+XJAC(LLL,J)*PD2Z
+          IF(I.LE.IMX)THEN !6B
+		    IF(RRR.GT.EPS)THEN !7B
+		      IF(AKZ.LE.-1.5E-10)THEN !8B
+		        IF(AKZ.GT.-251)THEN !9B
+		          IF(AKR.LT.100)THEN !10B
+                    F1=XL1*APD1X(KI-2,KJ-2)+XL2*APD1X(KI-1,KJ-2)+XL3*APD1X(KI  ,KJ-2)+&
+                        XL4*APD1X(KI+1,KJ-2)+XL5*APD1X(KI+2,KJ-2)
+                    F2=XL1*APD1X(KI-2,KJ-1)+XL2*APD1X(KI-1,KJ-1)+XL3*APD1X(KI  ,KJ-1)+&
+                        XL4*APD1X(KI+1,KJ-1)+XL5*APD1X(KI+2,KJ-1)
+                    F3=XL1*APD1X(KI-2,KJ  )+XL2*APD1X(KI-1,KJ  )+XL3*APD1X(KI  ,KJ  )+&
+                        XL4*APD1X(KI+1,KJ  )+XL5*APD1X(KI+2,KJ  )
+                    F4=XL1*APD1X(KI-2,KJ+1)+XL2*APD1X(KI-1,KJ+1)+XL3*APD1X(KI  ,KJ+1)+&
+                        XL4*APD1X(KI+1,KJ+1)+XL5*APD1X(KI+2,KJ+1)
+                    F5=XL1*APD1X(KI-2,KJ+2)+XL2*APD1X(KI-1,KJ+2)+XL3*APD1X(KI  ,KJ+2)+&
+                        XL4*APD1X(KI+1,KJ+2)+XL5*APD1X(KI+2,KJ+2)
+                    PD1X=ZL1*F1+ZL2*F2+ZL3*F3+ZL4*F4+ZL5*F5
+                    F1=XL1*APD2X(KI-2,KJ-2)+XL2*APD2X(KI-1,KJ-2)+XL3*APD2X(KI  ,KJ-2)+&
+                        XL4*APD2X(KI+1,KJ-2)+XL5*APD2X(KI+2,KJ-2)
+                    F2=XL1*APD2X(KI-2,KJ-1)+XL2*APD2X(KI-1,KJ-1)+XL3*APD2X(KI  ,KJ-1)+&
+                        XL4*APD2X(KI+1,KJ-1)+XL5*APD2X(KI+2,KJ-1)
+                    F3=XL1*APD2X(KI-2,KJ  )+XL2*APD2X(KI-1,KJ  )+XL3*APD2X(KI  ,KJ  )+&
+                        XL4*APD2X(KI+1,KJ  )+XL5*APD2X(KI+2,KJ  )
+                    F4=XL1*APD2X(KI-2,KJ+1)+XL2*APD2X(KI-1,KJ+1)+XL3*APD2X(KI  ,KJ+1)+&
+                        XL4*APD2X(KI+1,KJ+1)+XL5*APD2X(KI+2,KJ+1)
+                    F5=XL1*APD2X(KI-2,KJ+2)+XL2*APD2X(KI-1,KJ+2)+XL3*APD2X(KI  ,KJ+2)+&
+                        XL4*APD2X(KI+1,KJ+2)+XL5*APD2X(KI+2,KJ+2)
+                    PD2X=ZL1*F1+ZL2*F2+ZL3*F3+ZL4*F4+ZL5*F5
+		          ELSE !10E
+			        DSK=0.5/AKR
+                    PD1X=-PSURR*AKR+PI*EPZ*SQ*(CSK-DSK*SIK)
+			        PD2X=EPZ*SQ*(SIK+DSK*CSK)
+		          ENDIF !10F
+
+		          VR1=-PD1X-PSURR*AKR
+		          VR2=-PD2X
+		        ELSE !9E
+		          PD1X=-PSURR*AKR
+		          PD2X=0.
+		          VR1=0.
+		          VR2=0.
+		        ENDIF !9F
+		      ENDIF !8F
+
+		      CVX=(XGI-XGA(LLL,J))/RRR
+		      CVY=(YGI-YMJJJ)/RRR
+              VSX1(J,JJ)=VSX1(J,JJ)+XJAC(LLL,J)*VR1*CVX
+              VSX2(J,JJ)=VSX2(J,JJ)+XJAC(LLL,J)*VR2*CVX
+              VSY1(J,JJ)=VSY1(J,JJ)+XJAC(LLL,J)*VR1*CVY
+              VSY2(J,JJ)=VSY2(J,JJ)+XJAC(LLL,J)*VR2*CVY
+              VSZ1(J,JJ)=VSZ1(J,JJ)+XJAC(LLL,J)*VZ1
+              VSZ2(J,JJ)=VSZ2(J,JJ)+XJAC(LLL,J)*VZ2
+		    ELSE !7E
+		      VSX1(J,JJ)=0.
+		      VSX2(J,JJ)=0.
+		      VSY1(J,JJ)=0.
+		      VSY2(J,JJ)=0.
+              VSZ1(J,JJ)=VSZ1(J,JJ)+XJAC(LLL,J)*VZ1
+              VSZ2(J,JJ)=VSZ2(J,JJ)+XJAC(LLL,J)*VZ2
+		    ENDIF !7F
  	      ENDIF !6F
-  211 CONTINUE
-	   ELSE !2E
-	      FS1(J,JJ)=0.                                        
-	      FS2(J,JJ)=0.                                    
-	      VSX1(J,JJ)=0.
-	      VSX2(J,JJ)=0.                                         
-	      VSY1(J,JJ)=0.                                      
-	      VSY2(J,JJ)=0.                                         
-	      VSZ1(J,JJ)=0.                                       
-	      VSZ2(J,JJ)=0.
-	      KK(1)=M1(J)
-	      KK(2)=M2(J)
-	      KK(3)=M3(J)
-	      KK(4)=M4(J)
-	      KK(5)=KK(1)
-	   DO 30 IT=1,NQ
+  211   CONTINUE
+	  ELSE !2E
+	    FS1(J,JJ)=0.                                        
+	    FS2(J,JJ)=0.                                    
+	    VSX1(J,JJ)=0.
+	    VSX2(J,JJ)=0.                                         
+	    VSY1(J,JJ)=0.                                      
+	    VSY2(J,JJ)=0.                                         
+	    VSZ1(J,JJ)=0.                                       
+	    VSZ2(J,JJ)=0.
+	    KK(1)=M1(J)
+	    KK(2)=M2(J)
+	    KK(3)=M3(J)
+	    KK(4)=M4(J)
+	    KK(5)=KK(1)
+	    DO 30 IT=1,NQ
 	      TETA=QQ(IT)
 	      CT=COS(TETA)
 	      ST=SIN(TETA)
 	      DO 20 L=1,4
-		ZIJ(L)=AK0*(ZMIII+Z(KK(L))+ZI*((XGI-X(KK(L)))*CT+(YGI-Y(KK(L))*BX)*ST))
-		IF(REAL(ZIJ(L)).GT.-25.)THEN
-		  CEX(L)=CEXP(ZIJ(L))
-		ELSE
-		  CEX(L)=(0.,0.)
-		ENDIF
-		GZ(L)=GG(ZIJ(L),CEX(L))
-	    20 CONTINUE
+		    ZIJ(L)=AK0*(ZMIII+Z(KK(L))+ZI*((XGI-X(KK(L)))*CT+(YGI-Y(KK(L))*BX)*ST))
+		    IF(REAL(ZIJ(L)).GT.-25.)THEN
+		      CEX(L)=CEXP(ZIJ(L))
+		    ELSE
+		      CEX(L)=(0.,0.)
+		    ENDIF
+		    GZ(L)=GG(ZIJ(L),CEX(L))
+	   20 CONTINUE
 	      ZIJ(5)=ZIJ(1)
 	      CEX(5)=CEX(1)
 	      GZ(5)=GZ(1)
@@ -444,22 +446,22 @@ MODULE COMPUTE_GREEN_INFD
 	      ZB=(0.,0.)
 	      ZVS=(0.,0.)
 	      DO 37 L=1,4
-		C1=ZIJ(L+1)-ZIJ(L)
-		IF(ABS(AIMAG(C1)).LT.EPS.AND.ABS(REAL(C1)).LT.EPS)THEN
-		  ASD=(GZ(L+1)+GZ(L))*0.5
-		  BSD=(CEX(L+1)+CEX(L))*0.5
-		  CSD=ASD-(0.5/ZIJ(L+1)+0.5/ZIJ(L))
-		ELSE
-		  CSD=(GZ(L+1)-GZ(L))/C1
-		  ASD=(GZ(L+1)-GZ(L)+CLOG(ZIJ(L+1)/ZIJ(L)))/C1
-		  BSD=(CEX(L+1)-CEX(L))/C1
-		ENDIF
-		C2=(YN(J)*BX-ZI*ZN(J)*ST)*(X(KK(L+1))-X(KK(L)))-&
-	      & (XN(J)-ZI*ZN(J)*CT)*(Y(KK(L+1))-Y(KK(L)))*BX
-		ZA=ZA+ASD*C2
-		ZB=ZB+BSD*C2
-		ZVS=ZVS+CSD*C2
- 	  37 CONTINUE
+		    C1=ZIJ(L+1)-ZIJ(L)
+		    IF(ABS(AIMAG(C1)).LT.EPS.AND.ABS(REAL(C1)).LT.EPS)THEN
+		      ASD=(GZ(L+1)+GZ(L))*0.5
+		      BSD=(CEX(L+1)+CEX(L))*0.5
+		      CSD=ASD-(0.5/ZIJ(L+1)+0.5/ZIJ(L))
+		    ELSE
+		      CSD=(GZ(L+1)-GZ(L))/C1
+		      ASD=(GZ(L+1)-GZ(L)+CLOG(ZIJ(L+1)/ZIJ(L)))/C1
+		      BSD=(CEX(L+1)-CEX(L))/C1
+		    ENDIF
+		    C2=(YN(J)*BX-ZI*ZN(J)*ST)*(X(KK(L+1))-X(KK(L)))-&
+	          & (XN(J)-ZI*ZN(J)*CT)*(Y(KK(L+1))-Y(KK(L)))*BX
+		    ZA=ZA+ASD*C2
+		    ZB=ZB+BSD*C2
+		    ZVS=ZVS+CSD*C2
+ 	  37  CONTINUE
 	      FS1(J,JJ)=FS1(J,JJ)+CQ(IT)*REAL(ZA)
 	      FS2(J,JJ)=FS2(J,JJ)+CQ(IT)*REAL(ZB)
 	      VSX1(J,JJ)=VSX1(J,JJ)-CQ(IT)*CT*AIMAG(ZVS)
@@ -468,7 +470,7 @@ MODULE COMPUTE_GREEN_INFD
 	      VSY2(J,JJ)=VSY2(J,JJ)-CQ(IT)*ST*AIMAG(ZB)
 	      VSZ1(J,JJ)=VSZ1(J,JJ)+CQ(IT)*REAL(ZVS)
 	      VSZ2(J,JJ)=VSZ2(J,JJ)+CQ(IT)*REAL(ZB)
- 	30 CONTINUE                 
+ 	30  CONTINUE                 
 	      AKAIR=AK0*AIRE(J)            
 	      FS1(J,JJ)=FS1(J,JJ)*BX/AKAIR
 	      FS2(J,JJ)=FS2(J,JJ)*BX/AKAIR
@@ -478,10 +480,10 @@ MODULE COMPUTE_GREEN_INFD
 	      VSY2(J,JJ)=VSY2(J,JJ)*BX/AKAIR
 	      VSZ1(J,JJ)=VSZ1(J,JJ)*BX/AKAIR
 	      VSZ2(J,JJ)=VSZ2(J,JJ)*BX/AKAIR
- 	   ENDIF !2F                                                             
-    22 CONTINUE    
+ 	    ENDIF !2F                                                             
+ 22 CONTINUE    
                                                               
-      IF(NSYMY.EQ.1)THEN !11B        
+    IF(NSYMY.EQ.1)THEN !11B        
 	  AKAIR=AK0*AIRE(J)
 	  ADPI2=AKAIR/DPI2
 	  ADPI=AKAIR/DPI
@@ -503,7 +505,7 @@ MODULE COMPUTE_GREEN_INFD
 	  VSYM2=-(VSY2(J,1)-VSY2(J,2))*AKDPI                                    
 	  VSZP2=-(VSZ2(J,1)+VSZ2(J,2))*AKDPI                                    
 	  VSZM2=-(VSZ2(J,1)-VSZ2(J,2))*AKDPI                                 
-      ELSE   !11E
+    ELSE   !11E
 	  AKAIR=AK0*AIRE(J)
 	  ADPI2=AKAIR/DPI2
 	  ADPI=AKAIR/DPI
@@ -525,10 +527,9 @@ MODULE COMPUTE_GREEN_INFD
 	  VSYM2=VSYP2
 	  VSZP2=-VSZ2(J,1)*AKDPI
 	  VSZM2=VSZP2                                                         
-      ENDIF !11F
-                            
-      RETURN                                                                    
-      END SUBROUTINE
+    ENDIF !11F
+    RETURN
+  END SUBROUTINE
 !-------------------------------------------------------------------------------!
       SUBROUTINE CINT_INFD(AKK,N)
 
