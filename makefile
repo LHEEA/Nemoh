@@ -1,8 +1,11 @@
 # makefile written by Christophe Peyrard from EDF R&D
+# extended to OS X by Yi-Hsiang Hu & Eliot Quin from NREL
 
 #COMPILATEUR
 gtest=$(shell which gfortran 2> /dev/null | grep -o gfortran)
 itest=$(shell which ifort 2> /dev/null | grep -o ifort)
+
+outputdir=./bin
 
 ifeq ($(gtest), gfortran)
 	FC=gfortran
@@ -137,20 +140,23 @@ IRF.o\
 Plot_WaveElevation.o\
 Main.o\
 
-build: msh pre solver post clean
+build: bin msh pre solver post clean
+
+bin:
+	mkdir -p $(outputdir)
 
 #
 #Build Mesh executable
 msh:	mesh
 #Rules to Build MAIN EXECUTABLE  (dependances et regle d'execution)
 mesh:	$(OBJM) 
-		$(FC) -o mesh $(OBJM2)
+		$(FC) -o $(outputdir)/mesh $(OBJM2)
 #
 #Build preProc executable
 pre:	preProc
 #Rules to Build MAIN EXECUTABLE  (dependances et regle d'execution)
 preProc:	$(OBJP) 
-		$(FC) -o preProc $(OBJP2)
+		$(FC) -o $(outputdir)/preProc $(OBJP2)
 
 
 #
@@ -158,7 +164,7 @@ preProc:	$(OBJP)
 solver:	Nemoh
 #Rules to Build MAIN EXECUTABLE  (dependances et regle d'execution)
 Nemoh:	$(OBJS) 
-		$(FC) -o solver $(OBJS2)
+		$(FC) -o $(outputdir)/solver $(OBJS2)
 
 
 #
@@ -166,7 +172,7 @@ Nemoh:	$(OBJS)
 post:	postProc
 #Rules to Build MAIN EXECUTABLE  (dependances et regle d'execution)
 postProc:	$(OBJO) 
-		$(FC) -o postProc $(OBJO2)
+		$(FC) -o $(outputdir)/postProc $(OBJO2)
 
 # Rules for .f comiplation
 .f.o:
@@ -177,7 +183,7 @@ postProc:	$(OBJO)
 
 #Copy to local bin directory
 install: build
-	cp mesh preProc solver postProc ~/bin/
+	cp $(outputdir)/* ~/bin/
 
 # Remove *.o and main executable
 clean:
