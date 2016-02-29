@@ -250,7 +250,7 @@
     WRITE(11,*) (Nbeta+Nradiation)*Nw
     WRITE(11,*) ((w(i),j=1,Nbeta+Nradiation),i=1,Nw)
     DO i=1,Nw
-    WRITE(11,*) (/ (/(beta(j),j=1,Nbeta)/),(-1.,j=1,Nradiation) /)
+        WRITE(11,*) (/ (/(beta(j),j=1,Nbeta)/),(-1.,j=1,Nradiation) /)
     ENDDO
     WRITE(11,*) ((Switch_Potential,j=1,Nbeta+Nradiation),i=1,Nw)
     WRITE(11,*) ((Switch_Freesurface,j=1,Nbeta+Nradiation),i=1,Nw)
