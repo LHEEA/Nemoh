@@ -241,9 +241,8 @@
                 WRITE(10,'(F7.4,6(X,E13.6),6(X,F7.2))') Results%w(l),(ABS(Results%DiffractionForce(l,j,k)+Results%FroudeKrylovForce(l,j,k)),k=1,Results%Nintegration),  &
                                                             (180.D0/PI*( ATAN2(IMAG(Results%DiffractionForce(l,j,k)+Results%FroudeKrylovForce(l,j,k)),        &
 !                                                            (-180.D0/PI*( ATAN2(IMAG(Results%DiffractionForce(l,j,k)+Results%FroudeKrylovForce(l,j,k)),        &
-                                                                               REAL(Results%DiffractionForce(l,j,k)+Results%FroudeKrylovForce(l,j,k)) )        &
-                                                                         ) , 
-!                                                                         -PI/2D0  ),                                                                         &
+                                                                               REAL(Results%DiffractionForce(l,j,k)+Results%FroudeKrylovForce(l,j,k)))),        &
+        !                                                                         -PI/2D0  ),                                                                         &
                                                                k=1,Results%Nintegration)
             END DO
         END DO
