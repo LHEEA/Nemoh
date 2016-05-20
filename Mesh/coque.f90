@@ -19,7 +19,7 @@
 !
 !--------------------------------------------------------------------------------------
 !
-	SUBROUTINE coque(X,Y,Z,NP,facettes,NF,Deplacement,Icoque,Gcoque,Nsym,rho)
+	SUBROUTINE coque(X,Y,Z,NP,facettes,NF,Deplacement,Icoque,Gcoque,CG,Nsym,rho)
 
 	IMPLICIT NONE
 
@@ -33,7 +33,7 @@
 	INTEGER Nsym
 	REAL :: rho
 !	Caracteristiques de la coque
-	REAL,DIMENSION(3) :: Gcoque
+	REAL,DIMENSION(3) :: Gcoque,CG
 	REAL mcoque
 	REAL,DIMENSION(3,3) :: Icoque
 	REAL decoque
@@ -89,13 +89,23 @@
 		END DO
 	END DO
 	DO i=1,nF
-		Icoque(1,1)=Icoque(1,1)+Aire(i)*decoque*((CdG(2,i)-Gcoque(2))**2+(CdG(3,i)-Gcoque(3))**2)
-		Icoque(1,2)=Icoque(1,2)+Aire(i)*decoque*((CdG(1,i)-Gcoque(1))*(CdG(2,i)-Gcoque(2)))
-		Icoque(1,3)=Icoque(1,3)+Aire(i)*decoque*((CdG(1,i)-Gcoque(1))*(CdG(3,i)-Gcoque(3)))
-		Icoque(2,2)=Icoque(2,2)+Aire(i)*decoque*((CdG(1,i)-Gcoque(1))**2+(CdG(3,i)-Gcoque(3))**2)
-		Icoque(2,3)=Icoque(2,3)+Aire(i)*decoque*((CdG(2,i)-Gcoque(2))*(CdG(3,i)-Gcoque(3)))
-		Icoque(3,3)=Icoque(3,3)+Aire(i)*decoque*((CdG(1,i)-Gcoque(1))**2+(CdG(2,i)-Gcoque(2))**2)
+!		Icoque(1,1)=Icoque(1,1)+Aire(i)*decoque*((CdG(2,i)-Gcoque(2))**2+(CdG(3,i)-Gcoque(3))**2)
+!		Icoque(1,2)=Icoque(1,2)-Aire(i)*decoque*((CdG(1,i)-Gcoque(1))*(CdG(2,i)-Gcoque(2)))
+!		Icoque(1,3)=Icoque(1,3)-Aire(i)*decoque*((CdG(1,i)-Gcoque(1))*(CdG(3,i)-Gcoque(3)))
+!		Icoque(2,2)=Icoque(2,2)+Aire(i)*decoque*((CdG(1,i)-Gcoque(1))**2+(CdG(3,i)-Gcoque(3))**2)
+!		Icoque(2,3)=Icoque(2,3)-Aire(i)*decoque*((CdG(2,i)-Gcoque(2))*(CdG(3,i)-Gcoque(3)))
+!		Icoque(3,3)=Icoque(3,3)+Aire(i)*decoque*((CdG(1,i)-Gcoque(1))**2+(CdG(2,i)-Gcoque(2))**2)
+		Icoque(1,1)=Icoque(1,1)+Aire(i)*decoque*((CdG(2,i)-Gcoque(2))**2+(CdG(3,i)-CG(3))**2)
+		Icoque(1,2)=Icoque(1,2)-Aire(i)*decoque*((CdG(1,i)-Gcoque(1))*(CdG(2,i)-CG(2)))
+		Icoque(1,3)=Icoque(1,3)-Aire(i)*decoque*((CdG(1,i)-Gcoque(1))*(CdG(3,i)-CG(3)))
+		Icoque(2,2)=Icoque(2,2)+Aire(i)*decoque*((CdG(1,i)-Gcoque(1))**2+(CdG(3,i)-CG(3))**2)
+		Icoque(2,3)=Icoque(2,3)-Aire(i)*decoque*((CdG(2,i)-Gcoque(2))*(CdG(3,i)-CG(3)))
+		Icoque(3,3)=Icoque(3,3)+Aire(i)*decoque*((CdG(1,i)-Gcoque(1))**2+(CdG(2,i)-CG(2))**2)
 	END DO
+	IF (Nsym.EQ.1) THEN
+	    Icoque(1,2)=0.
+	    Icoque(2,3)=0.    
+	END IF
 	!
 	Icoque(2,1)=Icoque(1,2)
 	Icoque(3,1)=Icoque(1,3)

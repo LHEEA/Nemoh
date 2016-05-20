@@ -175,7 +175,7 @@ for c=1:nBodies
     ligne=fscanf(fid,'%s',3);
     WPA(c)=fscanf(fid,'%f',1);
     status=fclose(fid);
-    clear ligne
+    clear ligne;
     fid=fopen([nomrep,filesep,'mesh',filesep,'Inertia_hull.dat'],'r');
     for i=1:3
         ligne=fscanf(fid,'%g %g',3);
@@ -184,6 +184,7 @@ for c=1:nBodies
     Inertia(c,1,1)=Mass(c);
     Inertia(c,2,2)=Mass(c);
     Inertia(c,3,3)=Mass(c);
+    fclose(fid);
     if (~(c == nBodies))
         next=input('Press enter to proceed with next body ');
     end
