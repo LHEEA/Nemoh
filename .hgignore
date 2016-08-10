@@ -1,0 +1,5 @@
+syntax: glob
+.cproject
+.project
+.settings/org.eclipse.photran.core.prefs
+bin/

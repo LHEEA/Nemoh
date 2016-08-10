@@ -75,9 +75,10 @@
     REAL :: Thetamin,Thetamax
 !   Other local variables
     INTEGER :: M,N
-    INTEGER :: i,j,c,d,k
+    INTEGER :: i,j,c,d,k,ios
     INTEGER :: jrad,jint
     REAL :: PI
+    CHARACTER(LEN=256) :: string
 !
     PI=4.*ATAN(1.)
 !
@@ -114,23 +115,31 @@
         END DO
     END DO
     READ(10,*)
-    READ(10,*) Nw,wmin,wmax
+    READ(10,'(A)') string
+    string=string(1:SCAN(string,'!')-1)
+    READ(string,*) Nw
     ALLOCATE(w(Nw))
-    IF (Nw.GT.1) THEN
+    READ(string,*,IOSTAT=ios) Nw,w
+    IF (ios.LT.0) THEN
+        wmin=w(1)
+        wmax=w(2)
         DO j=1,Nw
             w(j)=wmin+(wmax-wmin)*(j-1)/(Nw-1)
         END DO
-    ELSE
-        w(1)=wmin
     END IF
-    READ(10,*) Nbeta,betamin,betamax
+    READ(10,'(A)') string
+    string=string(1:SCAN(string,'!')-1)
+    READ(string,*) Nbeta
     ALLOCATE(beta(Nbeta))
-    IF (Nbeta.GT.1) THEN
+    READ(string,*,IOSTAT=ios) Nbeta,beta
+    IF (ios.LT.0) THEN
+        betamin=beta(1)
+        betamax=beta(2)
         DO j=1,Nbeta
             beta(j)=(betamin+(betamax-betamin)*(j-1)/(Nbeta-1))*PI/180.
         END DO
     ELSE
-        beta(1)=betamin*PI/180.
+        beta=beta*PI/180.
     END IF
     READ(10,*)
     READ(10,*)

@@ -2,21 +2,22 @@
 # extended to OS X by Yi-Hsiang Hu & Eliot Quin from NREL
 
 #COMPILATEUR
-gtest=$(shell which gfortran 2> /dev/null | grep -o gfortran)
-itest=$(shell which ifort 2> /dev/null | grep -o ifort)
+#gtest=$(shell which gfortran 2> /dev/null | grep -o gfortran)
+#itest=$(shell which ifort 2> /dev/null | grep -o ifort)
 
-outputdir=./bin
+outputdir=bin
 
-ifeq ($(gtest), gfortran)
-	FC=gfortran
-	FFLAGS=-cpp -DGNUFORT -O2 -ffree-line-length-none -c
-endif
-
-ifeq ($(itest), ifort)
-	FC=ifort
-	FFLAGS=-c -cpp
-endif
-
+#ifeq ($(gtest), gfortran)
+#	FC=gfortran
+#	FFLAGS=-cpp -DGNUFORT -O2 -ffree-line-length-none -c
+#endif
+#
+#ifeq ($(itest), ifort)
+#	FC=ifort
+#	FFLAGS=-c -cpp
+#endif
+FC=gfortran
+FFLAGS=-cpp -DGNUFORT -O2 -ffree-line-length-none -c
 #SOURCES FORTRAN Mesh(modules de maillage)
 SRCM=./Common/Identification.f90\
 ./Mesh/calCol.f90\
@@ -142,21 +143,21 @@ Main.o\
 
 build: bin msh pre solver post clean
 
-bin:
-	mkdir -p $(outputdir)
+bin:	
+	mkdir $(outputdir)
 
 #
 #Build Mesh executable
 msh:	mesh
 #Rules to Build MAIN EXECUTABLE  (dependances et regle d'execution)
 mesh:	$(OBJM) 
-		$(FC) -o $(outputdir)/mesh $(OBJM2)
+		$(FC) -static -o $(outputdir)/mesh $(OBJM2)
 #
 #Build preProc executable
 pre:	preProc
 #Rules to Build MAIN EXECUTABLE  (dependances et regle d'execution)
 preProc:	$(OBJP) 
-		$(FC) -o $(outputdir)/preProc $(OBJP2)
+		$(FC) -static -o $(outputdir)/preProc $(OBJP2)
 
 
 #
@@ -164,7 +165,7 @@ preProc:	$(OBJP)
 solver:	Nemoh
 #Rules to Build MAIN EXECUTABLE  (dependances et regle d'execution)
 Nemoh:	$(OBJS) 
-		$(FC) -o $(outputdir)/solver $(OBJS2)
+		$(FC) -static -o $(outputdir)/solver $(OBJS2)
 
 
 #
@@ -172,7 +173,7 @@ Nemoh:	$(OBJS)
 post:	postProc
 #Rules to Build MAIN EXECUTABLE  (dependances et regle d'execution)
 postProc:	$(OBJO) 
-		$(FC) -o $(outputdir)/postProc $(OBJO2)
+		$(FC) -static -o $(outputdir)/postProc $(OBJO2)
 
 # Rules for .f comiplation
 .f.o:
@@ -187,4 +188,4 @@ install: build
 
 # Remove *.o and main executable
 clean:
-	rm *.o *.mod
+	del *.o *.mod
