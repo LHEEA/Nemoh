@@ -116,7 +116,9 @@
     END DO
     READ(10,*)
     READ(10,'(A)') string
-    string=string(1:SCAN(string,'!')-1)
+    IF (SCAN(string,'!').NE.0) THEN
+        string=string(1:SCAN(string,'!')-1)
+    END IF
     READ(string,*) Nw
     ALLOCATE(w(Nw))
     READ(string,*,IOSTAT=ios) Nw,w
@@ -127,8 +129,9 @@
             w(j)=wmin+(wmax-wmin)*(j-1)/(Nw-1)
         END DO
     END IF
-    READ(10,'(A)') string
-    string=string(1:SCAN(string,'!')-1)
+    IF (SCAN(string,'!').NE.0) THEN
+        string=string(1:SCAN(string,'!')-1)
+    END IF
     READ(string,*) Nbeta
     ALLOCATE(beta(Nbeta))
     READ(string,*,IOSTAT=ios) Nbeta,beta
