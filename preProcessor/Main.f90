@@ -129,6 +129,7 @@
             w(j)=wmin+(wmax-wmin)*(j-1)/(Nw-1)
         END DO
     END IF
+    READ(10,'(A)') string
     IF (SCAN(string,'!').NE.0) THEN
         string=string(1:SCAN(string,'!')-1)
     END IF
