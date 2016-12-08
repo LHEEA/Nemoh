@@ -75,10 +75,9 @@
     REAL :: Thetamin,Thetamax
 !   Other local variables
     INTEGER :: M,N
-    INTEGER :: i,j,c,d,k,ios
+    INTEGER :: i,j,c,d,k
     INTEGER :: jrad,jint
     REAL :: PI
-    CHARACTER(LEN=256) :: string
 !
     PI=4.*ATAN(1.)
 !
@@ -115,35 +114,23 @@
         END DO
     END DO
     READ(10,*)
-    READ(10,'(A)') string
-    IF (SCAN(string,'!').NE.0) THEN
-        string=string(1:SCAN(string,'!')-1)
-    END IF
-    READ(string,*) Nw
+    READ(10,*) Nw,wmin,wmax
     ALLOCATE(w(Nw))
-    READ(string,*,IOSTAT=ios) Nw,w
-    IF (ios.LT.0) THEN
-        wmin=w(1)
-        wmax=w(2)
+    IF (Nw.GT.1) THEN
         DO j=1,Nw
             w(j)=wmin+(wmax-wmin)*(j-1)/(Nw-1)
         END DO
+    ELSE
+        w(1)=wmin
     END IF
-    READ(10,'(A)') string
-    IF (SCAN(string,'!').NE.0) THEN
-        string=string(1:SCAN(string,'!')-1)
-    END IF
-    READ(string,*) Nbeta
+    READ(10,*) Nbeta,betamin,betamax
     ALLOCATE(beta(Nbeta))
-    READ(string,*,IOSTAT=ios) Nbeta,beta
-    IF (ios.LT.0) THEN
-        betamin=beta(1)
-        betamax=beta(2)
+    IF (Nbeta.GT.1) THEN
         DO j=1,Nbeta
             beta(j)=(betamin+(betamax-betamin)*(j-1)/(Nbeta-1))*PI/180.
         END DO
     ELSE
-        beta=beta*PI/180.
+        beta(1)=betamin*PI/180.
     END IF
     READ(10,*)
     READ(10,*)
@@ -218,9 +205,9 @@
         DO c=1,Mesh%Npanels*2**Mesh%Isym
             FNDS(j,c)=NDS(c)
         END DO
-    END DO 
+    END DO
     DEALLOCATE(NDS)
-    OPEN(11,FILE=ID%ID(1:ID%lID)//'/mesh/Integration.dat')
+    OPEN(11,FILE=ID%ID(1:ID%lID)//'/mesh/Integration.dat',status='unknown')
     WRITE(11,*) Nintegration
     DO j=1,Nintegration
         WRITE(11,*) (FNDS(j,c),c=1,Mesh%Npanels*2**Mesh%Isym)
@@ -263,7 +250,7 @@
     WRITE(11,*) (Nbeta+Nradiation)*Nw
     WRITE(11,*) ((w(i),j=1,Nbeta+Nradiation),i=1,Nw)
     DO i=1,Nw
-        WRITE(11,*) (/ (/(beta(j),j=1,Nbeta)/),(-1.,j=1,Nradiation) /)
+    WRITE(11,*) (/ (/(beta(j),j=1,Nbeta)/),(-1.,j=1,Nradiation) /)
     ENDDO
     WRITE(11,*) ((Switch_Potential,j=1,Nbeta+Nradiation),i=1,Nw)
     WRITE(11,*) ((Switch_Freesurface,j=1,Nbeta+Nradiation),i=1,Nw)

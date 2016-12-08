@@ -16,7 +16,7 @@
 !
 !   Contributors list:
 !   - J. Singh
-!   - A. Babarit 
+!   - A. Babarit
 !
 !--------------------------------------------------------------------------------------
 MODULE SOLVE_BEM
@@ -63,7 +63,8 @@ CONTAINS
         W=2.*PI/T
         kwave=w*w/g
 !       Select calculation in function of water depth
-        IF ((Depth.EQ.0.).OR.(kwave*Depth.GE.20)) THEN
+!        IF ((Depth.EQ.0.).OR.(kwave*Depth.GE.20)) THEN
+        IF ((Depth.EQ.0.)) THEN
 !           Calculate wave number
             kwave=w*w/g
             AMH=kwave*Depth
@@ -89,10 +90,15 @@ CONTAINS
         END IF
 !       Assemble pressure
         DO i=1,NFA
+        if(zg(i).lt.0.)then
             PRESSURE(i)=RHO*II*W*ZPB(i) !*AIRE(i)
             IF (NSYMY.EQ.1) THEN
-                PRESSURE(i+NFA)=RHO*II*W*ZPS(i) !*AIRE(i)    
+                PRESSURE(i+NFA)=RHO*II*W*ZPS(i) !*AIRE(i)
             END IF
+            else
+            PRESSURE(i)=0.
+            PRESSURE(i+nfa)=0.
+            endif
         END DO
 !       Compute Kochin Functions
         IF (Switch_Kochin.EQ.1) THEN

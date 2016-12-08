@@ -41,8 +41,25 @@ MODULE SOLVE_BEM_INFD_DIRECT
     REAL:: W,tdepth,BETA,BJ,GM,DIJ,AKK
     REAL:: CB,SB,CP,CR,COEFB,COEFS,PCOS,PSIN
     REAL:: AKAD,AM0,SD1B,SD1S,SD2B,SD2S,PI,DPI,ZERO
+    REAL:: TIRAN,ZMAX,ZMIN
     COMPLEX:: ZOL(IMX,2),B(IMX)
 
+      ZMAX=0.
+      DO 7333 I=1,IMX
+      ZMAX=MIN(ZMAX,ZG(I))
+ 7333 CONTINUE
+      ZMAX=ABS(ZMAX)
+      ZMIN=-ZMAX
+      ZMIN=ABS(ZMIN)
+      TIRAN=0.
+      DO 7300 I=1,IMX
+      IF(ZG(I).NE.0)THEN
+      TIRAN=MAX(TIRAN,ABS(ZG(I)))
+      ENDIF
+ 7300 CONTINUE
+!      PRINT *,'TIRAN = ',TIRAN
+      ZER=-0.001*TIRAN
+!      PRINT *,'ZER = ',ZER
 
       NJJ=NSYMY+1
       PI=4.*ATAN(1.)
@@ -87,18 +104,28 @@ MODULE SOLVE_BEM_INFD_DIRECT
 	            IF(ISYM.EQ.1)THEN
 	                DO 31 IFP=1,IMX
               	        call VAVINFD(1,XG(ISP),YG(ISP),ZG(ISP),ISP,IFP)  !1/r+1/r1
-                        call VNSINFD(1,ISP,IFP,XG(ISP),YG(ISP),ZG(ISP))  
-                        PCOS=VSXP1*XN(ISP)+VSYP1*YN(ISP)+VSZP1*ZN(ISP)
+                        call VNSINFD(1,ISP,IFP,XG(ISP),YG(ISP),ZG(ISP))
+                        IF(ZG(ISP).LT.0.)THEN
+                            PCOS=VSXP1*XN(ISP)+VSYP1*YN(ISP)+VSZP1*ZN(ISP)
 	                    PSIN=VSXP2*XN(ISP)+VSYP2*YN(ISP)+VSZP2*ZN(ISP)
+                        ELSE
+                        PCOS=VSZP1
+                        PSIN=VSZP2
+                        ENDIF
 	                    ZIJ(ISP,IFP)=CMPLX(PCOS,PSIN)
 	                31 CONTINUE
 	            ELSE
 	                DO 32 IFP=1,IMX
 	                    call VAVINFD(1,XG(ISP),YG(ISP),ZG(ISP),ISP,IFP)
                         call VNSINFD(1,ISP,IFP,XG(ISP),YG(ISP),ZG(ISP))  
+                        IF(ZG(ISP).LT.0.)THEN
 	                    PCOS=VSXM1*XN(ISP)+VSYM1*YN(ISP)+VSZM1*ZN(ISP)
 	                    PSIN=VSXM2*XN(ISP)+VSYM2*YN(ISP)+VSZM2*ZN(ISP)
-	                    ZIJ(ISP,IFP)=CMPLX(PCOS,PSIN)           
+                        ELSE
+                        PCOS=VSZM1
+                        PSIN=VSZM2
+                        ENDIF
+	                    ZIJ(ISP,IFP)=CMPLX(PCOS,PSIN)
 	                32 CONTINUE
 	            ENDIF
             1 CONTINUE
@@ -123,11 +150,15 @@ MODULE SOLVE_BEM_INFD_DIRECT
     DO ISYM=1,NJJ
         BX=(-1)**(ISYM+1)
         DO I=1,IMX
+        IF(ZG(I).NE.0.)THEN
     	    IF (NSYMY.EQ.1) THEN
     	        B(I)=(NVEL(I)+BX*NVEL(I+NFA))*0.5
     	    ELSE
     	        B(I)=NVEL(I)
     	    END IF
+    	ELSE
+    	        B(I)=0.
+    	ENDIF
     	END DO
     	DO I=1,IMX
     	    ZOL(I,(ISYM-1)+1)=(0.,0.)
@@ -154,12 +185,14 @@ MODULE SOLVE_BEM_INFD_DIRECT
     ZPB=(0.,0.)
     ZPS=(0.,0.)
     DO I=1,IMX
+    IF(ZG(I).LT.0.)THEN
 	    DO J=1,IMX
 	        call VAVINFD(1,XG(I),YG(I),ZG(I),I,J)
             call VNSINFD(1,I,J,XG(I),YG(I),ZG(I)) 
 	        ZPB(I)=ZPB(I)+0.5*(ZIGB(J)*CMPLX(SP1+SM1,SP2+SM2)+ZIGS(J)*CMPLX(SP1-SM1,SP2-SM2))
 	        ZPS(I)=ZPS(I)+0.5*(ZIGS(J)*CMPLX(SP1+SM1,SP2+SM2)+ZIGB(J)*CMPLX(SP1-SM1,SP2-SM2))
         END DO
+        ENDIF
     END DO
 
 END SUBROUTINE

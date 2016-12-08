@@ -156,7 +156,7 @@
         READ(10,*)
         READ(10,*)
         READ(10,*)
-        READ(10,*) 
+        READ(10,*)
         DO c=1,Nbodies
             READ(10,*) meshfile
             tX=0.
@@ -164,13 +164,14 @@
             READ(10,*) meshfile
               lfile=LNBLNK(meshfile)
             OPEN(11,FILE=meshfile(1:lfile))
+            write(*,*)meshfile
             READ(11,*) M,N
             IF ((c.GT.1).AND.(N.NE.Mesh%Isym)) THEN
-                WRITE(*,*) ' Error: there is an inconsistency in the mesh files regarding the xOz symmetries'  
+                WRITE(*,*) ' Error: there is an inconsistency in the mesh files regarding the xOz symmetries'
                 STOP     
             ELSE
                 Mesh%Isym=N
-            END IF          
+            END IF
             READ(10,*) M,N
             DO i=1,M
                 READ(11,*) d,(Mesh%X(j,Npoints+i),j=1,3)
