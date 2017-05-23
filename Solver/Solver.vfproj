@@ -42,12 +42,13 @@
 		<File RelativePath=".\Core\COMPUTE_POTENTIAL_DOMAIN.f90"/>
 		<File RelativePath=".\Core\DEALLOCATE_DATA.f90"/>
 		<File RelativePath=".\Core\ELEMENTARY_FNS.f90"/>
+		<File RelativePath=".\Core\FIC_COM.F90"/>
 		<File RelativePath=".\Core\INITIALIZATION.f90"/>
 		<File RelativePath=".\Core\M_SOLVER.f90"/>
 		<File RelativePath=".\Core\OUTPUT.f90"/>
 		<File RelativePath=".\Core\PREPARE_MESH.f90"/>
-		<File RelativePath=".\Core\SOLVE_BEM.f90"/>
+		<File RelativePath=".\Core\SOLVE_BEM.F90"/>
 		<File RelativePath=".\Core\SOLVE_BEM_FD_DIRECT.f90"/>
 		<File RelativePath=".\Core\SOLVE_BEM_INFD_DIRECT.f90"/></Filter>
-		<File RelativePath=".\NEMOH.f90"/></Filter></Files>
+		<File RelativePath=".\NEMOH.F90"/></Filter></Files>
 	<Globals/></VisualStudioProject>
