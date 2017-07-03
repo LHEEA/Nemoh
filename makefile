@@ -1,15 +1,21 @@
-# makefile written by Christophe Peyrard from EDF R&D
-# extended to OS X by Yi-Hsiang Hu & Eliot Quin from NREL
+# Makefile written by Christophe Peyrard from EDF R&D
+# Extended to OS X by Yi-Hsiang Hu & Eliot Quin from NREL
+# Clean up by Matthieu Ancellin (only tested with gfortran on Linux for the moment)
 
-#COMPILATEUR
+# Compiler
 gtest=$(shell which gfortran 2> /dev/null | grep -o gfortran)
 itest=$(shell which ifort 2> /dev/null | grep -o ifort)
+# M.A.: this test does not work by me...
 
-outputdir=./bin
+MOD_DIR=/tmp/
 
 ifeq ($(gtest), gfortran)
 	FC=gfortran
-	FFLAGS=-cpp -DGNUFORT -O2 -ffree-line-length-none -c
+	FFLAGS=  -c                                     # No linker (yet)
+	FFLAGS+= -g                                     # Add extra indormations for debugging
+	FFLAGS+= -O2                                    # Optimization level
+	FFLAGS+= -J$(MOD_DIR)                           # Where to put .mod files
+	FFLAGS+= -cpp -DGNUFORT -ffree-line-length-none # Run preprocessor
 endif
 
 ifeq ($(itest), ifort)
@@ -17,174 +23,174 @@ ifeq ($(itest), ifort)
 	FFLAGS=-c -cpp
 endif
 
-#SOURCES FORTRAN Mesh(modules de maillage)
+# Output directory
+outputdir=./bin
+
+# Default rule: build all
+.PHONY: all clean_all remake
+all:		mesh preProc solver postProc
+
+clean_all:	clean_mesh clean_preProc clean_solver clean_postProc
+			@rm -f $(MOD_DIR)/*.mod
+
+remake:		clean_all all
+
+# Rule to compile f90 file
+%.o:	%.f90
+		@$(FC) $(FFLAGS) $< -o $@
+
+##################
+#  Meshing tool  #
+##################
+
+# Sources (relative to DIRM)
 SRCM=./Common/Identification.f90\
 ./Mesh/calCol.f90\
 ./Mesh/coque.f90\
 ./Mesh/ExMaillage.f90\
 ./Mesh/hydre.f90\
 ./Mesh/Mailleur.f90\
-./Mesh/mesh.f90\
+./Mesh/mesh.f90
 
-# LISTE DES .o preProc
-#TRANSFORME f90 en o  
 OBJM=$(SRCM:.f90=.o)
 
-#Liste pour transformer ./*/*.o en .o dans le OBJP (cf Yoann pour automatisation)  
-OBJM2=Identification.o\
-calCol.o\
-coque.o\
-ExMaillage.o\
-hydre.o\
-Mailleur.o\
-mesh.o\
+# Rules to build
+mesh:		$(OBJM)
+			@test -d $(outputdir) || mkdir $(outputdir)
+			@$(FC) -o $(outputdir)/mesh $(OBJM)
+			@echo "Meshing tool compilation successful!"
 
-#SOURCES FORTRAN preProc(modules de preprocessing)
-SRCP=./Common/Identification.f90\
+clean_mesh:
+			@rm -f $(OBJM)
+			@rm -f $(outputdir)/mesh
+
+###################
+#  Pre-processor  #
+###################
+
+# Sources
+SRCP=./Common/Constants.f90\
+./Common/Elementary_functions.f90\
+./Common/Identification.f90\
 ./Common/Environment.f90\
 ./preProcessor/Mesh.f90\
 ./preProcessor/BodyConditions.f90\
 ./preProcessor/Integration.f90\
-./preProcessor/Main.f90\
+./preProcessor/Main.f90
 
-# LISTE DES .o preProc
-#TRANSFORME f90 en o  
 OBJP=$(SRCP:.f90=.o)
 
-#Liste pour transformer ./*/*.o en .o dans le OBJP (cf Yoann pour automatisation)  
-OBJP2=Identification.o\
-Environment.o\
-Mesh.o\
-BodyConditions.o\
-Integration.o\
-Main.o\
+# Rules to build
+preProc:	$(OBJP)
+			@test -d $(outputdir) || mkdir $(outputdir)
+			@$(FC) -o $(outputdir)/preProc $(OBJP)
+			@echo "Preprocessor compilation successful!"
 
+clean_preProc:
+			@rm -f $(OBJP)
+			@rm -f $(outputdir)/preProc
 
-#SOURCES FORTRAN Solver(modules de preprocessing)
-SRCS=./Solver/Core/COM_VAR.f90\
+############
+#  Solver  #
+############
+
+# Sources
+SRCS=./Common/Constants.f90\
+./Common/Elementary_functions.f90\
+./Common/Bodyconditions.f90\
 ./Common/Environment.f90\
-./Common/Identification.f90\
 ./Common/Mesh.f90\
-./Solver/Core/Bodyconditions.f90\
-./Solver/Core/PREPARE_MESH.f90\
-./Solver/Core/INITIALIZATION.f90\
+./Common/Face.f90\
 ./Solver/Core/OUTPUT.f90\
-./Solver/Core/ELEMENTARY_FNS.f90\
 ./Solver/Core/M_SOLVER.f90\
-./Solver/Core/ALLOCATE_DATA.f90\
-./Solver/Core/COMPUTE_GREEN_INFD.f90\
-./Solver/Core/SOLVE_BEM_INFD_DIRECT.f90\
-./Solver/Core/COMPUTE_GREEN_FD.f90\
-./Solver/Core/SOLVE_BEM_FD_DIRECT.f90\
-./Solver/Core/SOLVE_BEM.f90\
-./Solver/Core/COMPUTE_KOCHIN.f90\
-./Solver/Core/COMPUTE_GREEN_FREESURFACE.f90\
-./Solver/Core/COMPUTE_POTENTIAL_DOMAIN.f90\
-./Solver/NEMOH.f90\
-./Solver/Core/DEALLOCATE_DATA.f90\
-#./Solver/Core/SOLVE_BEM_FD_ITERATIVE.f90
-#./Solver/Core/SOLVE_BEM_INFD_ITERATIVE.f90
+./Solver/Core/INITIALIZE_GREEN_2.f90\
+./Solver/Core/GREEN_1.f90\
+./Solver/Core/GREEN_2.f90\
+./Solver/Core/SOLVE_BEM_DIRECT.f90\
+./Solver/Core/KOCHIN.f90\
+./Solver/Core/FREESURFACE.f90\
+./Solver/Core/FORCES.f90\
+./Solver/NEMOH.f90
 
-
-# LISTE DES .o preProc
-#TRANSFORME f90 en o  
 OBJS=$(SRCS:.f90=.o)
 
-#Liste pour transformer ./*/*.o en .o dans le OBJS (cf Yoann pour automatisation)  
-OBJS2=COM_VAR.o\
-Environment.o\
-Identification.o\
-Mesh.o\
-Bodyconditions.o\
-PREPARE_MESH.o\
-INITIALIZATION.o\
-OUTPUT.o\
-ELEMENTARY_FNS.o\
-M_SOLVER.o\
-ALLOCATE_DATA.o\
-COMPUTE_GREEN_INFD.o\
-SOLVE_BEM_INFD_DIRECT.o\
-COMPUTE_GREEN_FD.o\
-SOLVE_BEM_FD_DIRECT.o\
-SOLVE_BEM.o\
-COMPUTE_KOCHIN.o\
-COMPUTE_GREEN_FREESURFACE.o\
-COMPUTE_POTENTIAL_DOMAIN.o\
-NEMOH.o\
-DEALLOCATE_DATA.o\
-#./Solver/Core/SOLVE_BEM_FD_ITERATIVE.o
-#./Solver/Core/SOLVE_BEM_INFD_ITERATIVE.o
+# Rules to build
+solver:		$(OBJS)
+			@test -d $(outputdir) || mkdir $(outputdir)
+			@$(FC) -o $(outputdir)/solver $(OBJS)
+			@echo "Solver compilation succesful!"
 
+clean_solver:
+			@rm -f $(OBJS)
+			@rm -f $(outputdir)/solver
 
-#SOURCES FORTRAN preProc(modules de preprocessing)
-SRCO=./Common/Identification.f90\
+####################
+#  Post-processor  #
+####################
+
+# Sources
+SRCO=./Common/Constants.f90\
+./Common/Elementary_functions.f90\
+./Common/Identification.f90\
 ./Common/Environment.f90\
 ./Common/Results.f90\
 ./Common/Mesh.f90\
 ./postProcessor/Compute_RAOs.f90\
 ./postProcessor/IRF.f90\
 ./postProcessor/Plot_WaveElevation.f90\
-./postProcessor/Main.f90\
+./postProcessor/Main.f90
 
-# LISTE DES .o preProc
-#TRANSFORME f90 en o  
 OBJO=$(SRCO:.f90=.o)
 
-#Liste pour transformer ./*/*.o en .o dans le OBJP (cf Yoann pour automatisation)  
-OBJO2=Identification.o\
-Environment.o\
-Results.o\
-Mesh.o\
-Compute_RAOs.o\
-IRF.o\
-Plot_WaveElevation.o\
-Main.o\
+# Rules to build
+postProc:	$(OBJO)
+			@test -d $(outputdir) || mkdir $(outputdir)
+			@$(FC) -o $(outputdir)/postProc $(OBJO)
+			@echo "Postprocessor compilation succesful!"
 
-build: bin msh pre solver post clean
+clean_postProc:
+			@rm -f $(OBJO)
+			@rm -f $(outputdir)/postProc
 
-bin:
-	mkdir -p $(outputdir)
+################
+#  Test cases  #
+################
 
-#
-#Build Mesh executable
-msh:	mesh
-#Rules to Build MAIN EXECUTABLE  (dependances et regle d'execution)
-mesh:	$(OBJM) 
-		$(FC) -o $(outputdir)/mesh $(OBJM2)
-#
-#Build preProc executable
-pre:	preProc
-#Rules to Build MAIN EXECUTABLE  (dependances et regle d'execution)
-preProc:	$(OBJP) 
-		$(FC) -o $(outputdir)/preProc $(OBJP2)
+.PHONY: run_cylinder clean_cylinder
+run_cylinder: preProc solver postProc
+	$(MAKE) -C Verification/Cylinder/ run
 
+clean_cylinder:
+	$(MAKE) -C Verification/Cylinder/ clean
 
-#
-#Build solver executable
-solver:	Nemoh
-#Rules to Build MAIN EXECUTABLE  (dependances et regle d'execution)
-Nemoh:	$(OBJS) 
-		$(FC) -o $(outputdir)/solver $(OBJS2)
+.PHONY: run_nonsymmetrical clean_nonsymmetrical
+run_nonsymmetrical: preProc solver postProc
+	$(MAKE) -C Verification/NonSymmetrical/ run
 
+clean_nonsymmetrical:
+	$(MAKE) -C Verification/NonSymmetrical/ clean
 
-#
-#Build postProc executable
-post:	postProc
-#Rules to Build MAIN EXECUTABLE  (dependances et regle d'execution)
-postProc:	$(OBJO) 
-		$(FC) -o $(outputdir)/postProc $(OBJO2)
+.PHONY: test clean_test
+test: preProc solver postProc
+	@echo ""
+	@echo "Sphere"
+	@$(MAKE) --silent -C Verification/QuickTests/1_Sphere/                     test
+	@echo ""
+	@echo "Sphere using y-symmetry"
+	@$(MAKE) --silent -C Verification/QuickTests/2_SymmetricSphere/            test
+	@echo ""
+	@echo "Sphere in finite depth"
+	@$(MAKE) --silent -C Verification/QuickTests/3_FiniteDepthSphere/          test
+	@echo ""
+	@echo "Sphere in finite depth using y-symmetry"
+	@$(MAKE) --silent -C Verification/QuickTests/4_SymmetricFiniteDepthSphere/ test
+	@echo ""
+	@echo "Alien sphere"
+	@$(MAKE) --silent -C Verification/QuickTests/5_AlienSphere/                test
 
-# Rules for .f comiplation
-.f.o:
-	$(FC) $(FFLAGS) $<
-%.o:	%.f90
-	$(FC) $(FFLAGS) $<
-
-
-#Copy to local bin directory
-install: build
-	cp $(outputdir)/* ~/bin/
-
-# Remove *.o and main executable
-clean:
-	rm *.o *.mod
+clean_test:
+	@$(MAKE) --silent -C Verification/QuickTests/1_Sphere/                     clean
+	@$(MAKE) --silent -C Verification/QuickTests/2_SymmetricSphere/            clean
+	@$(MAKE) --silent -C Verification/QuickTests/3_FiniteDepthSphere/          clean
+	@$(MAKE) --silent -C Verification/QuickTests/4_SymmetricFiniteDepthSphere/ clean
+	@$(MAKE) --silent -C Verification/QuickTests/5_AlienSphere/                clean

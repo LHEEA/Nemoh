@@ -1,6 +1,6 @@
 !--------------------------------------------------------------------------------------
 !
-!   Copyright 2014 Ecole Centrale de Nantes, 1 rue de la Noë, 44300 Nantes, France
+!   Copyright 2014 Ecole Centrale de Nantes, 1 rue de la NoÃ«, 44300 Nantes, France
 !
 !   Licensed under the Apache License, Version 2.0 (the "License");
 !   you may not use this file except in compliance with the License.
@@ -12,18 +12,20 @@
 !   distributed under the License is distributed on an "AS IS" BASIS,
 !   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 !   See the License for the specific language governing permissions and
-!   limitations under the License. 
+!   limitations under the License.
 !
 !   Contributors list:
-!   - A. Babarit  
+!   - A. Babarit
 !
 !--------------------------------------------------------------------------------------
     SUBROUTINE Plot_WaveElevation(ID,Environment,iw,iBeta,RAOS,Results)
-!    
+!
+    USE Constants, only: PI, II
     USE MIdentification
     USE MResults
     USE MEnvironment
-!    
+    USE Elementary_functions, ONLY: CIH
+!
     IMPLICIT NONE
 !
 !   Inputs/outputs
@@ -33,21 +35,18 @@
     COMPLEX,DIMENSION(Results%Nintegration,Results%Nw,*) :: RAOs
     TYPE(TEnvironment) :: Environment
 !   Locals
-    CHARACTER*20 :: lookfor
+    CHARACTER(LEN=20) :: lookfor
     INTEGER :: Nx,Ny
     REAL :: Lx,Ly
     REAL,DIMENSION(:),ALLOCATABLE :: X,Y
     REAL :: r,theta
     COMPLEX,DIMENSION(:,:),ALLOCATABLE :: etaI,etaP,eta
-    INTEGER :: j,i,k,M,N,d,l
-    REAL :: PI
-    REAL :: w,kwave,CIH
-    COMPLEX,PARAMETER :: II=CMPLX(0.,1.)
+    INTEGER :: j,i,k,l
+    REAL :: w,kwave
     COMPLEX :: HKleft,HKright,HKochin,Potential,p,Vx,Vy,Vz
 !
-    PI=4.*ATAN(1.)
 !   Read data
-    OPEN(10,FILE=ID%ID(1:ID%lID)//'/Nemoh.cal')
+    OPEN(10,FILE=TRIM(ID%ID)//'/Nemoh.cal')
     READ(10,'(A20)') lookfor
     DO WHILE (lookfor.NE.'--- Post processing ')
         READ(10,'(A20)') lookfor
@@ -82,7 +81,7 @@
             CALL Compute_Wave(kwave,w,Results%beta(iBeta),X(i),Y(j),0.,Potential,p,Vx,Vy,Vz,Environment)
             EtaI(i,j)=1./Environment%G*II*w*Potential
             HKleft=0.
-            HKright=0.                
+            HKright=0.
             DO l=1,Results%Nradiation
                 HKleft=HKleft+RAOs(l,iw,iBeta)*Results%HKochinRadiation(iw,l,k)
                 HKright=HKright+RAOs(l,iw,iBeta)*Results%HKochinRadiation(iw,l,k+1)
@@ -95,11 +94,11 @@
             ELSE
                 Potential=0.
             END IF
-            EtaP(i,j)=1./Environment%G*II*w*Potential 
+            EtaP(i,j)=1./Environment%G*II*w*Potential
             Eta(i,j)=EtaI(i,j)+EtaP(i,j)
         END DO
     END DO
-    OPEN(10,FILE=ID%ID(1:ID%lID)//'/results/WaveField.tec')
+    OPEN(10,FILE=TRIM(ID%ID)//'/results/WaveField.tec')
     WRITE(10,'(A)') 'VARIABLES="X" "Y" "etaI_C" "etaI_S" "etaP_C" "etaC_S" "etaI_C+etaP_C" "etaI_S+etaI_P" "|etaP|" "|etaI+etaP|"'
     WRITE(10,'(A,E14.7,A,I6,A,I6,A)') 'ZONE t="Wave frequency - w =',w,'",N=',Nx*Ny,', E=',(Nx-1)*(Ny-1),' , F=FEPOINT,ET=QUADRILATERAL'
     DO i=1,Nx
@@ -110,25 +109,25 @@
     DO i=1,Nx-1
         DO j=1,Ny-1
             WRITE(10,'(I5,3(2X,I5))') j+(i-1)*Ny,j+i*Ny,j+1+i*Ny,j+1+(i-1)*Ny
-		END DO  
-    END DO     
+        END DO
+    END DO
     CLOSE(10)
     DEALLOCATE(X,Y,etaI,etaP,eta)
 !
     END SUBROUTINE Plot_WaveElevation
-!   
-    SUBROUTINE Initialize_Plot_WaveElevation(Switch_Plot_WaveElevation,namefile)   
-    IMPLICIT NONE	    
-    CHARACTER*(*) :: namefile
-    CHARACTER*20 :: lookfor
-    CHARACTER*80 :: discard
+!
+    SUBROUTINE Initialize_Plot_WaveElevation(Switch_Plot_WaveElevation,namefile)
+    IMPLICIT NONE
+    CHARACTER(LEN=*) :: namefile
+    CHARACTER(LEN=20) :: lookfor
+    CHARACTER(LEN=80) :: discard
     INTEGER :: i
-    REAL :: Switch_Plot_WaveElevation
+    REAL :: Switch_Plot_WaveElevation ! Unused?
     OPEN(10,FILE=namefile)
     READ(10,'(A20)') lookfor
     DO WHILE (lookfor.NE.'--- Post processing ')
         READ(10,'(A20,A)') lookfor,discard
-    END DO    
+    END DO
     DO i=1,3
         READ(10,*)
     END DO

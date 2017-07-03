@@ -1,6 +1,6 @@
 !--------------------------------------------------------------------------------------
 !
-!   Copyright 2014 Ecole Centrale de Nantes, 1 rue de la Noë, 44300 Nantes, France
+!   Copyright 2014 Ecole Centrale de Nantes, 1 rue de la NoÃ«, 44300 Nantes, France
 !
 !   Licensed under the Apache License, Version 2.0 (the "License");
 !   you may not use this file except in compliance with the License.
@@ -12,10 +12,10 @@
 !   distributed under the License is distributed on an "AS IS" BASIS,
 !   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 !   See the License for the specific language governing permissions and
-!   limitations under the License. 
+!   limitations under the License.
 !
 !   Contributors list:
-!   - A. Babarit / Ecole Centrale de Nantes 
+!   - A. Babarit / Ecole Centrale de Nantes
 !   - C. Peyrard / EDF R&D
 !
 !--------------------------------------------------------------------------------------
@@ -34,7 +34,7 @@
         INTEGER :: Ntheta
         REAL,DIMENSION(:),ALLOCATABLE :: Theta
         COMPLEX,DIMENSION(:,:,:),ALLOCATABLE :: HKochinDiffraction
-        COMPLEX,DIMENSION(:,:,:),ALLOCATABLE :: HKochinRadiation   
+        COMPLEX,DIMENSION(:,:,:),ALLOCATABLE :: HKochinRadiation
     END TYPE TResults
 !
     CONTAINS
@@ -52,15 +52,15 @@
         ALLOCATE(Results%w(Nw),Results%IndxForce(Nintegration,3),Results%beta(Nbeta),Results%IndxRadiation(Nintegration,3))
         ALLOCATE(Results%DiffractionForce(Nw,Nbeta,Nintegration),Results%FroudeKrylovForce(Nw,Nbeta,Nintegration),Results%AddedMass(Nw,Nradiation,Nintegration),Results%RadiationDamping(Nw,Nradiation,Nintegration))
         Results%Ntheta=Ntheta
-        IF (Results%Ntheta.GT.0) THEN            
+        IF (Results%Ntheta.GT.0) THEN
             ALLOCATE(Results%Theta(Ntheta),Results%HKochinDiffraction(Nw,Nbeta,Ntheta),Results%HKochinRadiation(Nw,Nradiation,Ntheta))
         END IF
         END SUBROUTINE CreateTResults
-!       --- 
+!       ---
         SUBROUTINE CopyTResults(ResultsTarget,ResultsSource)
         IMPLICIT NONE
         INTEGER :: i,j,k
-        TYPE(TResults) :: ResultsTarget,ResultsSource      
+        TYPE(TResults) :: ResultsTarget,ResultsSource
         CALL CreateTResults(ResultsTarget,ResultsSource%Nw,ResultsSource%Nbeta,ResultsSource%Nradiation,ResultsSource%Nintegration,ResultsSource%Ntheta)
         DO i=1,ResultsTarget%Nw
             ResultsTarget%w(i)=ResultsSource%w(i)
@@ -91,10 +91,10 @@
         DO k=1,ResultsTarget%Ntheta
             ResultsTarget%Theta(k)=ResultsSource%Theta(k)
             DO j=1,ResultsTarget%Nw
-                DO i=1,ResultsTarget%Nbeta               
+                DO i=1,ResultsTarget%Nbeta
                     ResultsTarget%HKochinDiffraction(j,i,k)=ResultsSource%HKochinDiffraction(j,i,k)
                 END DO
-                DO i=1,ResultsTarget%Nradiation              
+                DO i=1,ResultsTarget%Nradiation
                     ResultsTarget%HKochinRadiation(j,i,k)=ResultsSource%HKochinRadiation(j,i,k)
                 END DO
             END DO
@@ -102,12 +102,11 @@
         END SUBROUTINE CopyTResults
 !       ---
         SUBROUTINE ReadTResults(Results,namefile,nameindex,namefileFK)
-        IMPLICIT NONE	    
+        IMPLICIT NONE
         TYPE(TResults) :: Results
-        CHARACTER*(*) :: namefile,nameindex,namefileFK
+        CHARACTER(LEN=*) :: namefile,nameindex,namefileFK
         INTEGER :: Nw,Nbeta,Nradiation,Nintegration,Ntheta
         INTEGER :: i,j,k,c
-        REAL :: discard,amplitude,phase
         REAL,DIMENSION(:),ALLOCATABLE :: line
         OPEN(10,FILE=nameindex)
         READ(10,*) Nw,Nbeta,Nradiation,Nintegration,Ntheta
@@ -125,7 +124,7 @@
         READ(10,*) (Results%theta(k),k=1,Ntheta)
         CLOSE(10)
         ALLOCATE(line(2*Nw*(Nbeta+Nradiation)))
-        OPEN(10,FILE=namefile)        
+        OPEN(10,FILE=namefile)
         DO k=1,Nintegration
             READ(10,*) (line(j),j=1,2*Nw*(Nbeta+Nradiation))
             c=1
@@ -165,9 +164,9 @@
         END SUBROUTINE ReadTResults
 !       ---
         SUBROUTINE SaveTResults(Results,namedir)
-        IMPLICIT NONE	    
+        IMPLICIT NONE
         TYPE(TResults) :: Results
-        CHARACTER*(*) :: namedir
+        CHARACTER(LEN=*) :: namedir
         INTEGER :: i,j,k,l
         REAL :: PI
         PI=4.*ATAN(1.0)
@@ -203,7 +202,7 @@
         DO j=1,Results%Nbeta
             WRITE(10,'(A,F7.3,A,I6,A)') 'Zone t="Diffraction force - beta = ',Results%beta(j)*180./(4.*ATAN(1.0)),' deg",I=',Results%Nw,',F=POINT'
             DO i=1,Results%Nw
-!				Adrien Combourieu: in ExcitationForce.tec, the phase is given in radians.
+!       Adrien Combourieu: in ExcitationForce.tec, the phase is given in radians.
                 WRITE(10,'(80(X,E14.7))') Results%w(i),(ABS(Results%DiffractionForce(i,j,k)+Results%FroudeKrylovForce(i,j,k)),ATAN2(IMAG(Results%DiffractionForce(i,j,k)+Results%FroudeKrylovForce(i,j,k)),REAL(Results%DiffractionForce(i,j,k)+Results%FroudeKrylovForce(i,j,k))),k=1,Results%Nintegration)
             END DO
         END DO
@@ -213,30 +212,30 @@
         OPEN(10,FILE=namedir//'/CA.dat')
         WRITE(10,'(A,I5)') 'Nb de periode : ',Results%Nw
         DO l=1,Results%Nw
-	        WRITE(10,'(F7.4)') Results%w(l)
-	        DO j=1,Results%Nradiation
-	            WRITE(10,'(6(X,E13.6))') (Results%RadiationDamping(l,j,k),k=1,Results%Nradiation)
-	        END DO
+          WRITE(10,'(F7.4)') Results%w(l)
+          DO j=1,Results%Nradiation
+              WRITE(10,'(6(X,E13.6))') (Results%RadiationDamping(l,j,k),k=1,Results%Nradiation)
+          END DO
         END DO
         CLOSE(10)
         OPEN(10,FILE=namedir//'/CM.dat')
         WRITE(10,'(A,I5)') 'Nb de periode : ',Results%Nw
         DO l=1,Results%Nw
-	        WRITE(10,'(F7.4)') Results%w(l)
-	        DO j=1,Results%Nradiation
-	            WRITE(10,'(6(X,E13.6))') (Results%AddedMass(l,j,k),k=1,Results%Nradiation)
-	        END DO
+          WRITE(10,'(F7.4)') Results%w(l)
+          DO j=1,Results%Nradiation
+              WRITE(10,'(6(X,E13.6))') (Results%AddedMass(l,j,k),k=1,Results%Nradiation)
+          END DO
         END DO
         CLOSE(10)
         OPEN(10,FILE=namedir//'/Fe.dat')
-        WRITE(10,'(A)') 'VARIABLES="Period (s)" "|Fx| (N/m)" "|Fy| (N/m)" "|Fz| (N/m)" "|Cx| (N)" "|Cy| (N)" "|Cz| (N)" "ang(Fx) (°)" "ang(Fy) (°)" "ang(Fz) (°)" "ang(Cx) (°)" "ang(Cy) (°)" "ang(Cz) (°)"'
+        WRITE(10,'(A)') 'VARIABLES="Period (s)" "|Fx| (N/m)" "|Fy| (N/m)" "|Fz| (N/m)" "|Cx| (N)" "|Cy| (N)" "|Cz| (N)" "ang(Fx) (Â°)" "ang(Fy) (Â°)" "ang(Fz) (Â°)" "ang(Cx) (Â°)" "ang(Cy) (Â°)" "ang(Cz) (Â°)"'
         WRITE(10,'(A,I2,A)') 'Zone t="Corps ',1,'"'
         DO j=1,Results%Nbeta
             WRITE(10,'(A,F7.3,A,I6,A)') 'Zone t="Diffraction force - beta = ',Results%beta(j)*180./PI,' deg",I=',Results%Nw,',F=POINT'
             DO l=1,Results%Nw
 !           Be careful of the phase referential when comparing with Aquaplus
 !           In Nemoh, PHI = -g/w * CIH CEXP(k.x), so ETA= i w/g * PHI = -i CEXP(k.x)
-!           Thus, in time domain ETA = sin(k.x -wt) 
+!           Thus, in time domain ETA = sin(k.x -wt)
 !           Forces/Phase shift in Fe.dat are given with the following form : F= Force * sin(-wt-phase), so a phase shift of -PI/2 is necessary
                 WRITE(10,'(F7.4,6(X,E13.6),6(X,F7.2))') Results%w(l),(ABS(Results%DiffractionForce(l,j,k)+Results%FroudeKrylovForce(l,j,k)),k=1,Results%Nintegration),  &
                                                             (180.D0/PI*( ATAN2(IMAG(Results%DiffractionForce(l,j,k)+Results%FroudeKrylovForce(l,j,k)),        &
@@ -249,13 +248,13 @@
         CLOSE(10)
 !       End of addition
         END SUBROUTINE SaveTResults
-!       --- 
+!       ---
         SUBROUTINE DeleteTResults(Results)
         IMPLICIT NONE
         TYPE(TResults) :: Results
         DEALLOCATE(Results%w,Results%beta,Results%IndxForce,Results%IndxRadiation)
         DEALLOCATE(Results%DiffractionForce,Results%FroudeKrylovForce,Results%AddedMass,Results%RadiationDamping)
         IF (Results%Ntheta.GT.0) DEALLOCATE(Results%Theta,Results%HKochinRadiation,Results%HKochinDiffraction)
-        END SUBROUTINE DeleteTResults  
+        END SUBROUTINE DeleteTResults
 !       ---
 END MODULE

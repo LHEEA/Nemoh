@@ -1,6 +1,6 @@
 !--------------------------------------------------------------------------------------
 !
-!   Copyright 2014 Ecole Centrale de Nantes, 1 rue de la Noë, 44300 Nantes, France
+!   Copyright 2014 Ecole Centrale de Nantes, 1 rue de la NoÃ«, 44300 Nantes, France
 !
 !   Licensed under the Apache License, Version 2.0 (the "License");
 !   you may not use this file except in compliance with the License.
@@ -19,104 +19,100 @@
 !
 !--------------------------------------------------------------------------------------
 MODULE MEnvironment
-! Definition of TYPE Environment
-TYPE TEnvironment
+
+  USE Elementary_functions, ONLY: CIH, SIH
+
+  IMPLICIT NONE  
+
+  ! Definition of TYPE Environment
+  TYPE TEnvironment
     REAL :: RHO         ! Sea water density
     REAL :: G           ! Gravity constant
     REAL :: Depth       ! Water depth
-    REAL :: XEFF,YEFF   ! Coordinates of point where the incident wave is measured
-END TYPE TEnvironment
-!
+    REAL :: Xeff, Yeff  ! Coordinates of point where the incident wave is measured
+  END TYPE TEnvironment
+
 CONTAINS
-!   Read Environment data from file 
-    SUBROUTINE ReadTEnvironment(Environment,file) 
-    IMPLICIT NONE  
-    TYPE(TEnvironment) :: Environment
-    CHARACTER*(*) :: file
-    OPEN(10,FILE=file)
-    READ(10,*)
-    READ(10,*) Environment%RHO
-    READ(10,*) Environment%G
-    READ(10,*) Environment%Depth
-    READ(10,*) Environment%XEFF,Environment%YEFF
-    CLOSE(10)    
-    END SUBROUTINE
-!   Calculate wave number for frequency w and given depth
-    REAL FUNCTION Wavenumber(w,Environment)
-    IMPLICIT NONE
-    REAL :: w
-    TYPE(TEnvironment) :: Environment
+
+  SUBROUTINE ReadTEnvironment(Environment, file) 
+    ! Read Environment data from file 
+
+    CHARACTER(LEN=*),   INTENT(IN)  :: file
+    TYPE(TEnvironment), INTENT(OUT) :: Environment
+
+    INTEGER :: u
+
+    OPEN(NEWUNIT=u, FILE=file, FORM='FORMATTED', STATUS='OLD')
+    READ(u,*)
+    READ(u,*) Environment%RHO
+    READ(u,*) Environment%G
+    READ(u,*) Environment%Depth
+    READ(u,*) Environment%Xeff, Environment%Yeff
+    CLOSE(u)    
+
+  END SUBROUTINE
+
+
+  REAL FUNCTION Wavenumber(w, Environment)
+    ! Calculate wave number for frequency w and given depth
+    ! To be merge with X0 on Elementary_functions.
+
+    REAL,               INTENT(IN) :: w
+    TYPE(TEnvironment), INTENT(IN) :: Environment
+
     REAL :: k0,x0,xg,xd,xc
     INTEGER,PARAMETER :: Nitemx=10000
     INTEGER :: Nite
+
     Wavenumber=w*w/Environment%g
     x0=Wavenumber*Environment%Depth
     IF ((x0.LE.20.).AND.(x0.GT.0.)) THEN
-        xg=0.
-        xd=x0
-        Nite=0
-        DO WHILE ((Nite.LT.Nitemx).AND.((x0-xg*TANH(xg))*(x0-xd*TANH(xd)).GT.0.))
-            xg=xd
-            xd=2.*xd
-            Nite=Nite+1
-        END DO
-        Nite=0
-        IF (Nite.GE.Nitemx) THEN
-            WRITE(*,*) 'Error: unable to find the wavenumber'
-            STOP
-        END IF
+      xg=0.
+      xd=x0
+      Nite=0
+      DO WHILE ((Nite.LT.Nitemx).AND.((x0-xg*TANH(xg))*(x0-xd*TANH(xd)).GT.0.))
+        xg=xd
+        xd=2.*xd
+        Nite=Nite+1
+      END DO
+      Nite=0
+      IF (Nite.GE.Nitemx) THEN
+        WRITE(*,*) 'Error: unable to find the wavenumber'
+        STOP
+      END IF
+      xc=0.5*(xd+xg)
+      DO WHILE ((Nite.LT.Nitemx).AND.(ABS(xd-xg)/ABS(xc).GE.1.0E-06))
         xc=0.5*(xd+xg)
-        DO WHILE ((Nite.LT.Nitemx).AND.(ABS(xd-xg)/ABS(xc).GE.1.0E-06))
-            xc=0.5*(xd+xg)
-            IF ((x0-xg*TANH(xg))*(x0-xc*TANH(xc)).GT.0.) THEN
-                xg=xc
-            ELSE
-                xd=xc
-            END IF
-            Nite=Nite+1
-        END DO
-        IF (Nite.GE.Nitemx) THEN
-            WRITE(*,*) 'Error: unable to find the wavenumber'
-            STOP
-        END IF  
-        Wavenumber=xc/Environment%Depth    
+        IF ((x0-xg*TANH(xg))*(x0-xc*TANH(xc)).GT.0.) THEN
+          xg=xc
+        ELSE
+          xd=xc
+        END IF
+        Nite=Nite+1
+      END DO
+      IF (Nite.GE.Nitemx) THEN
+        WRITE(*,*) 'Error: unable to find the wavenumber'
+        STOP
+      END IF  
+      Wavenumber=xc/Environment%Depth    
     END IF
-    END FUNCTION Wavenumber
-!   Calculate the complex potential, pressure and fluid velocities for a regular wave eta=sin(k*wbar-wt)
-    SUBROUTINE Compute_Wave(k,w,beta,x,y,z,Phi,p,Vx,Vy,Vz,Environment)
-    IMPLICIT NONE
+  END FUNCTION Wavenumber
+
+  SUBROUTINE Compute_Wave(k,w,beta,x,y,z,Phi,p,Vx,Vy,Vz,Environment)
+    ! Calculate the complex potential, pressure and fluid velocities for a regular wave eta=sin(k*wbar-wt)
+
     REAL :: k,w,beta,x,y,z
     COMPLEX :: Phi,p,Vx,Vy,Vz
     TYPE(TEnvironment) :: Environment
-    REAL :: wbar,CIH,SIH
+    REAL :: wbar
     COMPLEX,PARAMETER :: II=CMPLX(0.,1.)
+
     wbar=(x-Environment%XEFF)*COS(Beta)+(y-Environment%YEFF)*SIN(Beta)
     Phi=-II*Environment%g/w*CIH(k,z,Environment%Depth)*CEXP(II*k*wbar)
     p=Environment%rho*Environment%g*CIH(k,z,Environment%Depth)*CEXP(II*k*wbar)
     Vx=Environment%g/w*k*COS(beta)*CIH(k,z,Environment%Depth)*CEXP(II*k*wbar)
     Vy=Environment%g/w*k*SIN(beta)*CIH(k,z,Environment%Depth)*CEXP(II*k*wbar)
     Vz=-II*Environment%g/w*k*SIH(k,z,Environment%Depth)*CEXP(II*k*wbar)
-    END SUBROUTINE Compute_wave
+  END SUBROUTINE Compute_wave
 
 END MODULE 
-
-!   COSH(k*(z+h))/COSH(kh)
-    REAL FUNCTION CIH(k,z,h)
-    IMPLICIT NONE
-    REAL k,z,h
-    IF ((k*h.LE.20).AND.(k*h.GT.0.)) THEN
-        CIH=COSH(k*(z+h))/COSH(k*h)
-    ELSE
-        CIH=EXP(k*z)
-    ENDIF
-    END FUNCTION CIH
-!   SINH(k*(z+h))/COSH(kh)
-    REAL FUNCTION SIH(k,z,h)
-    IMPLICIT NONE
-    REAL k,z,h
-    IF ((k*h.LE.20).AND.(k*h.GT.0.)) THEN
-        SIH=SINH(k*(z+h))/COSH(k*h)
-    ELSE
-        SIH=EXP(k*z)
-    ENDIF
-    END FUNCTION SIH

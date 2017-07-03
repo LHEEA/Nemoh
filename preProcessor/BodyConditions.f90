@@ -1,6 +1,6 @@
 !--------------------------------------------------------------------------------------
 !
-!   Copyright 2014 Ecole Centrale de Nantes, 1 rue de la Noë, 44300 Nantes, France
+!   Copyright 2014 Ecole Centrale de Nantes, 1 rue de la NoÃ«, 44300 Nantes, France
 !
 !   Licensed under the Apache License, Version 2.0 (the "License");
 !   you may not use this file except in compliance with the License.
@@ -19,13 +19,17 @@
 !
 !--------------------------------------------------------------------------------------
 MODULE BodyConditions
-!
+
 IMPLICIT NONE
-!
+
 CONTAINS
+
 !-- SUBROUTINE ComputeRadiationCondition
-    SUBROUTINE ComputeRadiationCondition(Mesh,c,iCase,Direction,Axis,NVEL)  
+
+  SUBROUTINE ComputeRadiationCondition(Mesh,c,iCase,Direction,Axis,NVEL)  
+
     USE MMesh
+
     IMPLICIT NONE
     TYPE(TMesh) :: Mesh
     INTEGER :: c,iCase
@@ -33,6 +37,7 @@ CONTAINS
     COMPLEX,DIMENSION(:) :: NVEL
     REAL,DIMENSION(3) :: VEL
     INTEGER :: i
+
     SELECT CASE (iCase)    
     CASE (1)
 !       Degree of freedom is a translation      
@@ -86,10 +91,14 @@ CONTAINS
         STOP
     END SELECT
     END SUBROUTINE
+
 !-- SUBROUTINE ComputeDiffractionCondition
-    SUBROUTINE ComputeDiffractionCondition(Mesh,w,beta,Environment,PRESSURE,NVEL)
+  SUBROUTINE ComputeDiffractionCondition(Mesh,w,beta,Environment,PRESSURE,NVEL)
+    
+    USE Constants, only: PI
     USE MEnvironment
     USE MMEsh
+
     IMPLICIT NONE
 !   Inputs/outputs
     TYPE(TMesh)             :: Mesh
@@ -97,14 +106,13 @@ CONTAINS
     TYPE(TEnvironment)      :: Environment      ! Environment
     COMPLEX,DIMENSION(*)    :: PRESSURE,NVEL    ! Pressure and normal velocities on panels
 !   Locals
-    REAL :: PI,X0,CIH,SIH
     REAL :: kwaveh,kwave
     COMPLEX,PARAMETER :: II=CMPLX(0.,1.)
     REAL :: wbar
     INTEGER :: i,j
     COMPLEX :: tmp
     COMPLEX :: Phi,p,Vx,Vy,Vz
-    PI=4.*ATAN(1.) 
+
 !   Compute wavenumber
 !    kwave=w**2/Environment%g
 !    IF ((Environment%Depth.GT.0.).AND.(kwave*Environment%Depth.LE.20)) THEN    
@@ -137,46 +145,3 @@ CONTAINS
    END SUBROUTINE ComputeDiffractionCondition
 !-- 
 END MODULE
-!   PROGRAMMES AQUADYN : (15-04-85) P.GUEVEL,J-C.DAUBISSE,G.DELHOMMEAU  C
-!-- FUNCTION X0   
-    REAL FUNCTION X0(AK)
-    REAL::AK
-    INTEGER::ITOUR,IITER    
-    REAL::XS,XI,XM,PAS,EPS,VAL1,VAL2,VALM                                      
-    EPS=5.E-6                                                                 
-    ITOUR=0                                                                   
-    XI=0.                                                                     
-    XS=AK
-    VAL1= AK-XI*TANH(XI)
-    VAL2= AK-XS*TANH(XS) 
-    DO WHILE ((ITOUR.LT.1000).AND.(VAL1*VAL2.GT.0)) 
-        ITOUR=ITOUR+1 
-        XI=XS
-        XS=XS*2
-        VAL1= AK-XI*TANH(XI)
-        VAL2= AK-XS*TANH(XS) 
-    END DO  
-    IF (ITOUR.GE.1000) THEN
-        WRITE(*,*) 'Error: unable to find the wavenumber'
-        STOP
-    END IF
-    IITER=0
-    DO WHILE ((IITER.LT.1000).AND.(ABS((XS-XI)/XM).GT.EPS))     
-        IITER=IITER+1
-        XM=(XI+XS)*0.5   
-        VAL1= AK-XI*TANH(XI)
-        VALM= AK-XM*TANH(XM)
-        VAL2= AK-XS*TANH(XS)
-        IF (VAL1*VALM.GE.0.) THEN
-            XI=XM
-        ELSE
-            XS=XM
-        END IF
-    END DO  
-    IF (IITER.GE.1000) THEN
-        WRITE(*,*) 'Error: unable to find the wavenumber'
-        STOP
-    END IF  
-    X0=XM 
-    RETURN                                                                    
-    END FUNCTION
