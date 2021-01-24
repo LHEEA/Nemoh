@@ -27,10 +27,10 @@ SRCM=./Common/Identification.f90\
 ./Mesh/mesh.f90\
 
 # LISTE DES .o preProc
-#TRANSFORME f90 en o  
+#TRANSFORME f90 en o
 OBJM=$(SRCM:.f90=.o)
 
-#Liste pour transformer ./*/*.o en .o dans le OBJP (cf Yoann pour automatisation)  
+#Liste pour transformer ./*/*.o en .o dans le OBJP (cf Yoann pour automatisation)
 OBJM2=Identification.o\
 calCol.o\
 coque.o\
@@ -48,10 +48,10 @@ SRCP=./Common/Identification.f90\
 ./preProcessor/Main.f90\
 
 # LISTE DES .o preProc
-#TRANSFORME f90 en o  
+#TRANSFORME f90 en o
 OBJP=$(SRCP:.f90=.o)
 
-#Liste pour transformer ./*/*.o en .o dans le OBJP (cf Yoann pour automatisation)  
+#Liste pour transformer ./*/*.o en .o dans le OBJP (cf Yoann pour automatisation)
 OBJP2=Identification.o\
 Environment.o\
 Mesh.o\
@@ -87,10 +87,10 @@ SRCS=./Solver/Core/COM_VAR.f90\
 
 
 # LISTE DES .o preProc
-#TRANSFORME f90 en o  
+#TRANSFORME f90 en o
 OBJS=$(SRCS:.f90=.o)
 
-#Liste pour transformer ./*/*.o en .o dans le OBJS (cf Yoann pour automatisation)  
+#Liste pour transformer ./*/*.o en .o dans le OBJS (cf Yoann pour automatisation)
 OBJS2=COM_VAR.o\
 Environment.o\
 Identification.o\
@@ -127,10 +127,10 @@ SRCO=./Common/Identification.f90\
 ./postProcessor/Main.f90\
 
 # LISTE DES .o preProc
-#TRANSFORME f90 en o  
+#TRANSFORME f90 en o
 OBJO=$(SRCO:.f90=.o)
 
-#Liste pour transformer ./*/*.o en .o dans le OBJP (cf Yoann pour automatisation)  
+#Liste pour transformer ./*/*.o en .o dans le OBJP (cf Yoann pour automatisation)
 OBJO2=Identification.o\
 Environment.o\
 Results.o\
@@ -149,13 +149,13 @@ bin:
 #Build Mesh executable
 msh:	mesh
 #Rules to Build MAIN EXECUTABLE  (dependances et regle d'execution)
-mesh:	$(OBJM) 
+mesh:	$(OBJM)
 		$(FC) -o $(outputdir)/mesh $(OBJM2)
 #
 #Build preProc executable
 pre:	preProc
 #Rules to Build MAIN EXECUTABLE  (dependances et regle d'execution)
-preProc:	$(OBJP) 
+preProc:	$(OBJP)
 		$(FC) -o $(outputdir)/preProc $(OBJP2)
 
 
@@ -163,7 +163,7 @@ preProc:	$(OBJP)
 #Build solver executable
 solver:	Nemoh
 #Rules to Build MAIN EXECUTABLE  (dependances et regle d'execution)
-Nemoh:	$(OBJS) 
+Nemoh:	$(OBJS)
 		$(FC) -o $(outputdir)/solver $(OBJS2)
 
 
@@ -171,7 +171,7 @@ Nemoh:	$(OBJS)
 #Build postProc executable
 post:	postProc
 #Rules to Build MAIN EXECUTABLE  (dependances et regle d'execution)
-postProc:	$(OBJO) 
+postProc:	$(OBJO)
 		$(FC) -o $(outputdir)/postProc $(OBJO2)
 
 # Rules for .f comiplation
