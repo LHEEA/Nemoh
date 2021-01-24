@@ -155,3 +155,15 @@ docker_build:
 	-v $(shell pwd):/opt/share \
 	-w /opt/share \
 	gcc:8.2.0 /bin/bash -c "make"
+
+# Run demo with docker for linux arm64 architecture
+docker_demo:
+	docker run --rm \
+	-u $(shell id -u):$(shell id -g) \
+	-v $(shell pwd):/opt/share \
+	-w /opt/share \
+	gcc:8.2.0 /bin/bash -c \
+	"cd Verification/Cylinder && ../../bin/preProc && \
+	cd .. && ../bin/solver && \
+	../bin/postProc && \
+	ls"
