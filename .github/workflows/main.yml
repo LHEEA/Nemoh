@@ -9,4 +9,4 @@ jobs:
       uses: actions/checkout@v1
     - name: Build Nemoh programs
       id: build_nemoh
-      run: make docker_build
+      run: make docker_build docker_demo
