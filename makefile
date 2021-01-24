@@ -30,14 +30,8 @@ SRCM=./Common/Identification.f90\
 #TRANSFORME f90 en o
 OBJM=$(SRCM:.f90=.o)
 
-#Liste pour transformer ./*/*.o en .o dans le OBJP (cf Yoann pour automatisation)
-OBJM2=Identification.o\
-calCol.o\
-coque.o\
-ExMaillage.o\
-hydre.o\
-Mailleur.o\
-mesh.o\
+#Liste pour transformer ./*/*.o en .o dans le OBJP
+OBJM2:=$(subst .f90,.o,$(notdir ${SRCM}))
 
 #SOURCES FORTRAN preProc(modules de preprocessing)
 SRCP=./Common/Identification.f90\
@@ -51,14 +45,8 @@ SRCP=./Common/Identification.f90\
 #TRANSFORME f90 en o
 OBJP=$(SRCP:.f90=.o)
 
-#Liste pour transformer ./*/*.o en .o dans le OBJP (cf Yoann pour automatisation)
-OBJP2=Identification.o\
-Environment.o\
-Mesh.o\
-BodyConditions.o\
-Integration.o\
-Main.o\
-
+#Liste pour transformer ./*/*.o en .o dans le OBJP
+OBJP2:=$(subst .f90,.o,$(notdir ${SRCP}))
 
 #SOURCES FORTRAN Solver(modules de preprocessing)
 SRCS=./Solver/Core/COM_VAR.f90\
@@ -90,30 +78,8 @@ SRCS=./Solver/Core/COM_VAR.f90\
 #TRANSFORME f90 en o
 OBJS=$(SRCS:.f90=.o)
 
-#Liste pour transformer ./*/*.o en .o dans le OBJS (cf Yoann pour automatisation)
-OBJS2=COM_VAR.o\
-Environment.o\
-Identification.o\
-Mesh.o\
-Bodyconditions.o\
-PREPARE_MESH.o\
-INITIALIZATION.o\
-OUTPUT.o\
-ELEMENTARY_FNS.o\
-M_SOLVER.o\
-ALLOCATE_DATA.o\
-COMPUTE_GREEN_INFD.o\
-SOLVE_BEM_INFD_DIRECT.o\
-COMPUTE_GREEN_FD.o\
-SOLVE_BEM_FD_DIRECT.o\
-SOLVE_BEM.o\
-COMPUTE_KOCHIN.o\
-COMPUTE_GREEN_FREESURFACE.o\
-COMPUTE_POTENTIAL_DOMAIN.o\
-NEMOH.o\
-DEALLOCATE_DATA.o\
-#./Solver/Core/SOLVE_BEM_FD_ITERATIVE.o
-#./Solver/Core/SOLVE_BEM_INFD_ITERATIVE.o
+#Liste pour transformer ./*/*.o en .o dans le OBJS
+OBJS2:=$(subst .f90,.o,$(notdir ${SRCS}))
 
 
 #SOURCES FORTRAN preProc(modules de preprocessing)
@@ -130,15 +96,8 @@ SRCO=./Common/Identification.f90\
 #TRANSFORME f90 en o
 OBJO=$(SRCO:.f90=.o)
 
-#Liste pour transformer ./*/*.o en .o dans le OBJP (cf Yoann pour automatisation)
-OBJO2=Identification.o\
-Environment.o\
-Results.o\
-Mesh.o\
-Compute_RAOs.o\
-IRF.o\
-Plot_WaveElevation.o\
-Main.o\
+#Liste pour transformer ./*/*.o en .o dans le OBJP
+OBJO2:=$(subst .f90,.o,$(notdir ${SRCO}))
 
 build: bin msh pre solver post clean
 
