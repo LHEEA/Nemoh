@@ -146,7 +146,7 @@ install: build
 
 # Remove *.o and main executable
 clean:
-	rm *.o *.mod
+	@rm -f *.o *.mod
 
 # Build targets with docker for linux arm64 architecture
 docker_build:
