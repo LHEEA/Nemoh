@@ -1,3 +1,5 @@
 *.o
 *.mod
 bin
+*.dat
+*.tec
