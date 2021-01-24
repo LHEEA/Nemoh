@@ -147,3 +147,11 @@ install: build
 # Remove *.o and main executable
 clean:
 	rm *.o *.mod
+
+# Build targets with docker for linux arm64 architecture
+docker_build:
+	docker run --rm \
+	-u $(shell id -u):$(shell id -g) \
+	-v $(shell pwd):/opt/share \
+	-w /opt/share \
+	gcc:8.2.0 /bin/bash -c "make"
