@@ -148,21 +148,21 @@ install: build
 clean:
 	@rm -f *.o *.mod
 
-# Build targets with docker for linux arm64 architecture
-docker_build:
+
+DOCKER_RUN:=\
 	docker run --rm \
 	-u $(shell id -u):$(shell id -g) \
 	-v $(shell pwd):/opt/share \
 	-w /opt/share \
-	gcc:8.2.0 /bin/bash -c "make"
+	gcc:8.2.0 /bin/bash -c
+
+# Build targets with docker for linux arm64 architecture
+docker_build:
+	${DOCKER_RUN} "make"
 
 # Run demo with docker for linux arm64 architecture
 docker_demo:
-	docker run --rm \
-	-u $(shell id -u):$(shell id -g) \
-	-v $(shell pwd):/opt/share \
-	-w /opt/share \
-	gcc:8.2.0 /bin/bash -c \
+	${DOCKER_RUN} \
 	"cd Verification/Cylinder && ../../bin/preProc && \
 	cd .. && ../bin/solver && \
 	../bin/postProc && \
