@@ -1,7 +1,7 @@
 on: [push]
 
 jobs:
-  hello_world_job:
+  build_nemoh_programs_with_docker:
     runs-on: ubuntu-latest
     name: A job to build Nemoh programs
     steps:
