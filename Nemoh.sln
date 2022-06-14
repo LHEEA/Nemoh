@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31515.178
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{6989167D-11E4-40FE-8C1A-2192A86A7E90}") = "preProcessor", "preProcessor\preProcessor.vfproj", "{966A3ADA-093E-4C23-BD98-26BCF0BA061E}"
 EndProject
 Project("{6989167D-11E4-40FE-8C1A-2192A86A7E90}") = "postProcessor", "postProcessor\postProcessor.vfproj", "{8EE0EB67-9FD0-4E2A-B13B-FB9E24B2BB9B}"
@@ -34,5 +36,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {113CA8E2-1A18-49A2-AED4-00DD9413A11C}
 	EndGlobalSection
 EndGlobal

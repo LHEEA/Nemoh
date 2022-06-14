@@ -17,19 +17,35 @@
 % Copyright Ecole Centrale de Nantes 2014
 % Licensed under the Apache License, Version 2.0
 % Written by A. Babarit, LHEEA Lab.
-%
+
 function [A,B,Fe]=Nemoh(w, dir, depth)
-% Preparation du calcul
-fid=fopen('ID.dat');
-line=fgetl(fid);
-rep=fscanf(fid,'%s',1);
+
+% Open ID.dat file
+fid  = fopen('ID.dat');
+fgetl(fid);
+rep  = fscanf(fid,'%s');
 fclose('all');
+
+
+
+% Open and read Nemoh.cal file
 fid=fopen([rep,filesep,'Nemoh.cal'],'r');
 for i=1:6
-    ligne=fgetl(fid);
+    fgetl(fid);
 end
 nBodies=fscanf(fid,'%g',1);
 fclose(fid);
+
+% The following is slightly faster, but have to make sure it always works
+% tic
+% fid=fopen([rep,filesep,'Nemoh.cal'],'r');
+% nBodies=textscan(fid,'%d',1,'delimiter','\n', 'headerlines',7);
+% fclose(fid);
+% t2 = toc
+
+
+
+% Open and read Nemoh.cal file
 fid=fopen([rep,filesep,'Nemoh.cal'],'r');
 n=1;
 clear textline;
@@ -48,7 +64,7 @@ while (~feof(fid))
             if (temp(i) == '\')
                 temp2=[temp2,temp(k:i),'\'];
                 k=i+1;
-            end;            
+            end            
         end
         temp2=[temp2,temp(k:ntemp)];
         textline(n)={temp2};
@@ -63,15 +79,24 @@ while (~feof(fid))
     n=n+1;
 end
 fclose(fid);
+
+
+% Open and Write to Nemoh.cal file
 fid = fopen([rep,filesep,'Nemoh.cal'], 'w'); 
 for i=1:n-1
     fprintf(fid, [cell2mat(textline(i)),'\n']);
 end
 fclose(fid);
+
+
+% Open and write to input.txt file in .txt format
 fid=fopen([rep,filesep,'input.txt'],'wt');
 fprintf(fid,' \n 0 \n');
-status=fclose(fid);
-% Calcul des coefficients hydrodynamiques
+fclose(fid);
+
+
+
+% Calculate Hydrodynamic coefficients
 l = isunix;
 if l == 1
     fprintf('\n------ Starting NEMOH ----------- \n');
@@ -82,11 +107,17 @@ if l == 1
     system('postProc');
 else
     fprintf('\n------ Starting NEMOH ----------- \n');
-    system('.\Nemoh\preProcessor.exe');
+    %system('.\Nemoh\preProcessor.exe');
+    filepath = which('preProcessor.exe');
+    system(filepath)
     fprintf('------ Solving BVPs ------------- \n');
-    system('.\Nemoh\Solver.exe');
+    %system('.\Nemoh\Solver.exe');
+    filepath = which('Solver.exe');
+    system(filepath)
     fprintf('------ Postprocessing results --- \n');
-    system('.\Nemoh\postProcessor.exe');
+    %system('.\Nemoh\postProcessor.exe');
+    filepath = which('postProcessor.exe');
+    system(filepath)
 end
 %% Lecture des resultats CA CM Fe
 clear Periode A B Famp Fphi Fe;
