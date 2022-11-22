@@ -23,7 +23,7 @@ cd(filepath)
 % Define some additional parameters in problem data structure (pdata)
 pdata.plotdir      = mfoldername(mfilename('fullpath'),'plots');  % Plot directory
 pdata.sname        = 'Cylinder_test';                             % Directory for storage of some results from Nemoh
-%pdata.meshfilename = ''
+pdata.meshfilename = 'axisym_new';
 
 
 %% Step 2: Create a mesh 
@@ -44,11 +44,11 @@ pdata.rho      = 1000;
 pdata.g        = 9.81;
 pdata.plotflag = 1;
 pdata.meshflag = 1;
-
+pdata.nbodies  = 1;
 
 
 if pdata.meshflag
-    [Mass,Inertia,KH,XB,YB,ZB] = axiMesh(r,z,n, pdata);
+    [Mass,Inertia,KH,XB,YB,ZB] = axiMesh(r,z,n,0,0, pdata);
 end
 
 
@@ -56,7 +56,7 @@ end
 
 %% Step 3: Run NEMOH
 
-nbfreq         = 525;                                % number of calculations = # of BVP per freq * # of freq 
+nbfreq         = 10;                                % number of calculations = # of BVP per freq * # of freq 
 w              = linspace(0.04, 21,nbfreq)';         % periods from 3s to 20 s for waves
 dir            = 0;                                  % Wave direction (angle of the incident wave)
 depth          = 60;                                 % Water depth (0 for deep water)

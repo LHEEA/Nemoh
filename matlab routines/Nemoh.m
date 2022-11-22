@@ -109,14 +109,17 @@ else
     fprintf('\n------ Starting NEMOH ----------- \n');
     %system('.\Nemoh\preProcessor.exe');
     filepath = which('preProcessor.exe');
+    %filepath = 'A:\Azad\Resources\OpenWARP\source\NemohImproved\Nemoh\matlabRoutines\Nemoh\preProcessor.exe';
     system(filepath)
     fprintf('------ Solving BVPs ------------- \n');
     %system('.\Nemoh\Solver.exe');
     filepath = which('Solver.exe');
+    %filepath = 'A:\Azad\Resources\OpenWARP\source\NemohImproved\Nemoh\matlabRoutines\Nemoh\Solver.exe';
     system(filepath)
     fprintf('------ Postprocessing results --- \n');
     %system('.\Nemoh\postProcessor.exe');
     filepath = which('postProcessor.exe');
+    %filepath = 'A:\Azad\Resources\OpenWARP\source\NemohImproved\Nemoh\matlabRoutines\Nemoh\postProcessor.exe';
     system(filepath)
 end
 %% Lecture des resultats CA CM Fe

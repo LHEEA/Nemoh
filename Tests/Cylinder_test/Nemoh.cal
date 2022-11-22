@@ -1,12 +1,12 @@
 --- Environment ------------------------------------------------------------------------------------------------------------------ 
 1000.000000				! RHO 			! KG/M**3 	! Fluid specific volume 
 9.810000				! G			! M/S**2	! Gravity 
-60.000000                 ! DEPTH			! M		! Water depth
+0.                 ! DEPTH			! M		! Water depth
 0.	0.              ! XEFF YEFF		! M		! Wave measurement point
 --- Description of floating bodies -----------------------------------------------------------------------------------------------
 1				! Number of bodies
 --- Body 1 -----------------------------------------------------------------------------------------------------------------------
-Cylinder_test\mesh\axisym.dat      ! Name of mesh file
+Cylinder_test\mesh\axisym_new.dat      ! Name of mesh file
 1078 441			! Number of points and number of panels 	
 6				! Number of degrees of freedom
 1 1. 0.	0. 0. 0. 0.		! Surge
@@ -24,8 +24,8 @@ Cylinder_test\mesh\axisym.dat      ! Name of mesh file
 2 0. 0. 1. 0. 0. 0.000000		! Moment force in z direction about a point
 0				! Number of lines of additional information 
 --- Load cases to be solved -------------------------------------------------------------------------------------------------------
-525 0.040000 21.000000       ! Number of wave frequencies, Min, and Max (rad/s)
-1 0.000000 0.000000		! Number of wave directions, Min and Max (degrees)
+1	0.8	0.8		! Number of wave frequencies, Min, and Max (rad/s)
+1	0.	0.		! Number of wave directions, Min and Max (degrees)
 --- Post processing ---------------------------------------------------------------------------------------------------------------
 1	0.1	10.		! IRF 				! IRF calculation (0 for no calculation), time step and duration
 0				! Show pressure
