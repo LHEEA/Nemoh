@@ -1,0 +1,32 @@
+Hello everyone,
+
+Here are some propositions about code refactoring in the current version of Nemoh:
+
+* Making Nemoh buildable by gfortran by removing all dependences to Intel libraries (removing compiler conditional directives actually used)
+* Allow the build under Windows using the makefile (under Cygwin ?) -> may be of practical interest for some of us...
+* Merge redundant variables used across the code (by e.g. the number of mesh faces that can appear as NFA, NXX...)
+* Remove the use of the COM_VAR.f90 module that introduces number of global variables which can be seen as very bad coding practice and make the code hard to read and error prone --> remove any global variables and encapsulate this into derived data type to be passed as subroutines arguments
+* Rely on the Mesh derived type everywhere in the solver instead of copying mesh data into "Nemoh format" (basically copied into global variables of COM_VAR.f90, thus quickly breaking its usage in the subsequent code)
+* Add mesh properties (areas, normals, faces centroids, gauss points positions, distances, symmetries...) into the Mesh derived data type to be passed across the subroutines calls
+* Group related spatial data into 2D arrays to reduce signature footprint of subroutines and increase readability
+* Embed green functions variables into a derived data type
+* Embed source distribution into a derived data type
+* Embed solvers parameters into a derived data type
+* Pass whole derived type as subroutine argument instead of passing only members, selection of data should be done inside subroutine -> reduce subroutine signature arguments and increase clarity
+* Globally ventilate the code (add line breaks to delimit functional blocs of code) to enhance readability and ensure proper indentation rules across the whole code, add spaces around '=' signs everywhere and align them inside variable initialization blocs
+* Refactor variable, subroutines and derived type naming to follow a consistent naming convention across the code (convention that has to be defined and approved by the group)
+* Remove any old style FORTRAN 77 programming directives (COMMON, GOTO...)
+* Decouple I/O part and computational parts (file I/O for writing results must not appear surrounded by computations)
+* Translate remaining French messages to standard output and code comments into English
+* Switch to a Lapack dense solver for linear system resolution and solve for several second member at once instead of computing an inverse matrix, storing it and using it every time we get the same frequency (using the w_previous hack variable in COM_VAR...)
+* Merge SOLVE_BEM_IND_DIRECT.f90 and SOLVE_BEM_FD_DIRECT.f90 into one source file as most of the code is duplicated (and the algorithmic structure is identical)
+* DO NOT recompute green functions in SOLVE_BEM_XX_DIRECT.f90 to compute the potential on the boundary, it has already been done while building the influence matrix and must be stored for further usage --> potential speedup of 2 of the code !
+* Rely on a ad-hoc library for file path management, by e.g. by using flibs from Arjen Markus (specially the filedir module) and whose license is compatible with the Apache 2.0 license of Nemoh --> increasing portability
+* Remove the use of ID.dat input file which is useless (very old style programming !)
+* Increase flexibility in the file structure and in the input file naming by allowing Nemoh to accept command line arguments such as the input file Nemoh.cal, making it possible to have a central installation of Nemoh on the computer and allowing to run it any folder, without having to copy executables
+* Allow to specify a result folder name as a command line option to ease parametric computations
+* Ship Nemoh with the GRIN.QAT tabulation data file (tune a special command line option to build it)
+* Make Nemoh output software agnostic everywhere (no tecplot output files) and provide utilities to translate these 'raw' output files into software specific file formats --> for this, we could rely on the NREL work in bemio (actually, this is not strictly speaking refactoring but more feature enhancement)
+
+
+

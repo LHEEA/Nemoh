@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31515.178
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{6989167D-11E4-40FE-8C1A-2192A86A7E90}") = "preProcessor", "preProcessor\preProcessor.vfproj", "{966A3ADA-093E-4C23-BD98-26BCF0BA061E}"
+EndProject
+Project("{6989167D-11E4-40FE-8C1A-2192A86A7E90}") = "postProcessor", "postProcessor\postProcessor.vfproj", "{8EE0EB67-9FD0-4E2A-B13B-FB9E24B2BB9B}"
+EndProject
+Project("{6989167D-11E4-40FE-8C1A-2192A86A7E90}") = "Solver", "Solver\Solver.vfproj", "{64404A7B-CEED-4ECA-80DB-22D7AEF2FA2D}"
+EndProject
+Project("{6989167D-11E4-40FE-8C1A-2192A86A7E90}") = "Mesh", "Mesh\Mesh.vfproj", "{EC685050-D730-4454-9EBC-A0ECA8B0FA69}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{966A3ADA-093E-4C23-BD98-26BCF0BA061E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{966A3ADA-093E-4C23-BD98-26BCF0BA061E}.Debug|Win32.Build.0 = Debug|Win32
+		{966A3ADA-093E-4C23-BD98-26BCF0BA061E}.Release|Win32.ActiveCfg = Release|Win32
+		{966A3ADA-093E-4C23-BD98-26BCF0BA061E}.Release|Win32.Build.0 = Release|Win32
+		{8EE0EB67-9FD0-4E2A-B13B-FB9E24B2BB9B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8EE0EB67-9FD0-4E2A-B13B-FB9E24B2BB9B}.Debug|Win32.Build.0 = Debug|Win32
+		{8EE0EB67-9FD0-4E2A-B13B-FB9E24B2BB9B}.Release|Win32.ActiveCfg = Release|Win32
+		{8EE0EB67-9FD0-4E2A-B13B-FB9E24B2BB9B}.Release|Win32.Build.0 = Release|Win32
+		{64404A7B-CEED-4ECA-80DB-22D7AEF2FA2D}.Debug|Win32.ActiveCfg = Release|Win32
+		{64404A7B-CEED-4ECA-80DB-22D7AEF2FA2D}.Debug|Win32.Build.0 = Release|Win32
+		{64404A7B-CEED-4ECA-80DB-22D7AEF2FA2D}.Release|Win32.ActiveCfg = Release|Win32
+		{64404A7B-CEED-4ECA-80DB-22D7AEF2FA2D}.Release|Win32.Build.0 = Release|Win32
+		{EC685050-D730-4454-9EBC-A0ECA8B0FA69}.Debug|Win32.ActiveCfg = Debug|Win32
+		{EC685050-D730-4454-9EBC-A0ECA8B0FA69}.Debug|Win32.Build.0 = Debug|Win32
+		{EC685050-D730-4454-9EBC-A0ECA8B0FA69}.Release|Win32.ActiveCfg = Release|Win32
+		{EC685050-D730-4454-9EBC-A0ECA8B0FA69}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {113CA8E2-1A18-49A2-AED4-00DD9413A11C}
+	EndGlobalSection
+EndGlobal

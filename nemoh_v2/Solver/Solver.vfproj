@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VisualStudioProject ProjectCreator="Intel Fortran" Keyword="Console Application" Version="11.0" ProjectIdGuid="{64404A7B-CEED-4ECA-80DB-22D7AEF2FA2D}">
+	<Platforms>
+		<Platform Name="Win32"/></Platforms>
+	<Configurations>
+		<Configuration Name="Debug|Win32" OutputDirectory="F:\Codes\Nemoh\Release">
+				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" DebugInformationFormat="debugEnabled" Optimization="optimizeDisabled" Preprocess="preprocessYes" Interfaces="true" WarnInterfaces="true" Traceback="true" BoundsCheck="true" RuntimeLibrary="rtMultiThreadedDebug"/>
+				<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" GenerateDebugInformation="true" SubSystem="subSystemConsole" StackReserveSize="1000000000"/>
+				<Tool Name="VFResourceCompilerTool"/>
+				<Tool Name="VFMidlTool" SuppressStartupBanner="true"/>
+				<Tool Name="VFCustomBuildTool"/>
+				<Tool Name="VFPreLinkEventTool"/>
+				<Tool Name="VFPreBuildEventTool"/>
+				<Tool Name="VFPostBuildEventTool"/>
+				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration>
+		<Configuration Name="Release|Win32" OutputDirectory="F:\Codes\Nemoh\Release">
+				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true"/>
+				<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" SubSystem="subSystemConsole"/>
+				<Tool Name="VFResourceCompilerTool"/>
+				<Tool Name="VFMidlTool" SuppressStartupBanner="true"/>
+				<Tool Name="VFCustomBuildTool"/>
+				<Tool Name="VFPreLinkEventTool"/>
+				<Tool Name="VFPreBuildEventTool"/>
+				<Tool Name="VFPostBuildEventTool"/>
+				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration></Configurations>
+	<Files>
+		<Filter Name="Header Files" Filter="fi;fd"/>
+		<Filter Name="Resource Files" Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"/>
+		<Filter Name="Source Files" Filter="f90;for;f;fpp;ftn;def;odl;idl">
+		<Filter Name="Common files">
+		<File RelativePath="..\Common\Environment.f90"/>
+		<File RelativePath="..\Common\Identification.f90"/>
+		<File RelativePath="..\Common\Mesh.f90"/></Filter>
+		<Filter Name="Core">
+		<File RelativePath=".\Core\ALLOCATE_DATA.f90"/>
+		<File RelativePath=".\Core\BODYCONDITIONS.f90"/>
+		<File RelativePath=".\Core\COM_VAR.f90"/>
+		<File RelativePath=".\Core\COMPUTE_GREEN_FD.f90"/>
+		<File RelativePath=".\Core\COMPUTE_GREEN_FREESURFACE.f90"/>
+		<File RelativePath=".\Core\COMPUTE_GREEN_INFD.f90"/>
+		<File RelativePath=".\Core\COMPUTE_KOCHIN.f90"/>
+		<File RelativePath=".\Core\COMPUTE_POTENTIAL_DOMAIN.f90"/>
+		<File RelativePath=".\Core\DEALLOCATE_DATA.f90"/>
+		<File RelativePath=".\Core\ELEMENTARY_FNS.f90"/>
+		<File RelativePath=".\Core\INITIALIZATION.f90"/>
+		<File RelativePath=".\Core\M_SOLVER.f90"/>
+		<File RelativePath=".\Core\OUTPUT.f90"/>
+		<File RelativePath=".\Core\PREPARE_MESH.f90"/>
+		<File RelativePath=".\Core\SOLVE_BEM.f90"/>
+		<File RelativePath=".\Core\SOLVE_BEM_FD_DIRECT.f90"/>
+		<File RelativePath=".\Core\SOLVE_BEM_INFD_DIRECT.f90"/></Filter>
+		<File RelativePath=".\NEMOH.f90"/></Filter></Files>
+	<Globals/></VisualStudioProject>
